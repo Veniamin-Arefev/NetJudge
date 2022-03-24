@@ -1,11 +1,7 @@
-import imaplib
-import datetime
 from email.mime.text import MIMEText
 from typing import Union
 
 from imap_tools import MailBox, AND, OR
-
-__all__ = ['MailerUtilities']
 
 
 class MailerUtilities:
@@ -19,10 +15,11 @@ class MailerUtilities:
         msg = MIMEText(filename, 'plain', 'utf-8')
         return msg.as_string().split()[-1]
 
-    def get_uids_for_file(self, filename):
+    def get_uids_for_file(self, filename, **kwargs):
         criteria = f'HEADER Content-Disposition "{filename}"'
         criteria_encoded = f'HEADER Content-Disposition "{self.encode_mime_header_filename(filename)}"'
-        return set(self.mailbox.uids(str(OR(criteria, criteria_encoded))))
+        mails = self.mailbox.fetch(OR(criteria, criteria_encoded), **kwargs, bulk=True, headers_only=False)
+        return set(item.uid for item in mails)
 
     def get_by_filenames(self, filenames: list[str]):
         uids = []
@@ -46,10 +43,9 @@ class MailerUtilities:
 
         uids_to_move = []
         for mail in mails:
-            target_mailbox.append(mail, dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
+            target_mailbox.append(mail)
             uids_to_move.append(mail.uid)
         self.mailbox.move(uids_to_move, 'archived')
 
         if print_info and len(uids_to_move) > 0:
-            print(f'[{datetime.datetime.now().strftime("%H:%M")}] '
-                  f'A total of {len(uids_to_move)} letters have been moved.')
+            print(f'A total of {len(uids_to_move)} letters have been moved.')
