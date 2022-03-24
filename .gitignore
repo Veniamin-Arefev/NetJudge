@@ -1,3 +1,4 @@
+
 .idea/
 venv/   
 *.cfg
@@ -131,3 +132,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Zone identifier on WSL platform:
+*.Identifier

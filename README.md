@@ -10,7 +10,7 @@
 ### **Net Judge** is a check enviroment for CS MSU course [«Working with network protocols in Linux»](http://uneex.ru/LecturesCMC/LinuxNetwork2022). The system provides following workflow:
 
 ## **Workflow scheme:**
-#
+
               [TEST KITs]        [REPORTs]            
                    |                 |
                    |                 V
@@ -35,13 +35,15 @@
 - **Results** are grades for each task.
 
 ## **Dependencies:**
-#
+
 Python libs/modules:
 - `beautifulsoup4`, `re`, `textdistance`, `shlex`, `tarfile`, `configparser`
 ## **Interface:**
-#
+
+Project interface includes both [**notification table**](https://uneex.veniamin.space/) for course participants, and interactive `command line` for course commander & moderators.
+
 ## **Authors:**
-#
+
 - [Veniamin Arefev](https://github.com/Veniamin-Arefev)
 - [Okonishnikov Ariy](https://github.com/Uberariy)
 - [Dmitry Stamplevsky](https://github.com/stamplevskiyd)
