@@ -1,5 +1,8 @@
 import configparser
+import datetime
 import imaplib
+from imap_tools import MailBox
+
 from mailer_configs import *
 from mailer_utilities import *
 
@@ -22,7 +25,7 @@ ya_mailbox = connect_to_mailbox(ya_configs)
 fac_mailer_utils = MailerUtilities(fac_mailbox)
 fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox, print_info=True)
 
-print('Start IDLE mode')
+print(f'[{datetime.datetime.now().strftime("%H:%M")}] Start IDLE mode')
 
 while True:
     try:
@@ -36,12 +39,14 @@ while True:
             fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox, print_info=True)
 
     except imaplib.IMAP4.abort:
-        print('Reconnecting...')
+        print(f'[{datetime.datetime.now().strftime("%H:%M")}] Reconnecting...')
         fac_mailbox = connect_to_mailbox(fac_configs)
         ya_mailbox = connect_to_mailbox(ya_configs)
 
         fac_mailer_utils = MailerUtilities(fac_mailbox)
+        fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox, print_info=True)
+
     except KeyboardInterrupt:
-        print("Exit IDLE mode")
+        print(f'[{datetime.datetime.now().strftime("%H:%M")}] Exit IDLE mode')
         # fac_mailbox.idle.stop()
         break

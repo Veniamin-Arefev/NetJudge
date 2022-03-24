@@ -1,11 +1,12 @@
+import imaplib
 import os
 from datetime import datetime, timedelta
 from email.header import decode_header
-from imap_tools import MailBox
+
+from imap_tools import MailBox, AND
 
 from mailer_configs import *
 from mailer_utilities import *
-from table_utilities import *
 
 configs = load_configs('mailer_ya.cfg')
 
@@ -53,28 +54,3 @@ deadlines = get_deadlines(homeworks.keys(), [
     '2022-04-27',
     '2022-05-04',
 ])
-
-submitted = {name: list() for name in homeworks}
-
-mailer_utils = MailerUtilities(mailbox)
-
-mailer_names = {}
-
-for homework_name, homework_files in homeworks.items():
-    uids = mailer_utils.get_by_filenames(homework_files)
-    for mail in mailer_utils.get_by_uids(uids):
-        name = mail.headers['from'][0]
-        name, codec = decode_header(name[:name.index('<')].strip())[0]
-        if codec is not None:
-            mailer_names[mail.from_] = name.decode(codec).title()
-        else:
-            mailer_names[mail.from_] = name.title()
-
-        correct_date = datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z")
-        submitted[homework_name].append((mail.uid,
-                                         mail.from_,
-                                         correct_date,
-                                         correct_date < deadlines[homework_name]))
-
-create_html(submitted, mailer_names,
-            target_filename=configs['Output']['Path to directory'] + os.sep + configs['Output']['File name'])
