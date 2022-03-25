@@ -12,6 +12,7 @@ def translate(code):
     for letter in 'A', 'B', 'C', 'D':
         code = code.replace(f"[{letter}", f"\x1b[{letter}\x1b")
     code = code.replace('\x7f', '\x1b\x7f\x1b')
+    code = code.replace('\t', '')  # пока нет идей лучше. Надо править
     lines = re.split(r'[\r\n]', code)
     new_lines = []
     line_number = 0

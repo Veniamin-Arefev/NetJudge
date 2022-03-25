@@ -17,3 +17,10 @@ for name in file_names:
     obj_members = obj.getmembers()
     text = obj.extractfile('./IN.txt').read().decode()
     machines[machine_name + number] = Machine(machine_name, number, text)
+for machine in machines.values():
+    print('Name: ', machine.name)
+    print('devices: ', machine.devices)
+    print('routes: ', machine.ip_routes)
+    print('is_router: ', machine.is_router)
+    print()
+
