@@ -1,73 +1,57 @@
 import re
 
 
-def translate(code):
+def translate(code: str) -> (str, str):
     """Translates text with bash escape sequences to normal text
 
     Input: raw shell input
-    Return: list of commands without escape sequences
-    Leaves \x04 and \t in lines, to process them in main part
+    Return: (type of line, processed line without control sequences)
     """
 
-    for letter in 'A', 'B', 'C', 'D':
-        code = code.replace(f"[{letter}", f"\x1b[{letter}\x1b")
-    code = code.replace('\x7f', '\x1b\x7f\x1b')
-    code = code.replace('\t', '')  # пока нет идей лучше. Надо править
-    lines = re.split(r'[\r\n]', code)
-    new_lines = []
-    line_number = 0
-    for line in lines:
-        data = [elem for elem in re.split(r'\x1b', line) if elem]
-        if not data or len(data) == 0:
-            continue
-        if len(data) == 1:
-            new_lines.append(data[0])
-            line_number += 1
+
+    code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
+    new_line = ''
+    digit = ''
+    state = 'standard'
+    position = 0
+    line_type = 'input' if re.search(r'\[[\s|\S]*~\]#', code) else 'output'
+    for letter in code:
+        if state == 'standard':
+            if letter == '\x1b':
+                state = 'escape'
+            elif letter == '\x08':
+                position = max(0, position - 1)
+            else:
+                new_line = new_line[:position] + letter + new_line[position + 1:]
+                position += 1
         else:
-            current_line = ''
-            index = line_number
-            symbol_number = 0
-            for word in data:
-                if word == '[A':  # переход на предыдущую строку
-                    index -= 1
-                    if index < 0:
-                        index = len(new_lines) - 1  # вроде бы пойдет по кругу
-                        current_line = new_lines[index]
-                        symbol_number = len(current_line)
-                    else:
-                        current_line = new_lines[index]
-                        symbol_number = len(current_line)
-                elif word == '[B':  # переход на следующую строку
-                    index += 1
-                    if index >= len(new_lines):
-                        current_line = ''
-                        symbol_number = 0
-                        index = len(new_lines)
-                    else:
-                        current_line = new_lines[index]
-                        symbol_number = len(current_line)
-                elif word == '[D':  # сдвиг курсора влево
-                    symbol_number -= 1
-                    symbol_number = max(0, symbol_number)
-                elif word == '[C':  # сдвиг курсора вправо
-                    symbol_number += 1
-                    if symbol_number > len(current_line):
-                        symbol_number = len(current_line)
-                elif word == '\x7f':  # удаление символа
-                    symbol_number -= 1
-                    if symbol_number < 0:
-                        symbol_number = 0
-                    else:  # нужно, так как возможна ошибка пользователя, при которой он нажимает
-                        # del, находясь в начале
-                        # строки, перед всеми символами. Тогда ничего не удаляется
-                        current_line = current_line[:symbol_number] + \
-                                       current_line[symbol_number + 1:]
-                elif word in ('\t', '\x04'):
-                    pass
-                else:  # не ESCAPE-SEQ -> часть текста
-                    current_line = current_line[:symbol_number] + word + \
-                                   current_line[symbol_number:]
-                    symbol_number += len(word)  # заведомо не выйдет в ноль
-            new_lines.append(current_line)
-            line_number += 1
-    return new_lines
+            if letter == '[':  # начало управляющей последовательности
+                pass
+            elif '0' <= letter <= '9':
+                digit += letter
+            elif letter == 'K':
+                digit = ''
+                if not digit or (number := int(digit)) == 0:
+                    new_line = new_line[:position]
+                elif number == 1:
+                    new_line = new_line[position:]
+                    position = 0
+                else:
+                    new_line = ''
+                    position = 0
+                state = 'standard'
+            elif letter == 'P':  # удаляет символы справа
+                number = int(digit)
+                digit = ''
+                new_line = new_line[:position] + new_line[position + number:]
+                state = 'standard'
+            elif letter == '@':
+                number = int(digit)
+                digit = ''
+                new_line = new_line[:position] + chr(1234) * number + new_line[position:]
+                state = 'standard'
+            else:
+                raise ValueError()
+    if line_type == 'input':
+        new_line = re.sub(r'\w*\[[\s|\S]*~\]# ', '', new_line)  # иногда в начале бывают лишние символы
+    return line_type, new_line
