@@ -26,6 +26,7 @@ if __name__ == '__main__':
             print('Name: ', machine.name)
             print('devices: ', machine.devices)
             print('routes: ', machine.ip_routes)
+            print('vlans: ', machine.vlans)
             print('is_router: ', machine.is_router)
             print('unsupported commands: ')
             if machine.unknown_lines:

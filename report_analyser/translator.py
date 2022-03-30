@@ -15,6 +15,8 @@ def translate(code: str) -> (str, str):
     state = 'standard'
     position = 0
     line_type = 'input' if re.search(r'\[[\s|\S]*~\]#', code) else 'output'
+    if line_type == 'input':
+        code = re.sub(r'\S*\[[\s|\S]*~\]# ', '', code)  # иногда в начале бывают лишние символы
     for letter in code:
         if state == 'standard':
             if letter == '\x1b':
@@ -52,6 +54,4 @@ def translate(code: str) -> (str, str):
                 state = 'standard'
             else:
                 raise ValueError()
-    if line_type == 'input':
-        new_line = re.sub(r'\w*\[[\s|\S]*~\]# ', '', new_line)  # иногда в начале бывают лишние символы
     return line_type, new_line
