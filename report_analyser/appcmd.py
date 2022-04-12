@@ -1,11 +1,22 @@
+"""
+appcmd.py
+=====================================
+Console
+"""
+
 import tarfile
 import sys
 import os
 import re
 import shlex
 import cmd
+import gettext
 from report_analyser.input_checker.Machine_config import Machine
 from .translator import translate
+
+'''Project l10n & i18n'''
+translation = gettext.translation('netjudge', 'po', fallback=True)
+_, ngettext = translation.gettext, translation.ngettext
 
 '''Structures to hold imported files and instructions.
 Each dict has a name of file as a key.
@@ -85,15 +96,15 @@ def Outer_semantic_check():
     # TODO: Outer_semantic_check():
 
 def print_exit_message():
-    print("\n ==[ Exiting! ]==")
+    print(_("\n ==[ Exiting! ]=="))
 
 def print_help():
     pass 
     # TODO: Add help for all the cmd variety
 
 class Repl(cmd.Cmd):
-    prompt = "[ NetJu ]:~$ "
-    print(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n")
+    prompt = _("[ NetJu ]:~$ ")
+    print(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
 
     def do_help(self, arg):
         print_help()
@@ -111,14 +122,14 @@ class Repl(cmd.Cmd):
         """This function clears all results achieved and imports made."""
         global GL_Files, GL_Instr, GL_Result_1, GL_Result_2, GL_Result_3
         GL_Files = GL_Instr = GL_Result_1 = GL_Result_2 = GL_Result_3 = dict()
-        print(" ==[ All progress is reset!! ]==\n")
+        print(_(" ==[ All progress is reset!! ]==\n"))
 
     def do_importedreports(self, arg):
         """Print imported report files"""
         if not GL_Files:
-            print("  =[ No reports imported ]=")
+            print(_("  =[ No reports imported ]="))
         else:
-            print("  =[ Imported reports: ]=")
+            print(_("  =[ Imported reports: ]="))
             for filename in GL_Files.keys():
                 print(filename, end="\t")
             print("")
@@ -126,9 +137,9 @@ class Repl(cmd.Cmd):
     def do_importedinstructions(self, arg):
         """Print imported instruction files"""
         if not GL_Instr:
-            print("  =[ No instructions imported ]=")
+            print(_("  =[ No instructions imported ]="))
         else:
-            print("  =[ Imported instructions: ]=")
+            print(_("  =[ Imported instructions: ]="))
             for filename in GL_Instr.keys():
                 print(filename, end="\t")
             print("")
@@ -141,7 +152,7 @@ class Repl(cmd.Cmd):
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
-            print("Not enough arguments")
+            print(_("Not enough arguments"))
         else:
             dir_paths = args[0:]
             import_files(dir_paths)            
@@ -156,7 +167,7 @@ class Repl(cmd.Cmd):
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
-            print("Not enough arguments")
+            print(_("Not enough arguments"))
         else:
             dir_paths = args[0:]
             import_instructions(dir_paths)   
@@ -180,30 +191,30 @@ class Repl(cmd.Cmd):
             steps = 3
         else: 
             if args[0] not in ["1", "2", "3",]:
-                print("Wrong number of steps to be done")
+                print(_("Wrong number of steps to be done: {}").format(args[0]))
                 steps = 0
             else:
                 steps = int(arg[0])
         if not GL_Files.keys():
             steps = min(steps, 0)
-            print('''No report files imported! => No steps would be done!
-    Use \'addf REPORT_FILES_DIR\'''')
+            print(_('''No report files imported! => No steps would be done!
+    Use \'addf REPORT_FILES_DIR\''''))
         if not GL_Instr.keys():
             steps = min(steps, 2)
-            print('''No instruction files imported! => Third step is skipped
-    Use \'addins INSTRUCTION_FILE\'''')
+            print(_('''No instruction files imported! => Third step is skipped
+    Use \'addins INSTRUCTION_FILE\''''))
 
-        print(f"  ==[ CHECK STARTS:  Going through {steps} steps ]==")
+        print(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
         if steps > 0: 
-            print(f"  =[ SYNTAX CHECK ]=")
+            print(_("  =[ SYNTAX CHECK ]="))
             Syntax_check() 
         if steps > 1: 
-            print(f"  =[ INNET SEMANTIC CHECK ]=")
+            print(_("  =[ INNET SEMANTIC CHECK ]="))
             Inner_semantic_check() 
         if steps > 2: 
-            print(f" =[ OUTER SEMANTIC CHECK ]=")
+            print(_(" =[ OUTER SEMANTIC CHECK ]="))
             Outer_semantic_check()
-        print(f"  ==[ CHECK ENDED ]==")   
+        print(_("  ==[ CHECK ENDED ]=="))   
 
     def complete_start(self, text, allcommand, beg, end):
         return [s for s in ["1", "2", "3",] if s.startswith(text)]
