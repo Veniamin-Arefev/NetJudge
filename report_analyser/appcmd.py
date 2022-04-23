@@ -13,43 +13,62 @@ import cmd
 import gettext
 from report_analyser.input_checker.Machine_config import Machine
 from .translator import translate
+from collections import defaultdict
+from termcolor import colored, cprint
 
 '''Project l10n & i18n'''
 translation = gettext.translation('netjudge', 'po', fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
-'''Structures to hold imported files and instructions.
-Each dict has a name of file as a key.
-'''
-GL_Files = dict()
+'''Cmd colors'''
+print_yellow = lambda x: cprint(x, 'yellow')
+print_green = lambda x: cprint(x, 'green')
+print_cyan = lambda x: cprint(x, 'cyan')
+print_red = lambda x: cprint(x, 'red')
+print_blue = lambda x: cprint(x, 'blue')
+
+'''Structures to hold imported files, instructions results.
+GL_Instr:
+  key = instruction name (name of file)
+  value = instruction data'''
 GL_Instr = dict()
+'''GL_Files, GL_Result_#:
+  key = participant name (if imported from dir -
+                          name of dir with reports)
+  value = python3 dictionary:
+    key = report name
+    value = participant data on this report'''
+GL_Files = defaultdict(dict)
 GL_Result_1 = dict()
 GL_Result_2 = dict()
 GL_Result_3 = dict()
 
-def import_files(dir_paths):
+def import_files_from_dir(dir_paths):
     '''Add keys to GF_Files'''
     for dir_path in dir_paths:
-        try:
-            file_names = [filename for filename in os.listdir(dir_path) if
-                          re.fullmatch(r"report.\d+.[^\.:]*", filename)] 
-        except FileNotFoundError as E:
-            print(E)
-            continue
-        for filename in file_names:
-            checkname = filename.split(".")
-            if checkname[0] != "report":
-                print(f"ERROR: Wrong file format \'{filename}\'. It should start with \'report\'!")
-                continue
+        '''Find all dirs = users'''
+        for user_dir in [dir[0] for dir in os.walk(dir_path)]:
             try:
-                checknumber = int(checkname[1])
-            except Exception as E:
-                print(f"ERROR: Wrong file format \'{filename}\'. Report number should be integer!")
+                file_names = [filename for filename in os.listdir(user_dir) if
+                            re.fullmatch(r"report.\d+.[^\.:]*", filename)] 
+            except FileNotFoundError as E:
+                print(E)
                 continue
-            GL_Files[dir_path + '/' + filename] = ""
+            for filename in file_names:
+                checkname = filename.split(".")
+                if checkname[0] != "report":
+                    print(f"ERROR: Wrong file format \'{filename}\'. It should start with \'report\'!")
+                    continue
+                try:
+                    checknumber = int(checkname[1])
+                except Exception as E:
+                    print(f"ERROR: Wrong file format \'{filename}\'. Report number should be integer!")
+                    continue
+                print(colored(user_dir, attrs=['bold']), " ", filename)
+                GL_Files[user_dir][filename] = ""
         
 
-def import_instructions(dir_paths):
+def import_instructions_from_dir(dir_paths):
     '''Add keys to GF_Instr'''
     for dir_path in dir_paths:
         try:
@@ -60,30 +79,35 @@ def import_instructions(dir_paths):
             continue
         for filename in file_names:
             checkname = ".".join(filename.split(".")[1:])
-            print(checkname)
-            for filewithpath in GL_Files.keys():
-                if checkname == filewithpath[-len(checkname):]:
-                    GL_Instr[dir_path + '/' + filename] = ""
+            for usercont in GL_Files.values():
+                for filewithpath in usercont.keys():
+                    if checkname == filewithpath[-len(checkname):]:
+                        print(colored(dir_path, attrs=['bold']), " ", filename)
+                        GL_Instr[dir_path + '/' + filename] = ""
 
 def Syntax_check():
     """Parse files & Write score in GL_Result_1"""
     machines = {}
-    for filename in GL_Files.keys():
-        # TODO: FORDIMA: Modernize this fun
-        print(filename)
-        number = filename.split(".")[-2]
-        machine_name = filename.split("/")[-1]
-        obj = tarfile.open(filename)
-        obj_members = obj.getmembers()
-        text = obj.extractfile('./OUT.txt').read().decode()
-        text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
-        lines = [translate(line) for line in text.split('\n') if line]
-        machines[machine_name + number] = Machine(machine_name, number, lines)
-    print(f'Task number: {int(number)}')
-    for machine in machines.values():
-        machine.print_log()
-    # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
-    # GL_Result_1 = ...
+    for user_dir, userfiles in GL_Files.items():
+        print("Participant: '", user_dir, "', his files:\n\t", end="")
+        for userfile in userfiles.keys():
+            # TODO: FORDIMA: Modernize this fun
+            filename = user_dir + "/" + userfile
+            print(filename)
+            number = filename.split(".")[-2]
+            machine_name = filename.split("/")[-1]
+            obj = tarfile.open(filename)
+            obj_members = obj.getmembers()
+            text = obj.extractfile('./OUT.txt').read().decode()
+            text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
+            lines = [translate(line) for line in text.split('\n') if line]
+            GL_Files[user_dir][userfile] = lines
+            machines[machine_name + number] = Machine(machine_name, number, lines)
+        print(f'Task number: {int(number)}')
+        for machine in machines.values():
+            machine.print_log()
+        # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
+        # GL_Result_1 = ...
 
 def Inner_semantic_check():
     """Write score in GL_Result_2"""
@@ -96,15 +120,15 @@ def Outer_semantic_check():
     # TODO: Outer_semantic_check():
 
 def print_exit_message():
-    print(_("\n ==[ Exiting! ]=="))
+    print_cyan(_("\n ==[ Exiting! ]=="))
 
 def print_help():
     pass 
     # TODO: Add help for all the cmd variety
 
 class Repl(cmd.Cmd):
-    prompt = _("[ NetJu ]:~$ ")
-    print(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
+    prompt = colored(_("[ NetJu ]:~$ "), 'blue')
+    print_cyan(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
 
     def do_help(self, arg):
         print_help()
@@ -122,24 +146,26 @@ class Repl(cmd.Cmd):
         """This function clears all results achieved and imports made."""
         global GL_Files, GL_Instr, GL_Result_1, GL_Result_2, GL_Result_3
         GL_Files = GL_Instr = GL_Result_1 = GL_Result_2 = GL_Result_3 = dict()
-        print(_(" ==[ All progress is reset!! ]==\n"))
+        print_cyan(_(" ==[ All progress is reset!! ]==\n"))
 
     def do_importedreports(self, arg):
         """Print imported report files"""
         if not GL_Files:
-            print(_("  =[ No reports imported ]="))
+            print_cyan(_("  =[ No reports imported ]="))
         else:
-            print(_("  =[ Imported reports: ]="))
-            for filename in GL_Files.keys():
-                print(filename, end="\t")
-            print("")
+            print_cyan(_("  =[ Imported reports: ]="))
+            for username, userfiles in GL_Files.items():
+                print("Participant: ", colored(username, attrs=['bold']), " His files:\n\t", end="")
+                for userfile in userfiles.keys():
+                    print(userfile, end="\t ")
+                print("")
 
     def do_importedinstructions(self, arg):
         """Print imported instruction files"""
         if not GL_Instr:
-            print(_("  =[ No instructions imported ]="))
+            print_cyan(_("  =[ No instructions imported ]="))
         else:
-            print(_("  =[ Imported instructions: ]="))
+            print_cyan(_("  =[ Imported instructions: ]="))
             for filename in GL_Instr.keys():
                 print(filename, end="\t")
             print("")
@@ -152,10 +178,10 @@ class Repl(cmd.Cmd):
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
-            print(_("Not enough arguments"))
+            print_red(_("Not enough arguments"))
         else:
             dir_paths = args[0:]
-            import_files(dir_paths)            
+            import_files_from_dir(dir_paths)            
 
     def do_addins(self, arg):
         """AddIns is used to add instruction files to the collection.
@@ -167,10 +193,10 @@ class Repl(cmd.Cmd):
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
-            print(_("Not enough arguments"))
+            print_red(_("Not enough arguments"))
         else:
             dir_paths = args[0:]
-            import_instructions(dir_paths)   
+            import_instructions_from_dir(dir_paths)   
 
     def do_start(self, arg):
         """Main function to start checking process. Checking steps:
@@ -190,34 +216,39 @@ class Repl(cmd.Cmd):
         if len(args) != 1:
             steps = 3
         else: 
-            if args[0] not in ["1", "2", "3",]:
+            if args[0] not in ["1", "2", "3", "regex"]:
                 print(_("Wrong number of steps to be done: {}").format(args[0]))
                 steps = 0
-            else:
+            elif args[0] not in ["regex"]:
                 steps = int(arg[0])
+            else:
+                steps = 1
         if not GL_Files.keys():
             steps = min(steps, 0)
-            print(_('''No report files imported! => No steps would be done!
-    Use \'addf REPORT_FILES_DIR\''''))
-        if not GL_Instr.keys():
+            print_yellow(_('''No report files imported! => No steps would be done!\nUse \'addf REPORT_FILES_DIR\''''))
+        if not GL_Instr.keys() and args[0] not in ["regex"]:
             steps = min(steps, 2)
-            print(_('''No instruction files imported! => Third step is skipped
-    Use \'addins INSTRUCTION_FILE\''''))
+            print_yellow(_('''No instruction files imported! => Third step is skipped\nUse \'addins INSTRUCTION_FILE\''''))
 
-        print(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
-        if steps > 0: 
-            print(_("  =[ SYNTAX CHECK ]="))
-            Syntax_check() 
-        if steps > 1: 
-            print(_("  =[ INNET SEMANTIC CHECK ]="))
-            Inner_semantic_check() 
-        if steps > 2: 
-            print(_(" =[ OUTER SEMANTIC CHECK ]="))
-            Outer_semantic_check()
-        print(_("  ==[ CHECK ENDED ]=="))   
+        if args[0] in ["regex"]:
+            '''Check with regexs'''
+            print_cyan(_("  ==[ CHECK WITH REGEXs STARTS: ]=="))
+        else:
+            '''Check with imported instructions'''
+            print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
+            if steps > 0: 
+                print_cyan(_("  =[ SYNTAX CHECK ]="))
+                Syntax_check() 
+            if steps > 1: 
+                print_cyan(_("  =[ INNET SEMANTIC CHECK ]="))
+                Inner_semantic_check() 
+            if steps > 2: 
+                print_cyan(_(" =[ OUTER SEMANTIC CHECK ]="))
+                Outer_semantic_check()
+        print_cyan(_("  ==[ CHECK ENDED ]=="))   
 
     def complete_start(self, text, allcommand, beg, end):
-        return [s for s in ["1", "2", "3",] if s.startswith(text)]
+        return [s for s in ["1", "2", "3", "regex",] if s.startswith(text)]
 
     def conclude(self, arg):
         """Function prints general result for each task number presented

@@ -1,5 +1,5 @@
 import sys
-from .appcmd import import_files, import_instructions, Repl
+from .appcmd import import_files_from_dir, import_instructions_from_dir, Repl
 import argparse
 
 arg_parser = argparse.ArgumentParser(prog='NET-Judge',
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     if (len(sys.argv) == 1):
         Repl().cmdloop()
     if (len(sys.argv) in [2, 3]):
-        import_files([sys.argv[1],])
+        import_files_from_dir([sys.argv[1],])
         if (len(sys.argv) > 2):
-            import_instructions(sys.argv[2])
+            import_instructions_from_dir(sys.argv[2])
         Repl().do_start("3")
