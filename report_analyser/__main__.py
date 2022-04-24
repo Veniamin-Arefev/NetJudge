@@ -18,7 +18,7 @@ if __name__ == '__main__':
             obj = tarfile.open(file_path + '/' + name)
             obj_members = obj.getmembers()
             text = obj.extractfile('./OUT.txt').read().decode()
-            text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
+            text = re.sub(r'\r\(', '\n(', text)  # re.split работал не совсем так, как надо
             lines = [translate(line) for line in text.split('\n') if line]
             machines[machine_name + number] = Machine(machine_name, number, lines)
         print(f'Task number: {int(number)}')
