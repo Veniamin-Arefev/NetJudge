@@ -21,18 +21,29 @@ translation = gettext.translation('netjudge', 'po', fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
 '''Cmd colors'''
-print_yellow = lambda x: cprint(x, 'yellow')
-print_green = lambda x: cprint(x, 'green')
-print_cyan = lambda x: cprint(x, 'cyan')
-print_red = lambda x: cprint(x, 'red')
-print_blue = lambda x: cprint(x, 'blue')
 
-'''Structures to hold imported files, instructions results.
-GL_Instr:
+'''  For regex'''
+print_magenta = lambda x: cprint(x, 'magenta')
+'''  For standart system output'''
+print_cyan = lambda x: cprint(x, 'cyan')
+'''  For positive user experience'''
+print_green = lambda x: cprint(x, 'green')
+'''  For negative user experience'''
+print_red = lambda x: cprint(x, 'red')
+'''  For undefined user experience'''
+print_yellow = lambda x: cprint(x, 'yellow')
+'''  Standart prompt'''
+print_blue = lambda x: cprint(x, 'blue')
+'''  Regex prompt'''
+print_magenta = lambda x: cprint(x, 'magenta')
+
+''' Global structures
+
+GL_Instr holds imported instruction files:
   key = instruction name (name of file)
   value = instruction data'''
 GL_Instr = dict()
-'''GL_Files, GL_Result_#:
+''' GL_Files, GL_Result_#:
   key = participant name (if imported from dir -
                           name of dir with reports)
   value = python3 dictionary:
@@ -42,6 +53,8 @@ GL_Files = defaultdict(dict)
 GL_Result_1 = dict()
 GL_Result_2 = dict()
 GL_Result_3 = dict()
+''' GL_Regex holds regexes used for checking'''
+GL_Regex = []
 
 def import_files_from_dir(dir_paths):
     '''Add keys to GF_Files'''
@@ -57,12 +70,12 @@ def import_files_from_dir(dir_paths):
             for filename in file_names:
                 checkname = filename.split(".")
                 if checkname[0] != "report":
-                    print(f"ERROR: Wrong file format \'{filename}\'. It should start with \'report\'!")
+                    print_red(f"ERROR: Wrong file format \'{filename}\'. It should start with \'report\'!")
                     continue
                 try:
                     checknumber = int(checkname[1])
                 except Exception as E:
-                    print(f"ERROR: Wrong file format \'{filename}\'. Report number should be integer!")
+                    print_red(f"ERROR: Wrong file format \'{filename}\'. Report number should be integer!")
                     continue
                 print(colored(user_dir, attrs=['bold']), " ", filename)
                 GL_Files[user_dir][filename] = ""
@@ -126,9 +139,53 @@ def print_help():
     pass 
     # TODO: Add help for all the cmd variety
 
+def print_help_regex():
+    pass 
+    # TODO: Add help for all the cmd variety
+
+class Repl_Regex(cmd.Cmd):
+    prompt = colored(_("[ NetJu REGEX ]:~$ "), 'magenta')
+    mode = "brief"
+
+    def do_help(self, arg):
+        print_help_regex()
+        self.lastcmd = ''
+
+    def do_addre(self, arg):
+        """Check REPORTs with REGEX"""
+        self.lastcmd = ''
+
+    def do_mode(self, arg):
+        """Modify verbosity mode"""
+        args = shlex.split(arg, comments=True)
+        if len(args) != 1:
+            print_red(_("Wrong number of arguments"))
+        else:
+            if args[0] not in ["quiet", "brief", "verbose"]:
+                print_red(_('Wrong argument. Use one of "quiet", "brief", "verbose"'))
+            else:
+                self.mode = args[0]
+                print_green(_("'{}' mode is set.").format(args[0]))
+        self.lastcmd = ''
+
+    def complete_mode(self, text, allcommand, beg, end):
+        return [s for s in ["quiet", "brief", "verbose",] if s.startswith(text)]
+
+    def do_q(self, arg):
+        """Easier exit"""
+        return True
+
+    def do_exit(self, arg):
+        return True
+    # TODO: Make cmd history recover after exiting regex mode
+
 class Repl(cmd.Cmd):
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
     print_cyan(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
+
+    def do_nothing(self, arg):
+        """Present to ease change between cmds"""
+        pass
 
     def do_help(self, arg):
         print_help()
@@ -213,42 +270,48 @@ class Repl(cmd.Cmd):
         Output: Result.
         """
         args = shlex.split(arg, comments=True)
-        if len(args) != 1:
-            steps = 3
+        if len(args) not in [0, 1]:
+            print_red(_("Wrong number of arguments"))
         else: 
-            if args[0] not in ["1", "2", "3", "regex"]:
-                print(_("Wrong number of steps to be done: {}").format(args[0]))
-                steps = 0
-            elif args[0] not in ["regex"]:
-                steps = int(arg[0])
+            if len(args) == 1:
+                if args[0] not in ["1", "2", "3", "regex", "re"]:
+                    print_yellow(_("Wrong number of steps to be done: {}").format(args[0]))
+                    steps = 0
+                elif args[0] not in ["regex", "re"]:
+                    steps = int(arg[0])
+                else:
+                    steps = 1
             else:
-                steps = 1
-        if not GL_Files.keys():
-            steps = min(steps, 0)
-            print_yellow(_('''No report files imported! => No steps would be done!\nUse \'addf REPORT_FILES_DIR\''''))
-        if not GL_Instr.keys() and args[0] not in ["regex"]:
-            steps = min(steps, 2)
-            print_yellow(_('''No instruction files imported! => Third step is skipped\nUse \'addins INSTRUCTION_FILE\''''))
+                steps = 3
+            if not GL_Files.keys():
+                steps = min(steps, 0)
+                print_yellow(_('''No report files imported! => No steps would be done!\nUse \'addf REPORT_FILES_DIR\''''))
+            if not GL_Instr.keys() and (len(args) == 0 or len(args) == 1 and args[0] not in ["regex", "re"]):
+                steps = min(steps, 2)
+                print_yellow(_('''No instruction files imported! => Third step is skipped\nUse \'addins INSTRUCTION_FILE\''''))
 
-        if args[0] in ["regex"]:
-            '''Check with regexs'''
-            print_cyan(_("  ==[ CHECK WITH REGEXs STARTS: ]=="))
-        else:
-            '''Check with imported instructions'''
-            print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
-            if steps > 0: 
-                print_cyan(_("  =[ SYNTAX CHECK ]="))
-                Syntax_check() 
-            if steps > 1: 
-                print_cyan(_("  =[ INNET SEMANTIC CHECK ]="))
-                Inner_semantic_check() 
-            if steps > 2: 
-                print_cyan(_(" =[ OUTER SEMANTIC CHECK ]="))
-                Outer_semantic_check()
-        print_cyan(_("  ==[ CHECK ENDED ]=="))   
+            if len(args) == 1 and args[0] in ["regex", "re"]:
+                '''Check with regexs'''
+                print_cyan(_("  ==[ CHECK WITH REGEXs STARTS: ]=="))
+                Repl_Regex().cmdloop()
+                '''Otherwise last cmd is called after return'''
+                self.lastcmd = 'nothing'
+            else:
+                '''Check with imported instructions'''
+                print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
+                if steps > 0: 
+                    print_cyan(_("  =[ SYNTAX CHECK ]="))
+                    Syntax_check() 
+                if steps > 1: 
+                    print_cyan(_("  =[ INNET SEMANTIC CHECK ]="))
+                    Inner_semantic_check() 
+                if steps > 2: 
+                    print_cyan(_(" =[ OUTER SEMANTIC CHECK ]="))
+                    Outer_semantic_check()
+            print_cyan(_("  ==[ CHECK ENDED ]=="))   
 
     def complete_start(self, text, allcommand, beg, end):
-        return [s for s in ["1", "2", "3", "regex",] if s.startswith(text)]
+        return [s for s in ["1", "2", "3", "regex", "re",] if s.startswith(text)]
 
     def conclude(self, arg):
         """Function prints general result for each task number presented
