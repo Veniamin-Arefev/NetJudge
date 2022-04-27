@@ -58,7 +58,9 @@ GL_Regex = []
 ''' GL_Regex holds regexes used for checking
   GL_Regex[0] = regular expression
   GL_Regex[1] = files, it is applied to'''
+RegexPlay_Regex = []
 GL_Mode = "brief"
+'''Detailability of ouput'''
 
 def import_files_from_dir(dir_paths):
     '''Add keys to GF_Files'''
@@ -120,6 +122,7 @@ def import_instructions_from_json(json_paths):
             continue
 
 def Syntax_correct():
+    # TODO: Dima's function to proceed data
     """Parse files & Write score in GL_Result_1"""
     machines = {}
     for user_dir, userfiles in GL_Files.items():
@@ -141,24 +144,23 @@ def Syntax_correct():
         for machine in machines.values():
             machine.print_log()
         # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
-        # GL_Result_1 = ...
+        # GL_Result_1 = 1    If files complete Syntax_correct() without issues
+        # GL_Result_1 = 0    Otherwise
 
-def Semantic_check():
+def Semantic_check(GFiles, GRegex, save_results):
     """Write score in GL_Result_2"""
-    #print(GL_Regex, GL_Files)
     global GL_Result_2
-    for username, reportdict in GL_Files.items():
+    for username, reportdict in GFiles.items():
         print_blue(colored(_("Checking participant '{}':").format(username), attrs=['bold']))
         for reportname, lines in reportdict.items():
             print_blue(_("\n  Checking file {}:").format(reportname))
-            regexlist = [regex for regex in GL_Regex if reportname in regex['files'] or regex['files'] == ['']]
+            regexlist = [regex for regex in GRegex if reportname in regex['files'] or regex['files'] == ['']]
             for regexind, regex in enumerate(regexlist):
                 print_cyan(_("    RE {}: '{}' ({}put).").format(regexind, regex['regex'], regex['inout']))
                 find = False
                 matchind = 0
-                #print(lines)
+                linenumber = 0
                 for lineind, line in enumerate(lines):
-                    #print(line)
                     if line[0].startswith(regex['inout']):
                         patt = re.compile(regex['regex'])
                         for match in patt.findall(line[1]):
@@ -167,19 +169,23 @@ def Semantic_check():
                             print("      "+colored(_("Match {} in line {}:").format(matchind, lineind), attrs=["bold"]))
                             linewithmatch = colored(match, "green", attrs=["underline"]).join(line[1].split(match))
                             print(_("        {}").format(colored(linewithmatch)))
+                            linenumber = lineind + 1
+                listed_results = [0, 0]
                 if not find:
-                    print_red(_("      No matches in {} lines!").format(lineind+1))
+                    print_red(_("      No matches in {} lines!").format(linenumber))
                 else:
-                    GL_Result_2[username][reportname][0] += 1
-                GL_Result_2[username][reportname][1] += 1
-            checkeq = f"{GL_Result_2[username][reportname][0]} / {GL_Result_2[username][reportname][1]}"
-            if GL_Result_2[username][reportname][0] == GL_Result_2[username][reportname][1]:
+                    listed_results[0] += 1
+                listed_results[1] += 1
+            checkeq = f"{listed_results[0]} / {listed_results[1]}"
+            if listed_results[0] == listed_results[1]:
                 checkeq = colored(checkeq, 'green')
             else:
                 checkeq = colored(checkeq, 'red')
             print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'), colored(reportname, 'blue', attrs=['bold'])))
+            if save_results:
+                for i in range(0, 2):
+                    GL_Result_2[username][reportname][i] += listed_results[i]
         print_blue("\n")
-    # TODO: Semantic_check():
 
 def print_regex_record(record):
     print(_(" Re: {}").format(colored(record['regex'], attrs=['bold'])))
@@ -203,7 +209,7 @@ def print_help_regex():
     # TODO: Add help for all the cmd variety
 
 class Repl_Regex(cmd.Cmd):
-    prompt = colored(_("[ NetJu REGEX ]:~$ "), 'magenta')
+    prompt = colored(_("[ RegexTest ]:~$ "), 'magenta')
     mode = "brief"
 
     def emptyline(self):
@@ -212,19 +218,49 @@ class Repl_Regex(cmd.Cmd):
             self.lastcmd = ""
             return self.onecmd('\n')
 
-    def do_help(self, arg):
-        print_help_regex()
-        self.lastcmd = ''
+    def do_re(self, arg):
+        """Test regex on imported reports in regextest mode.
+        Usage: re [REGEX] ['in'/'out'] {[FILE]}
+           or: re [REGEX] ['in'/'out']
 
-    def do_addre(self, arg):
-        """Check REPORTs with REGEX"""
-        self.lastcmd = ''
+        Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
+        If FILE is not set, every imported file is checked with this regex!
+        REGEX and 'in'/'out' parameters must be set!
+        
+        Note, that in 'regextest' mode, results are not saved, only displayed.
+        """
+        global RegexPlay_Regex, GL_Files
+        args = shlex.split(arg, comments=True)
+        if len(args) < 2:
+            print_red(_("Not enough arguments"))
+        elif args[1] not in ['in', 'out']:
+            print_red(_("Wrong argument {}. Use in/out.").format(args[1]))
+        else:
+            reg = args[0]
+            inout = args[1]
+            if len(args) >= 3:
+                filenames = args[2:]
+            else:
+                filenames = ['']
+            record = {'regex': reg, 'inout': inout, 'files': filenames}
+            RegexPlay_Regex.append(record)
+            print_green(_('Testing regex:'))
+            print_regex_record(record)
+            Syntax_correct()
+            print_cyan(_("  =[ CHECKING... ]="))
+            Semantic_check(GL_Files, RegexPlay_Regex, save_results=False) 
+            print_cyan(_("  ==[ CHECK ENDED ]=="))  
 
     def do_q(self, arg):
-        """Easier exit"""
+        """Easier exit from regex testing mode.
+        Usage: q
+        """
         return True
 
     def do_exit(self, arg):
+        """Exit regex testing mode.
+        Usage: exint
+        """
         return True
     # TODO: Make cmd history recover after exiting regex mode
 
@@ -234,32 +270,39 @@ class Repl(cmd.Cmd):
     lastcmd = ''
 
     def emptyline(self):
-        """Override: Called when an empty line is entered in response to the prompt."""
+        """Override: Called when an empty line is entered in response to the prompt.
+        """
         if self.lastcmd:
             self.lastcmd = ""
             return self.onecmd('\n')
 
-    def do_help(self, arg):
-        print_help()
-
     def do_q(self, arg):
-        """Easier exit"""
+        """Shorter variant of 'exit' command.
+        Usage: q
+        """
         print_exit_message()
         return True
 
     def do_exit(self, arg):
+        """Exit application. All unsaved data would be lost!
+        Usage: exit
+        """
         print_exit_message()
         return True
 
     def do_reset(self, arg):
-        """This function clears all results achieved and imports made."""
+        """This function clears all results achieved and imports made.
+        Usage: reset
+        """
         global GL_Files, GL_Result_1, GL_Result_2, GL_Regex
         GL_Files = GL_Result_1 = GL_Result_2 = defaultdict(dict)
         GL_Regex = []
         print_cyan(_(" ==[ All progress is reset!! ]==\n"))
 
     def do_importedreports(self, arg):
-        """Print imported report files"""
+        """Print imported report files.
+        Usage: impoertedreports
+        """
         if not GL_Files:
             print_cyan(_("  =[ No reports imported ]="))
         else:
@@ -271,7 +314,9 @@ class Repl(cmd.Cmd):
                 print("")
 
     def do_importedinstructions(self, arg):
-        """Print imported instruction files"""
+        """Print imported instruction files
+        Usage: importedinstructions
+        """
         if not GL_Regex:
             print_cyan(_("  =[ No instructions imported ]="))
         else:
@@ -280,10 +325,15 @@ class Repl(cmd.Cmd):
                 print_regex_record(record)
 
     def do_addrep(self, arg):
-        """AddRep is used to add files to the collection.
+        """Add files to check to the collection from 1 or more dirs.
+        Usage: addrep {[DIR]}
         
-        Input: Target directories to extract files from.
-        Output: List of imported files.
+        Scheme of directory:
+            [DIR]---[USER1]---[REPORT1]
+                  |         |
+                  |         |-[REPORT2]
+                  |
+                  |-[USER2]---[REPORT1]
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
@@ -293,12 +343,10 @@ class Repl(cmd.Cmd):
             import_files_from_dir(dir_paths)            
 
     def do_addins(self, arg):
-        """AddIns is used to add instruction files to the collection.
-        Instr. files contain regex to check if smth is present in report.
-        This information is important for the last step of checking.
+        """Add 1 or more instruction files to the regex collection.
+        Usage: addins {[FILE]}
 
-        Input: Target directories to extract instructions from.
-        Output: List of imported instruction files.
+        Instr. files contain regex to check if smth is present in report.
         """
         args = shlex.split(arg, comments=True)
         if len(args) == 0:
@@ -308,9 +356,10 @@ class Repl(cmd.Cmd):
             import_instructions_from_json(json_path)  
 
     def do_saveins(self, arg):
-        """Save regular expressions in file in json format.
+        """Save regular expressions imported in project in file in json format.
+        Usage: saveins [FILE]
 
-        Input: File path
+        If file is present, it will be overrided, otherwise, we create new file
         """
         args = shlex.split(arg, comments=True)
         if len(args) not in [1]:
@@ -325,10 +374,13 @@ class Repl(cmd.Cmd):
                 print_green(_("Success: Saved REGEXs in {}").format(args[0]))
 
     def do_addreg(self, arg):
-        """AddReg is used to add single regular expression to collection.
+        """Add a single regular expression to collection.
+        Usage: re [REGEX] ['in'/'out'] {[FILE]}
+           or: re [REGEX] ['in'/'out']
 
-        Input: REGEX, in/out, FILE1, FILE2...
-        Output: Added regexpr.
+        Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
+        If FILE is not set, every imported file is checked with this regex!
+        REGEX and 'in'/'out' parameters must be set!
         """
         global GL_Regex
         args = shlex.split(arg, comments=True)
@@ -348,17 +400,21 @@ class Repl(cmd.Cmd):
             print_green(_('Success'))
             print_regex_record(record)
 
-    def do_regexmode(self, arg):
-        """Enter regex mode"""
+    def do_regextest(self, arg):
+        """Enter regex mode and test your regex :)
+        Usage: regextest
+        """
         args = shlex.split(arg, comments=True)
-        print_cyan(_("  ==[ ENTERING REGEX CONSTRUCTOR MODE: ]=="))
+        print_cyan(_("  ==[ ENTERING REGEX TESTING MODE: ]=="))
         Repl_Regex().cmdloop()
-        print_cyan(_("  ==[ EXITING REGEX CONSTRUCTOR MODE: ]=="))
+        print_cyan(_("  ==[ EXITING REGEX TESTING MODE: ]=="))
         '''Otherwise last cmd is called after return'''
         self.lastcmd = 'nothing'
 
     def do_mode(self, arg):
-        """Modify verbosity mode"""
+        """Modify verbosity mode
+        mode ['quiet'/'brief'/'verbose']
+        """
         args = shlex.split(arg, comments=True)
         global GL_Mode
         if len(args) != 1:
@@ -376,17 +432,16 @@ class Repl(cmd.Cmd):
 
     def do_start(self, arg):
         """Main function to start checking process. Checking steps:
+        Usage: start ['1'/'2']
 
         1. Parsing & Syntax check;
-        2. Semantic check;
-        3. Outer semantic check.
+        2. Parsing & Syntax check & Semantic check.
 
         No files in collection:              # # steps done
         Files present in collection:         1 # steps done
         Instructions present in collection:  1 2 steps done
-
-        Input: Number of steps done.
-        Output: Result.
+        
+        Results are saved and can be shown with 'conclude'.
         """
         args = shlex.split(arg, comments=True)
         if len(args) not in [0, 1]:
@@ -414,15 +469,19 @@ class Repl(cmd.Cmd):
                 Syntax_correct() 
             if steps > 1: 
                 print_cyan(_("  =[ SEMANTIC CHECK ]="))
-                Semantic_check() 
+                global GL_Result_2
+                Semantic_check(GL_Files, GL_Regex, save_results=True) 
             print_cyan(_("  ==[ CHECK ENDED ]=="))   
 
     def complete_start(self, text, allcommand, beg, end):
         return [s for s in ["1", "2",] if s.startswith(text)]
 
     def do_conclude(self, arg):
-        """Function prints general result for each task number presented
-        in collection
+        """Function prints general result for each task number presented in collection.
+        Usage: conclude
+        
+        Note, that conclude accumulates all the results during application run, except
+        those made in 'regextest' mode.
         """
         print_cyan(_("  ==[ RESULTS ]=="))
         global GL_Result_1, GL_Result_2
@@ -436,4 +495,3 @@ class Repl(cmd.Cmd):
                     checkeq = colored(checkeq, 'red')
                 print_blue(_("  {}:\t{}").format(reportname, checkeq))
             print("")
-        # TODO: Make marks
