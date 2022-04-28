@@ -1,0 +1,103 @@
+# Russian translations for NetJudge.
+# Copyright (C) 2022 NetJudge Team
+# This file is distributed under the same license as the NetJudge project.
+# FIRST AUTHOR <a3.okonishnikov@mail.ru>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  1.0\n"
+"Report-Msgid-Bugs-To: a3.okonishnikov@mail.ru\n"
+"POT-Creation-Date: 2022-04-11 22:47+0300\n"
+"PO-Revision-Date: 2022-04-11 18:57+0300\n"
+"Last-Translator: @Uberariy Okonishnikov Ariy <a3.okonishnikov@mail.ru>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+#: report_analyser/appcmd.py:99
+msgid ""
+"\n"
+" ==[ Exiting! ]=="
+msgstr ""
+"\n"
+" ==[ Исход проверяльщика. ]=="
+
+#: report_analyser/appcmd.py:106
+msgid "[ NetJu ]:~$ "
+msgstr "[ ИнетДжа ]:~$ "
+
+#: report_analyser/appcmd.py:107
+msgid " ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"
+msgstr ""
+" ==[ Добро Пожаловать в ИНЕТ-ДЖАДЖ - Среда проверки задач для библиотеки "
+"iproute2! ]==\n"
+
+#: report_analyser/appcmd.py:125
+msgid " ==[ All progress is reset!! ]==\n"
+msgstr " ==[ Весь прогресс работы сброшен!! ]==\n"
+
+#: report_analyser/appcmd.py:130
+msgid "  =[ No reports imported ]="
+msgstr "  =[ Отчёты в систему не добавлены ]="
+
+#: report_analyser/appcmd.py:132
+msgid "  =[ Imported reports: ]="
+msgstr "  =[ Добавленные отчёты: ]="
+
+#: report_analyser/appcmd.py:140
+msgid "  =[ No instructions imported ]="
+msgstr "  =[ Инструкций в систему не добавлено ]="
+
+#: report_analyser/appcmd.py:142
+msgid "  =[ Imported instructions: ]="
+msgstr "  =[ Добавленные инструкции: ]="
+
+#: report_analyser/appcmd.py:155 report_analyser/appcmd.py:170
+msgid "Not enough arguments"
+msgstr "Добавить бы ещё аргументов..."
+
+#: report_analyser/appcmd.py:194
+msgid "Wrong number of steps to be done: {}"
+msgstr "Введено неправильное число шагов проверки: {}"
+
+#: report_analyser/appcmd.py:200
+msgid ""
+"No report files imported! => No steps would be done!\n"
+"    Use 'addf REPORT_FILES_DIR'"
+msgstr ""
+"Отчётов в системе нет! => Проверки не будет!\n"
+"    Используйте 'addf ДИРЕКТОРИЯ_ОТЧЕТОВ'"
+
+#: report_analyser/appcmd.py:204
+msgid ""
+"No instruction files imported! => Third step is skipped\n"
+"    Use 'addins INSTRUCTION_FILE'"
+msgstr ""
+"Инструкций в системе нет! => Пропускаем третий этап проверки!\n"
+"    Используйте 'addf ФАЙЛ_ИНСТРУКЦИЙ'"
+
+#: report_analyser/appcmd.py:207
+msgid "  ==[ CHECK STARTS:  Going through {} steps ]=="
+msgstr "  ==[ НАЧИНАЕТСЯ ПРОВЕРКА:  Нас ожидает {} этапов ]=="
+
+#: report_analyser/appcmd.py:209
+msgid "  =[ SYNTAX CHECK ]="
+msgstr "  =[ ПРОВЕРКА СИНТАКСИСА ]="
+
+#: report_analyser/appcmd.py:212
+msgid "  =[ INNET SEMANTIC CHECK ]="
+msgstr "  =[ ПРОВЕРКА СМЫСЛА ОТДЕЛЬНЫХ КОМАНД ]="
+
+#: report_analyser/appcmd.py:215
+msgid " =[ OUTER SEMANTIC CHECK ]="
+msgstr " =[ ПРОВЕРКА СМЫСЛА КОМАНД В СОВОКУПНОСТИ ]="
+
+#: report_analyser/appcmd.py:217
+msgid "  ==[ CHECK ENDED ]=="
+msgstr "  ==[ ПРОВЕРКА ОКОНЧЕНА ]=="
+

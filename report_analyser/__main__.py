@@ -1,37 +1,35 @@
-import tarfile
 import sys
-import os
-import re
-from report_analyser.input_checker.Machine_config import Machine
-from .translator import translate
+from .appcmd import import_files_from_dir, import_instructions_from_json, Repl, print_red, _, ngettext
+import argparse
 
+arg_parser = argparse.ArgumentParser(prog='NET-Judge',
+                                     description='Check imported reports with imported instructions.')
+                                     
+arg_parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
+arg_parser.add_argument('-q', '--quiet', action='store_true', help='show only final marks.') # Not implemented yet
 
+arg_parser.add_argument('reports_source_type', metavar='SOURCE_TYPE', nargs='?', type=str, default='',
+                        choices=['DIR', 'DATABASE', 'CMD', ''], 
+                        help='Choose, whether reports are imported from local directory or server database or use interactive cmd mode.')
+arg_parser.add_argument('reports_directory', metavar='REP_DIR', nargs='?', type=str, default='', 
+                        help='Directory, contains reports in format REPORT.NUMBER.MACHINE')
+arg_parser.add_argument('instructions_directory', metavar='INS_DIR', nargs='?', type=str, default='', 
+                        help='Directory, includes instructions: Single file for each task. Format: INSTR.NUMBER')
+
+# TODO: quiet verbose brief regime.
 if __name__ == '__main__':
-    file_pathes = sys.argv[1:]
-    for file_path in file_pathes:
-        file_names = [file for file in os.listdir(file_path) if
-                      re.fullmatch(r"report.\d+.\S+", file)]
-        machines = {}
-        for name in file_names:
-            number = re.search(r"\d+", name)[0]
-            machine_name = name[len('report') + len(number[0]) + 3:]
-            obj = tarfile.open(file_path + '/' + name)
-            obj_members = obj.getmembers()
-            text = obj.extractfile('./OUT.txt').read().decode()
-            text = re.sub(r'\r\(', '\n(', text)  # re.split работал не совсем так, как надо
-            lines = [translate(line) for line in text.split('\n') if line]
-            machines[machine_name + number] = Machine(machine_name, number, lines)
-        print(f'Task number: {int(number)}')
-        for machine in machines.values():
-            print('Name: ', machine.name)
-            print('devices: ', machine.devices)
-            print('routes: ', machine.ip_routes)
-            print('vlans: ', machine.vlans)
-            print('is_router: ', machine.is_router)
-            print('unsupported commands: ')
-            if machine.unknown_lines:
-                for line in machine.unknown_lines:
-                    print(f"    {line}")
-            print('-' * 30)
-        if len(file_pathes) > 1:
-            print('\n' + '*' * 30 + '\n')
+    args = arg_parser.parse_args()
+    if args.reports_source_type in ["CMD", ""]:
+        Repl().cmdloop()
+    elif args.reports_source_type in ["DIR", "DATABASE"]:
+        if args.reports_directory == '':
+            print_red(_("Not enough arguments, see '--help'"))
+        elif args.reports_source_type == "DIR":
+            import_files_from_dir([args.reports_directory,])
+            if args.instructions_directory != '':
+                import_instructions_from_json([args.instructions_directory,])
+            Repl().do_start("2")
+            Repl().do_conclude("")
+        elif args.reports_source_type == "DATABASE":
+            #TODO: import from database
+            pass

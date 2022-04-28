@@ -64,3 +64,15 @@ class Machine:
             return True
         elif args[0] == 'exit':
             return True
+    
+    def print_log(self):
+        print('Name: ', self.name)
+        print('devices: ', self.devices)
+        print('routes: ', self.ip_routes)
+        print('vlans: ', self.vlans)
+        print('is_router: ', self.is_router)
+        print('unsupported commands: ')
+        if self.unknown_lines:
+            for line in self.unknown_lines:
+                print(f"    {line}")
+        print('-' * 30)

@@ -5,7 +5,7 @@ def translate(code: str) -> (str, str):
     """Translates text with bash escape sequences to normal text
 
     Input: raw shell input
-    Return: (type of line, processed line without control sequences)
+    Ouput: (type of line, processed line without control sequences)
     """
 
 
