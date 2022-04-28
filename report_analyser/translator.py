@@ -10,13 +10,16 @@ def translate(code: str) -> (str, str):
 
 
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
+    code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     new_line = ''
     digit = ''
     state = 'standard'
     position = 0
-    line_type = 'input' if re.search(r'\[[\s|\S]*~\]#', code) else 'output'
+    line_type = 'input' if (re.search(r'\[[\s|\S]*~\]#', code) or
+                            re.search(r'\(reverse-i-search\)`[\s |\S]*\':', code)) else 'output'
     if line_type == 'input':
         code = re.sub(r'\S*\[[\s|\S]*~\]# ', '', code)  # иногда в начале бывают лишние символы
+        code = re.sub(r'\(reverse-i-search\)`[\s |\S]*\':', '', code)
     for letter in code:
         if state == 'standard':
             if letter == '\x1b':
@@ -54,4 +57,7 @@ def translate(code: str) -> (str, str):
                 state = 'standard'
             else:
                 raise ValueError()
-    return line_type, new_line
+    if new_line and new_line[-1] == '\r':
+        new_line = new_line[:-1]
+        new_line = re.sub(r'(\s|\S)*\r', '', new_line)  # \r - это еще и возврат каретки
+    return line_type, new_line.strip()
