@@ -110,7 +110,7 @@ class Report(Base):
         self.output = '\n'.join([line[1] for line in lines if line[0] == 'output'])
         self.create_date = self.get_report_date(file)
         self.get_report_date(file)
-        self.hash = hashlib.md5(file.extractfile('./OUT.txt').read()).hexdigest()
+        self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
 
     def __repr__(self):
         """Строковое представление информации."""
