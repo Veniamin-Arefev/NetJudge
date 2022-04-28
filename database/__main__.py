@@ -1,4 +1,4 @@
-from .models import Person
+from .models import *
 from . import *
 
 
@@ -7,7 +7,14 @@ def create_test():
     shrek = Person("Shrek", "shrek@dreamworks.com")
     session.add(shrek)
     session.commit()
-    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report3/report.03.base')
+
+    shrek.add_task(3, "Task")
+    session.commit()
+
+    task = shrek.tasks[0]
+    task.add_report('/home/dmitry/Documents/netjudge_tests/report3/report.03.base')
+    session.commit()
+
     session.close()
 
 
@@ -25,7 +32,4 @@ if __name__ == "__main__":
         create_test()
     people = get_people()
     for person in people:
-        print(person)
-        print('-' * 10)
-        print(person.reports[0])
-        print('-' * 10)
+        print(person.tasks[0].reports)
