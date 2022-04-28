@@ -33,10 +33,12 @@ class Person(Base):
 
     def add_task(self, number):
         """Create new task object for this person."""
+        print("Number = ", number)
         session = session_factory()
         new_task = Task(self.id, number)
         session.add(new_task)
         session.commit()
+        print(new_task.person_id)
         session.close()
 
     def add_report(self, file_path):
@@ -48,7 +50,10 @@ class Person(Base):
         if task_number not in [task.number for task in self.tasks]:
             self.add_task(task_number)
         task = session.query(Task).filter(Task.number == task_number).filter(Task.person_id == self.id)[0]
+        if report_name in [report.name for report in task.reports]:
+            return  # это задание уже добавлено
         task.add_report(file_path)
+        print("TN", task.number)
         session.commit()
         session.close()
 

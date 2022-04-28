@@ -9,7 +9,7 @@ def create_test():
     session.add(shrek)
     session.commit()
 
-    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report3/report.03.clone')
+    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report4/report.04.base')
     session.commit()
 
     session.close()
@@ -19,14 +19,13 @@ def get_people():
     session = session_factory()
     people_query = session.query(Person)
     session.close()
-    return people_query.all()
+    return people_query.first()
 
 
 if __name__ == "__main__":
-    people = get_people()
-    if len(people) == 0:
-        print("No one found")
-        create_test()
-    people = get_people()
-    for person in people:
-        print(person.tasks[0])
+    person = get_people()
+    session = session_factory()
+    person.add_report('/home/dmitry/Documents/netjudge_tests/report4/report.04.base')
+    session.commit()
+    print(person.tasks[1].reports)
+    print(len(person.tasks))
