@@ -4,15 +4,12 @@ from . import *
 
 def create_test():
     session = session_factory()
+
     shrek = Person("Shrek", "shrek@dreamworks.com")
     session.add(shrek)
     session.commit()
 
-    shrek.add_task(3, "Task")
-    session.commit()
-
-    task = shrek.tasks[0]
-    task.add_report('/home/dmitry/Documents/netjudge_tests/report3/report.03.base')
+    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report3/report.03.clone')
     session.commit()
 
     session.close()
@@ -32,4 +29,4 @@ if __name__ == "__main__":
         create_test()
     people = get_people()
     for person in people:
-        print(person.tasks[0].reports)
+        print(person.tasks[0])

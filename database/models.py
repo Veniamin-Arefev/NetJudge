@@ -31,11 +31,24 @@ class Person(Base):
             line += str(task.number) + ','
         return line
 
-    def add_task(self, number, name=''):
+    def add_task(self, number):
+        """Create new task object for this person."""
         session = session_factory()
-        new_task = Task(self.id, number, name)
-        print(self.id)
+        new_task = Task(self.id, number)
         session.add(new_task)
+        session.commit()
+        session.close()
+
+    def add_report(self, file_path):
+        """Find or create task and add new report to it."""
+
+        report_name = os.path.basename(file_path)
+        task_number = int(report_name[7:9])  # позиции строго фиксированы
+        session = session_factory()
+        if task_number not in [task.number for task in self.tasks]:
+            self.add_task(task_number)
+        task = session.query(Task).filter(Task.number == task_number).filter(Task.person_id == self.id)[0]
+        task.add_report(file_path)
         session.commit()
         session.close()
 
@@ -48,14 +61,12 @@ class Task(Base):
     person_id = Column(Integer, ForeignKey('person.id', ondelete='CASCADE'), nullable=False)
     id = Column(Integer, primary_key=True)
     number = Column(Integer)
-    name = Column(String)
     reports = relationship("Report")
 
-    def __init__(self, person_id, number, name=''):
+    def __init__(self, person_id, number):
         """Initialise task object."""
 
         self.person_id = person_id
-        self.name = name
         self.number = number
 
     def add_report(self, file_path):
@@ -63,7 +74,6 @@ class Task(Base):
 
         session = session_factory()
         new_report = Report(self.id, file_path)
-        print(new_report)
         session.add(new_report)
         session.commit()
         session.close()
@@ -85,7 +95,6 @@ class Report(Base):
     grade = Column(Float)  # 0, 0.25, 0.5. 1
 
     def __init__(self, task_id, file_path):
-        print("Works")
         self.task_id = task_id
         self.name = os.path.basename(file_path)
         file = tarfile.open(file_path)
