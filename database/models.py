@@ -112,15 +112,15 @@ class Report(Base):
         self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./OUT.txt').read()).hexdigest()
 
-    # def __repr__(self):
-    #     """Строковое представление информации."""
-    #
-    #     session = session_factory()
-    #     line = f"Name: {self.name}\nAuthor: {session.query(Person).get(self.person_id).name}\n"
-    #     session.close()
-    #     line += f"Creation date: {self.create_date.strftime('%d.%m.%y')}\n"
-    #     line += f"Hash: {self.hash}"
-    #     return line
+    def __repr__(self):
+        """Строковое представление информации."""
+
+        session = session_factory()
+        line = f"Name: {self.name}\n"
+        session.close()
+        line += f"Creation date: {self.create_date.strftime('%d.%m.%y')}\n"
+        line += f"Hash: {self.hash}"
+        return line
 
     def get_report_date(self, file):
         """Вычислить дату начала выполнения отчета."""
