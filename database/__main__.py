@@ -26,4 +26,6 @@ if __name__ == "__main__":
     people = get_people()
     for person in people:
         print(person)
-        print(person.reports)
+        print('-' * 10)
+        print(person.reports[0])
+        print('-' * 10)
