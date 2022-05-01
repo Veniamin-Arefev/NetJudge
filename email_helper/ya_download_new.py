@@ -1,0 +1,96 @@
+import os
+from datetime import datetime, timedelta
+from email.header import decode_header
+from imap_tools import MailBox
+
+from mailer_configs import *
+from mailer_utilities import *
+from table_utilities import *
+
+configs = load_configs('mailer_ya.cfg')
+
+mailbox = MailBox(configs['Server']['email server host'])
+mailbox.login(configs['Credentials']['Username'],
+              configs['Credentials']['Password']
+              , initial_folder=configs['Server']['folder'])
+
+homeworks = {
+    "00_StackVirtualBox": ["image file"],
+    "01_HardwareAndCommandline": ["report.01.base", "report.01.clone"],
+    "02_DataLink": ["report.02.base", "report.02.clone"],
+    "03_BridgeVlan": ["report.03.base", "report.03.clone", "report.03.bridge"],
+    "04_AddressAndRoute": ['report.04.base', 'report.04.clone', 'report.04.router1', 'report.04.router2'],
+    "05_IProuteRule": ['report.05.router', 'report.05.client1', 'report.05.client2'],
+    "06_TransportAndNAT": ['report.06.client1', 'report.06.client2', 'report.06.client3'],
+    "07_ApplicationSystem": ['report.07.router', 'report.07.srv', 'report.07.clienta', 'report.07.clientb'],
+    "08_ApplicationSupplemental": ['report.08.srv', 'report.08.client'],
+    "09_NetworkProtocolsSecurity": ['report.09.srv', 'report.09.client', 'report.09.stranger'],
+    "10_SecurityAndTools": ['report.10.server', 'report.10.router', 'report.10.client'],
+    "11_FireWalls": ['TODO'],
+    # "12_SecurityAndTools": ['TODO'],
+    # "13_UserLevel": ['TODO'],
+}
+
+
+def get_deadlines(keys: list[str], date: list[str]):
+    deadlines_format = "%Y-%m-%d %z"
+    return_dict = {}
+    for index, key in enumerate(keys):
+        return_dict[key] = datetime.strptime(date[index] + " +0300", deadlines_format) + timedelta(days=1)
+    return return_dict
+
+
+# noinspection PyTypeChecker
+deadlines = get_deadlines(homeworks.keys(), [
+    '2022-02-16',
+    '2022-02-23',
+    '2022-03-02',
+    '2022-03-09',
+    '2022-03-18',
+    '2022-03-24',
+    '2022-04-02',
+    '2022-04-09',
+    '2022-04-16',
+    '2022-04-25',
+    '2022-05-02',
+    '2022-05-04',
+])
+
+mailer_utils = MailerUtilities(mailbox)
+
+mailer_names = {}
+
+submitted = {'00_StackVirtualBox': [], '01_HardwareAndCommandline': [('maksim.velikanov@graphics.cs.msu.ru', '1892'), ('adrmsk@mail.ru', '1917'), ('kzheltkov@gmail.com', '1920'), ('s90180021@gse.cs.msu.ru', '1933'), ('nakhodnov17@gmail.com', '1934'), ('solovevav@my.msu.ru', '1946'), ('andvch@ya.ru', '1955'), ('muragonser@yandex.ru', '1957'), ('katya_batulina@mail.ru', '1958'), ('s02200094@gse.cs.msu.ru', '1959'), ('egor.sklyarov.ru@gmail.com', '1960'), ('mariyaph17@gmail.com', '1961'), ('rizvanzaidullin@gmail.com', '1975'), ('iluhina.enot@gmail.com', '1987'), ('ezhopets@gmail.com', '1988'), ('p.komarov.2001@gmail.com', '1989'), ('s_dasha-00@mail.ru', '1990'), ('andrey.babichev@graphics.cs.msu.ru', '1991'), ('ir.borina@yandex.ru', '1992'), ('s02190164@gse.cs.msu.ru', '1993'), ('as.kozlov@list.ru', '1995'), ('rizvanzaidullin@gmail.com', '1996'), ('mkocharmin@yandex.ru', '1997'), ('andrey.stotskiy@graphics.cs.msu.ru', '1998'), ('s02190690@gse.cs.msu.ru', '1999'), ('vaniaushakov20@mail.ru', '2000'), ('alexander.v.yakovenko@gmail.com', '2001'), ('shoroh2525@gmail.com', '2003'), ('s02200251@gse.cs.msu.ru', '2004'), ('s02200165@gse.cs.msu.ru', '2005'), ('sevmaxclever@gmail.com', '2007'), ('derinhelm@yandex.ru', '2008'), ('smirnov1828@gmail.com', '2009'), ('s02210152@gse.cs.msu.ru', '2010'), ('veniamin.arefev@mail.ru', '2012'), ('demidovich.zh@gmail.com', '2013'), ('victorpanferov@gmail.com', '2014'), ('iliasfedorenko@mail.ru', '2017'), ('jispar@mail.ru', '2019'), ('lxnfrolov@gmail.com', '2020'), ('shibaev@internet.ru', '2021'), ('dengzmm@gmail.com', '2023'), ('nikitag594@gmail.com', '2024'), ('aida2001@mail.ru', '2025'), ('rue.2806@gmail.com', '2026'), ('stamplevskiyd@gmail.com', '2027'), ('s60190185@gse.cs.msu.ru', '2028'), ('s02200208@gse.cs.msu.ru', '2029'), ('shutkov6914@gmail.com', '2030'), ('ipsavitsky234@gmail.com', '2031'), ('ea.shlyakhtina@gmail.com', '2032'), ('j.zadorozhnaya2707@gmail.com', '2033'), ('lnik2025@gmail.com', '2034'), ('s02190141@gse.cs.msu.ru', '2036'), ('andryha-1999@mail.ru', '2037'), ('s02190288@gse.cs.msu.ru', '2039'), ('khasanovdima17@yandex.ru', '2040'), ('khasanovdima17@yandex.ru', '2041'), ('tarapelikan@gmail.com', '2107'), ('s02200131@gse.cs.msu.ru', '2218'), ('zhenek.kyptsov@mail.ru', '2269')], '02_DataLink': [('dg.reflex@yandex.ru', '1821'), ('nakhodnov17@gmail.com', '1885'), ('lnik2025@gmail.com', '1886'), ('s_dasha-00@mail.ru', '1887'), ('maksim.velikanov@graphics.cs.msu.ru', '1894'), ('shoroh2525@gmail.com', '1923'), ('s90180021@gse.cs.msu.ru', '1933'), ('s02210152@gse.cs.msu.ru', '1935'), ('andrey.babichev@graphics.cs.msu.ru', '1936'), ('s02190164@gse.cs.msu.ru', '1937'), ('j.zadorozhnaya2707@gmail.com', '1938'), ('s02200251@gse.cs.msu.ru', '1939'), ('ezhopets@gmail.com', '1940'), ('andryha-1999@mail.ru', '1941'), ('mkocharmin@yandex.ru', '1942'), ('egor.sklyarov.ru@gmail.com', '1943'), ('s02200094@gse.cs.msu.ru', '1944'), ('solovevav@my.msu.ru', '1947'), ('smirnov1828@gmail.com', '1948'), ('derinhelm@yandex.ru', '1949'), ('s02200165@gse.cs.msu.ru', '1950'), ('p.komarov.2001@gmail.com', '1951'), ('iluhina.enot@gmail.com', '1953'), ('mariyaph17@gmail.com', '1954'), ('andvch@ya.ru', '1955'), ('alexander.v.yakovenko@gmail.com', '1956'), ('muragonser@yandex.ru', '1957'), ('s02190288@gse.cs.msu.ru', '1962'), ('khasanovdima17@yandex.ru', '1963'), ('dengzmm@gmail.com', '1964'), ('victorpanferov@gmail.com', '1965'), ('ipsavitsky234@gmail.com', '1966'), ('ea.shlyakhtina@gmail.com', '1967'), ('shibaev@internet.ru', '1968'), ('jispar@mail.ru', '1969'), ('veniamin.arefev@mail.ru', '1970'), ('lxnfrolov@gmail.com', '1971'), ('iliasfedorenko@mail.ru', '1972'), ('demidovich.zh@gmail.com', '1973'), ('vaniaushakov20@mail.ru', '1974'), ('as.kozlov@list.ru', '1976'), ('aida2001@mail.ru', '1977'), ('andrey.stotskiy@graphics.cs.msu.ru', '1978'), ('s02190141@gse.cs.msu.ru', '1979'), ('s02200208@gse.cs.msu.ru', '1980'), ('sevmaxclever@gmail.com', '1981'), ('rizvanzaidullin@gmail.com', '1982'), ('tarapelikan@gmail.com', '1983'), ('shutkov6914@gmail.com', '1984'), ('s02190690@gse.cs.msu.ru', '1985'), ('stamplevskiyd@gmail.com', '1986'), ('s60190185@gse.cs.msu.ru', '2105'), ('kzheltkov@gmail.com', '2179'), ('s02200131@gse.cs.msu.ru', '2256'), ('zhenek.kyptsov@mail.ru', '2270')], '03_BridgeVlan': [('aida2001@mail.ru', '1812'), ('dg.reflex@yandex.ru', '1822'), ('rizvanzaidullin@gmail.com', '1834'), ('tarapelikan@gmail.com', '1884'), ('ea.shlyakhtina@gmail.com', '1889'), ('ipsavitsky234@gmail.com', '1890'), ('sevmaxclever@gmail.com', '1893'), ('andrey.babichev@graphics.cs.msu.ru', '1895'), ('iliasfedorenko@mail.ru', '1896'), ('maksim.velikanov@graphics.cs.msu.ru', '1897'), ('j.zadorozhnaya2707@gmail.com', '1898'), ('dengzmm@gmail.com', '1899'), ('veniamin.arefev@mail.ru', '1900'), ('shutkov6914@gmail.com', '1901'), ('demidovich.zh@gmail.com', '1902'), ('victorpanferov@gmail.com', '1903'), ('s02190164@gse.cs.msu.ru', '1904'), ('nakhodnov17@gmail.com', '1905'), ('andryha-1999@mail.ru', '1906'), ('mkocharmin@yandex.ru', '1907'), ('s02200094@gse.cs.msu.ru', '1908'), ('ezhopets@gmail.com', '1909'), ('solovevav@my.msu.ru', '1910'), ('andrey.stotskiy@graphics.cs.msu.ru', '1911'), ('s02200165@gse.cs.msu.ru', '1912'), ('khasanovdima17@yandex.ru', '1913'), ('s02210152@gse.cs.msu.ru', '1914'), ('smirnov1828@gmail.com', '1915'), ('jispar@mail.ru', '1916'), ('s02190288@gse.cs.msu.ru', '1918'), ('muragonser@yandex.ru', '1919'), ('s02190141@gse.cs.msu.ru', '1921'), ('alexander.v.yakovenko@gmail.com', '1922'), ('vaniaushakov20@mail.ru', '1924'), ('s_dasha-00@mail.ru', '1925'), ('s02190690@gse.cs.msu.ru', '1926'), ('shibaev@internet.ru', '1927'), ('lnik2025@gmail.com', '1928'), ('as.kozlov@list.ru', '1929'), ('derinhelm@yandex.ru', '1930'), ('s02200208@gse.cs.msu.ru', '1931'), ('egor.sklyarov.ru@gmail.com', '1932'), ('stamplevskiyd@gmail.com', '2100'), ('mariyaph17@gmail.com', '2101'), ('shoroh2525@gmail.com', '2102'), ('s90180021@gse.cs.msu.ru', '2103'), ('iluhina.enot@gmail.com', '2104'), ('s02200251@gse.cs.msu.ru', '2123'), ('lxnfrolov@gmail.com', '2172'), ('kzheltkov@gmail.com', '2180'), ('s02200131@gse.cs.msu.ru', '2257'), ('zhenek.kyptsov@mail.ru', '2271')], '04_AddressAndRoute': [('iluhina.enot@gmail.com', '1800'), ('s02200208@gse.cs.msu.ru', '1802'), ('derinhelm@yandex.ru', '1803'), ('andryha-1999@mail.ru', '1804'), ('victorpanferov@gmail.com', '1805'), ('nakhodnov17@gmail.com', '1806'), ('shibaev@internet.ru', '1808'), ('egor.sklyarov.ru@gmail.com', '1809'), ('alexander.v.yakovenko@gmail.com', '1810'), ('solovevav@my.msu.ru', '1811'), ('jispar@mail.ru', '1813'), ('j.zadorozhnaya2707@gmail.com', '1816'), ('dg.reflex@yandex.ru', '1825'), ('rizvanzaidullin@gmail.com', '1836'), ('shutkov6914@gmail.com', '1852'), ('aida2001@mail.ru', '1853'), ('andrey.babichev@graphics.cs.msu.ru', '1854'), ('dengzmm@gmail.com', '1855'), ('vaniaushakov20@mail.ru', '1856'), ('ezhopets@gmail.com', '1857'), ('ea.shlyakhtina@gmail.com', '1858'), ('s02190690@gse.cs.msu.ru', '1859'), ('s02210152@gse.cs.msu.ru', '1860'), ('s02200165@gse.cs.msu.ru', '1861'), ('muragonser@yandex.ru', '1862'), ('maksim.velikanov@graphics.cs.msu.ru', '1863'), ('s02190141@gse.cs.msu.ru', '1864'), ('khasanovdima17@yandex.ru', '1865'), ('iliasfedorenko@mail.ru', '1866'), ('s02200094@gse.cs.msu.ru', '1867'), ('stamplevskiyd@gmail.com', '1868'), ('smirnov1828@gmail.com', '1869'), ('lnik2025@gmail.com', '1870'), ('tarapelikan@gmail.com', '1871'), ('s_dasha-00@mail.ru', '1872'), ('mariyaph17@gmail.com', '1873'), ('veniamin.arefev@mail.ru', '1874'), ('andrey.stotskiy@graphics.cs.msu.ru', '1875'), ('mkocharmin@yandex.ru', '1876'), ('andvch@ya.ru', '1877'), ('demidovich.zh@gmail.com', '1878'), ('ea.shlyakhtina@gmail.com', '1879'), ('shoroh2525@gmail.com', '1880'), ('sevmaxclever@gmail.com', '1881'), ('as.kozlov@list.ru', '1882'), ('s02190288@gse.cs.msu.ru', '1883'), ('sergeyshadrin98@gmail.com', '2093'), ('s02190164@gse.cs.msu.ru', '2099'), ('iluhina.enot@gmail.com', '2106'), ('s02200251@gse.cs.msu.ru', '2123'), ('lxnfrolov@gmail.com', '2175'), ('s02200131@gse.cs.msu.ru', '2258'), ('zhenek.kyptsov@mail.ru', '2272')], '05_IProuteRule': [('s02190690@gse.cs.msu.ru', '1799'), ('iluhina.enot@gmail.com', '1800'), ('derinhelm@yandex.ru', '1801'), ('dengzmm@gmail.com', '1814'), ('jispar@mail.ru', '1815'), ('s02200094@gse.cs.msu.ru', '1817'), ('sevmaxclever@gmail.com', '1818'), ('s02190288@gse.cs.msu.ru', '1819'), ('demidovich.zh@gmail.com', '1820'), ('dg.reflex@yandex.ru', '1823'), ('s02190141@gse.cs.msu.ru', '1826'), ('khasanovdima17@yandex.ru', '1827'), ('iliasfedorenko@mail.ru', '1828'), ('j.zadorozhnaya2707@gmail.com', '1829'), ('ea.shlyakhtina@gmail.com', '1830'), ('tarapelikan@gmail.com', '1831'), ('muragonser@yandex.ru', '1832'), ('shibaev@internet.ru', '1833'), ('shutkov6914@gmail.com', '1835'), ('vaniaushakov20@mail.ru', '1837'), ('lnik2025@gmail.com', '1838'), ('mkocharmin@yandex.ru', '1839'), ('andrey.babichev@graphics.cs.msu.ru', '1840'), ('stamplevskiyd@gmail.com', '1841'), ('aida2001@mail.ru', '1842'), ('s02200165@gse.cs.msu.ru', '1843'), ('ezhopets@gmail.com', '1844'), ('egor.sklyarov.ru@gmail.com', '1845'), ('s02210152@gse.cs.msu.ru', '1846'), ('andvch@ya.ru', '1847'), ('nakhodnov17@gmail.com', '1848'), ('andryha-1999@mail.ru', '1849'), ('s_dasha-00@mail.ru', '1850'), ('smirnov1828@gmail.com', '1851'), ('maksim.velikanov@graphics.cs.msu.ru', '2092'), ('s90180021@gse.cs.msu.ru', '2094'), ('andrey.stotskiy@graphics.cs.msu.ru', '2095'), ('victorpanferov@gmail.com', '2096'), ('rizvanzaidullin@gmail.com', '2097'), ('veniamin.arefev@mail.ru', '2098'), ('derinhelm@yandex.ru', '2108'), ('mariyaph17@gmail.com', '2109'), ('shoroh2525@gmail.com', '2110'), ('alexander.v.yakovenko@gmail.com', '2111'), ('as.kozlov@list.ru', '2112'), ('solovevav@my.msu.ru', '2114'), ('s02190164@gse.cs.msu.ru', '2115'), ('s02200251@gse.cs.msu.ru', '2123'), ('lxnfrolov@gmail.com', '2219'), ('s02200131@gse.cs.msu.ru', '2259'), ('zhenek.kyptsov@mail.ru', '2273')], '06_TransportAndNAT': [('victorpanferov@gmail.com', '2119'), ('egor.sklyarov.ru@gmail.com', '2120'), ('s02190164@gse.cs.msu.ru', '2121'), ('s02200251@gse.cs.msu.ru', '2124'), ('ea.shlyakhtina@gmail.com', '2125'), ('dengzmm@gmail.com', '2126'), ('khasanovdima17@yandex.ru', '2127'), ('s02200094@gse.cs.msu.ru', '2128'), ('demidovich.zh@gmail.com', '2129'), ('vaniaushakov20@mail.ru', '2130'), ('ezhopets@gmail.com', '2131'), ('muragonser@yandex.ru', '2133'), ('sevmaxclever@gmail.com', '2134'), ('s02210152@gse.cs.msu.ru', '2135'), ('mkocharmin@yandex.ru', '2136'), ('andrey.babichev@graphics.cs.msu.ru', '2137'), ('nakhodnov17@gmail.com', '2138'), ('s02190141@gse.cs.msu.ru', '2139'), ('andryha-1999@mail.ru', '2141'), ('mariyaph17@gmail.com', '2142'), ('tarapelikan@gmail.com', '2143'), ('s02190690@gse.cs.msu.ru', '2144'), ('s02190288@gse.cs.msu.ru', '2145'), ('s02200165@gse.cs.msu.ru', '2146'), ('maksim.velikanov@graphics.cs.msu.ru', '2147'), ('j.zadorozhnaya2707@gmail.com', '2149'), ('andvch@ya.ru', '2150'), ('shibaev@internet.ru', '2151'), ('andrey.stotskiy@graphics.cs.msu.ru', '2153'), ('as.kozlov@list.ru', '2154'), ('s90180021@gse.cs.msu.ru', '2155'), ('s_dasha-00@mail.ru', '2156'), ('smirnov1828@gmail.com', '2157'), ('shoroh2525@gmail.com', '2158'), ('stamplevskiyd@gmail.com', '2159'), ('aida2001@mail.ru', '2160'), ('lnik2025@gmail.com', '2161'), ('veniamin.arefev@mail.ru', '2162'), ('derinhelm@yandex.ru', '2163'), ('iluhina.enot@gmail.com', '2164'), ('iliasfedorenko@mail.ru', '2165'), ('alexander.v.yakovenko@gmail.com', '2166'), ('rizvanzaidullin@gmail.com', '2167'), ('solovevav@my.msu.ru', '2168'), ('shutkov6914@gmail.com', '2169'), ('lxnfrolov@gmail.com', '2220'), ('dg.reflex@yandex.ru', '2222'), ('s02200131@gse.cs.msu.ru', '2260'), ('zhenek.kyptsov@mail.ru', '2274')], '07_ApplicationSystem': [('s02190141@gse.cs.msu.ru', '2170'), ('dengzmm@gmail.com', '2171'), ('s02200251@gse.cs.msu.ru', '2173'), ('s02190288@gse.cs.msu.ru', '2174'), ('shutkov6914@gmail.com', '2176'), ('iliasfedorenko@mail.ru', '2177'), ('khasanovdima17@yandex.ru', '2178'), ('vaniaushakov20@mail.ru', '2181'), ('mkocharmin@yandex.ru', '2182'), ('iluhina.enot@gmail.com', '2183'), ('demidovich.zh@gmail.com', '2184'), ('j.zadorozhnaya2707@gmail.com', '2185'), ('ea.shlyakhtina@gmail.com', '2186'), ('muragonser@yandex.ru', '2187'), ('andrey.stotskiy@graphics.cs.msu.ru', '2188'), ('s02210152@gse.cs.msu.ru', '2189'), ('s02200165@gse.cs.msu.ru', '2190'), ('mariyaph17@gmail.com', '2191'), ('egor.sklyarov.ru@gmail.com', '2193'), ('alexander.v.yakovenko@gmail.com', '2194'), ('smirnov1828@gmail.com', '2195'), ('maksim.velikanov@graphics.cs.msu.ru', '2196'), ('as.kozlov@list.ru', '2197'), ('lnik2025@gmail.com', '2198'), ('andrey.babichev@graphics.cs.msu.ru', '2199'), ('andryha-1999@mail.ru', '2200'), ('s02190690@gse.cs.msu.ru', '2201'), ('rizvanzaidullin@gmail.com', '2202'), ('derinhelm@yandex.ru', '2203'), ('andvch@ya.ru', '2204'), ('tarapelikan@gmail.com', '2206'), ('shibaev@internet.ru', '2207'), ('sevmaxclever@gmail.com', '2208'), ('s02200094@gse.cs.msu.ru', '2209'), ('ezhopets@gmail.com', '2210'), ('solovevav@my.msu.ru', '2211'), ('nakhodnov17@gmail.com', '2212'), ('s90180021@gse.cs.msu.ru', '2213'), ('shoroh2525@gmail.com', '2214'), ('veniamin.arefev@mail.ru', '2215'), ('victorpanferov@gmail.com', '2216'), ('s02190164@gse.cs.msu.ru', '2217'), ('dg.reflex@yandex.ru', '2225'), ('s02200131@gse.cs.msu.ru', '2261'), ('zhenek.kyptsov@mail.ru', '2275'), ('stamplevskiyd@gmail.com', '2276')], '08_ApplicationSupplemental': [('muragonser@yandex.ru', '2221'), ('veniamin.arefev@mail.ru', '2223'), ('khasanovdima17@yandex.ru', '2224'), ('s02190288@gse.cs.msu.ru', '2226'), ('andrey.stotskiy@graphics.cs.msu.ru', '2227'), ('s02210152@gse.cs.msu.ru', '2228'), ('shibaev@internet.ru', '2229'), ('maksim.velikanov@graphics.cs.msu.ru', '2230'), ('s02190141@gse.cs.msu.ru', '2231'), ('ea.shlyakhtina@gmail.com', '2232'), ('demidovich.zh@gmail.com', '2233'), ('andrey.babichev@graphics.cs.msu.ru', '2234'), ('iluhina.enot@gmail.com', '2235'), ('andryha-1999@mail.ru', '2236'), ('egor.sklyarov.ru@gmail.com', '2237'), ('s02200094@gse.cs.msu.ru', '2238'), ('smirnov1828@gmail.com', '2239'), ('iliasfedorenko@mail.ru', '2240'), ('mkocharmin@yandex.ru', '2241'), ('nakhodnov17@gmail.com', '2242'), ('lnik2025@gmail.com', '2243'), ('solovevav@my.msu.ru', '2244'), ('shoroh2525@gmail.com', '2245'), ('aida2001@mail.ru', '2246'), ('s_dasha-00@mail.ru', '2247'), ('alexander.v.yakovenko@gmail.com', '2248'), ('andvch@ya.ru', '2249'), ('victorpanferov@gmail.com', '2250'), ('s02200165@gse.cs.msu.ru', '2251'), ('j.zadorozhnaya2707@gmail.com', '2252'), ('as.kozlov@list.ru', '2253'), ('lxnfrolov@gmail.com', '2254'), ('sevmaxclever@gmail.com', '2255'), ('s02200131@gse.cs.msu.ru', '2262'), ('s02190690@gse.cs.msu.ru', '2267'), ('zhenek.kyptsov@mail.ru', '2285'), ('ezhopets@gmail.com', '2290'), ('shutkov6914@gmail.com', '2308')], '09_NetworkProtocolsSecurity': [('demidovich.zh@gmail.com', '2263'), ('iliasfedorenko@mail.ru', '2264'), ('mkocharmin@yandex.ru', '2265'), ('khasanovdima17@yandex.ru', '2268'), ('ea.shlyakhtina@gmail.com', '2277'), ('egor.sklyarov.ru@gmail.com', '2278'), ('s02210152@gse.cs.msu.ru', '2279'), ('muragonser@yandex.ru', '2280'), ('maksim.velikanov@graphics.cs.msu.ru', '2281'), ('as.kozlov@list.ru', '2282'), ('andryha-1999@mail.ru', '2283'), ('shibaev@internet.ru', '2284'), ('s02190288@gse.cs.msu.ru', '2286'), ('smirnov1828@gmail.com', '2287'), ('s02200165@gse.cs.msu.ru', '2288'), ('alexander.v.yakovenko@gmail.com', '2289'), ('andvch@ya.ru', '2291'), ('iluhina.enot@gmail.com', '2292'), ('shoroh2525@gmail.com', '2293'), ('lnik2025@gmail.com', '2294'), ('shoroh2525@gmail.com', '2295'), ('s02190141@gse.cs.msu.ru', '2296'), ('solovevav@my.msu.ru', '2297'), ('solovevav@my.msu.ru', '2298'), ('sevmaxclever@gmail.com', '2299'), ('nakhodnov17@gmail.com', '2300'), ('andrey.stotskiy@graphics.cs.msu.ru', '2301'), ('victorpanferov@gmail.com', '2302'), ('s02190164@gse.cs.msu.ru', '2303'), ('s02200094@gse.cs.msu.ru', '2304'), ('zhenek.kyptsov@mail.ru', '2305'), ('veniamin.arefev@mail.ru', '2306'), ('j.zadorozhnaya2707@gmail.com', '2307')], '10_SecurityAndTools': [('demidovich.zh@gmail.com', '2309'), ('muragonser@yandex.ru', '2310')], '11_FireWalls': []}
+
+
+
+download_dir = 'tasks'
+try:
+    os.mkdir(download_dir)
+except FileExistsError:
+    pass
+
+for homework_name in homeworks.keys():
+# for homework_name in ['01_HardwareAndCommandline']:
+    cur_dir = download_dir + os.sep + homework_name
+    try:
+        os.mkdir(cur_dir)
+    except FileExistsError:
+        pass
+    for email, uid in submitted[homework_name]:
+        email_path = cur_dir + os.sep + email
+        try:
+            os.mkdir(email_path)
+        except FileExistsError:
+            pass
+        try_number = 1
+        while os.path.isdir(email_path + os.sep + str(try_number)):
+            try_number += 1
+        email_path += os.sep + str(try_number)
+        os.mkdir(email_path)
+        for mail in mailer_utils.get_by_uids([uid]):
+            for attac in mail.attachments:
+                with open(email_path+os.sep+attac.filename, 'wb') as f:
+                    f.write(attac.payload)
+
+

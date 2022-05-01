@@ -32,7 +32,8 @@ def create_html(emails_dict: dict, mailer_names: dict, target_filename="out.html
             body_tr.append(elem)
 
             elem = soup.new_tag('th')
-            elem.string = cur_email
+            name, domain = cur_email.split('@')
+            elem.string = f'{name[:3]}*@{domain}'
             body_tr.append(elem)
 
             for item in [*emails_dict.values()]:
