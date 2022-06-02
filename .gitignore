@@ -137,3 +137,6 @@ dmypy.json
 
 # Zone identifier on WSL platform:
 *.Identifier
+
+# Database
+*.db
