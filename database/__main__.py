@@ -1,19 +1,7 @@
+import datetime
 from .models import *
 from . import *
-import datetime
-
-
-def create_test():
-    session = session_factory()
-
-    shrek = Person("Shrek", "shrek@dreamworks.com")
-    session.add(shrek)
-    session.commit()
-
-    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report4/report.04.base')
-    session.commit()
-
-    session.close()
+from .functions import *
 
 
 def get_people():
@@ -37,12 +25,5 @@ def print_statistics():
 
 
 if __name__ == "__main__":
-    session = session_factory()
-    shrek = Person("Shrek", "shrek@dreamworks.com")
-    session.add(shrek)
-    session.commit()
-
-    shrek.add_report('/home/dmitry/Documents/netjudge_tests/report4/report.04.base', datetime.datetime.today() - datetime.timedelta(days=8))
-    session.commit()
-    session.close()
+    add_report("shrek@dreamworks.com", '/home/dmitry/Documents/netjudge_tests/report4/report.04.base')
     print_statistics()
