@@ -21,34 +21,43 @@ class Person(Base):
     tasks = relationship("Task")
 
     def __init__(self, name, email):
+        """Initialise person object
+
+        :param name: Person's name
+        :param email: Person's email
+        """
+
         self.name = name
         self.email = email
 
     def __repr__(self):
+        """Person str"""
+
         line = f"Name: {self.name}\nemail: {self.email}\n"
         line += f"Completed tasks: "
         for task in self.tasks:
             line += str(task.number) + ','
         return line
 
-    def add_task(self, number):
+    def add_task(self, number, deadline=None):
         """Create new task object for this person."""
+
         print("Number = ", number)
         session = session_factory()
-        new_task = Task(self.id, number)
+        new_task = Task(self.id, number, deadline)
         session.add(new_task)
         session.commit()
         print(new_task.person_id)
         session.close()
 
-    def add_report(self, file_path):
+    def add_report(self, file_path, deadline=None):
         """Find or create task and add new report to it."""
 
         report_name = os.path.basename(file_path)
         task_number = int(report_name[7:9])  # позиции строго фиксированы
         session = session_factory()
         if task_number not in [task.number for task in self.tasks]:
-            self.add_task(task_number)
+            self.add_task(task_number, deadline)
         task = session.query(Task).filter(Task.number == task_number).filter(Task.person_id == self.id)[0]
         if report_name in [report.name for report in task.reports]:
             return  # это задание уже добавлено
@@ -67,12 +76,14 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     number = Column(Integer)
     reports = relationship("Report")
+    deadline = Column(Date)
 
-    def __init__(self, person_id, number):
+    def __init__(self, person_id, number, deadline):
         """Initialise task object."""
 
         self.person_id = person_id
         self.number = number
+        self.deadline = deadline
 
     def add_report(self, file_path):
         """Add report file for this task object."""
@@ -80,6 +91,7 @@ class Task(Base):
         session = session_factory()
         new_report = Report(self.id, file_path)
         session.add(new_report)
+        new_report.set_grade(self.deadline)
         session.commit()
         session.close()
 
@@ -100,7 +112,9 @@ class Report(Base):
     grade = Column(Float)  # 0, 0.25, 0.5. 1
 
     def __init__(self, task_id, file_path):
+        """Initialise report object"""
         self.task_id = task_id
+        self.plagiat = False
         self.name = os.path.basename(file_path)
         file = tarfile.open(file_path)
         self.text = file.extractfile('./OUT.txt').read().decode()
@@ -112,18 +126,28 @@ class Report(Base):
         self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
 
+    def check_originality(self):
+        """Find reports with the same hash"""
+
+        session = session_factory()
+        if session.query(Report).filter(Report.hash == self.hash).count() > 1:
+            self.plagiat = True
+        session.commit()
+        session.close()
+
     def __repr__(self):
-        """Строковое представление информации."""
+        """Report str"""
 
         session = session_factory()
         line = f"Name: {self.name}\n"
         session.close()
         line += f"Creation date: {self.create_date.strftime('%d.%m.%y')}\n"
-        line += f"Hash: {self.hash}"
+        line += f"Hash: {self.hash}\n"
+        line += f"Grade: {self.grade}"
         return line
 
     def get_report_date(self, file):
-        """Вычислить дату начала выполнения отчета."""
+        """Report creation date"""
 
         line = file.extractfile('./TIME.txt').read().decode().split('\n')[0]
         time_lines = re.findall(r'START_TIME \d{4}-\d{2}-\d{2}', line)
@@ -136,4 +160,18 @@ class Report(Base):
             raise ValueError()
 
     def set_grade(self, deadline):
-        pass
+        """Give report a grade"""
+
+        session = session_factory()
+        self.check_originality()
+        if self.plagiat:
+            self.grade = 0
+        else:
+            if (deadline - self.create_date).days < 7:
+                self.grade = 1
+            elif (deadline - self.create_date).days < 14:
+                self.grade = 0.5
+            else:
+                self.grade = 0.25
+        session.commit()
+        session.close()

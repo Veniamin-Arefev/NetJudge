@@ -3,8 +3,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-#database_path = 'sqlite:///:memory:'
-database_path = 'sqlite:///' + os.path.abspath('database/data.db')
+database_path = 'sqlite:///:memory:'
+#database_path = 'sqlite:///' + os.path.abspath('database/data.db')
 # sqlite:///relative/path/to/file.db
 # sqlite:///:memory: - создать в оперативной памяти
 engine = create_engine(database_path)
