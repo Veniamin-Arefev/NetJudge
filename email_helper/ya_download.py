@@ -6,6 +6,7 @@ from email_helper.mailer_configs import *
 from email_helper.mailer_utilities import *
 from email_helper.deadlines import *
 
+__all__ = ['ya_download']
 
 def ya_download(download_dir='tasks'):
     configs = load_configs('mailer_ya.cfg')

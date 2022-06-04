@@ -9,6 +9,8 @@ from imap_tools import MailBox
 
 from email_helper.mailer_configs import *
 
+__all__ = ['ya_idle_main']
+
 
 def connect_to_mailbox(configs: configparser.ConfigParser):
     con_mailbox = MailBox(configs['Server']['email server host'])
@@ -21,9 +23,11 @@ def connect_to_mailbox(configs: configparser.ConfigParser):
 
 def update():
     print(f'[{datetime.datetime.now().strftime("%H:%M")}] Update!')
-    my_process = subprocess.run(['python', 'ya_parse.py'])
-    if my_process.stderr is not None:
-        print(my_process.stderr)
+    try:
+        from email_helper.ya_parse import ya_parse_main
+        ya_parse_main()
+    except BaseException as e:
+        print(e)
 
 
 def ya_idle_main():

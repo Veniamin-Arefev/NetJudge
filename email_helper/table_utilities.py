@@ -1,16 +1,17 @@
 import datetime
+import os
 
 from bs4 import BeautifulSoup as Soup
 
 __all__ = ['create_html']
 
 
-def create_html(emails_dict: dict, mailer_names: dict, target_filename="out.html"):
+def create_html(emails_dict: dict, mailer_names: dict, target_path, target_filename):
     mailer_names = dict(sorted(mailer_names.items(), key=lambda x: x[1]))
 
     unique_emails = list(mailer_names.keys())
 
-    with open('pattern.html', 'r', encoding='utf-8') as file:
+    with open('email_helper' + os.sep + 'pattern.php', 'r', encoding='utf-8') as file:
         soup = Soup(file, features='html.parser')
 
         table = soup.find('table')
@@ -51,5 +52,8 @@ def create_html(emails_dict: dict, mailer_names: dict, target_filename="out.html
 
         soup.find('h6').string = f'Last updated: {datetime.datetime.now().strftime("%d %b %H:%M")}'.replace(' ',
                                                                                                             u'\xa0')
-        with open(target_filename, 'w', encoding='utf-8') as file1:
-            file1.write(str(soup))
+        with open(target_path + os.sep + target_filename, 'w', encoding='utf-8') as file1:
+            file1.write(str(soup).replace('&gt;', '>'))
+    with open('email_helper' + os.sep + 'data.php', 'r', encoding='utf-8') as in_file:
+        with open(target_path + os.sep + 'data.php', 'w', encoding='utf-8') as out_file:
+            out_file.write(in_file.read())

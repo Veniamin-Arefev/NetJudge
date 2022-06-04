@@ -9,14 +9,11 @@ homeworks_names_and_files = {
     '03_BridgeVlan': ['report.03.base', 'report.03.clone', 'report.03.bridge'],
     '04_AddressAndRoute': ['report.04.base', 'report.04.clone', 'report.04.router1', 'report.04.router2'],
     '05_IProuteRule': ['report.05.router', 'report.05.client1', 'report.05.client2'],
-    '06_TransportAndNAT': ['report.06.client1', 'report.06.client2', 'report.06.client3'],
-    '07_ApplicationSystem': ['report.07.router', 'report.07.srv', 'report.07.clienta', 'report.07.clientb'],
-    '08_ApplicationSupplemental': ['report.08.srv', 'report.08.client'],
-    '09_NetworkProtocolsSecurity': ['report.09.srv', 'report.09.client', 'report.09.stranger'],
-    '10_SecurityAndTools': ['report.10.server', 'report.10.router', 'report.10.client'],
-    '11_FireWalls': ['TODO'],
-    # '12_SecurityAndTools': ['TODO'],
-    # '13_UserLevel': ['TODO'],
+    '06_TransportProtocols': ['report.06.client1', 'report.06.client2', 'report.06.client3'],
+    '07_TransportNAT': ['report.07.router', 'report.07.srv', 'report.07.clienta', 'report.07.clientb'],
+    '08_ApplicationSystem': ['report.08.srv', 'report.08.client'],
+    '09_ApplicationSupplemental': ['report.09.srv', 'report.09.client', 'report.09.stranger'],
+    '10_FireWalls': ['report.10.server', 'report.10.router', 'report.10.client'],
 }
 
 
@@ -41,5 +38,4 @@ deadlines = get_deadlines(homeworks_names_and_files.keys(), [
     '2022-04-16',
     '2022-04-25',
     '2022-05-02',
-    '2022-05-04',
 ])

@@ -9,6 +9,7 @@ from imap_tools import MailBox
 from email_helper.mailer_configs import *
 from email_helper.mailer_utilities import *
 
+__all__ = ['fac_idle_main']
 
 def connect_to_mailbox(configs: configparser.ConfigParser):
     con_mailbox = MailBox(configs['Server']['email server host'])
