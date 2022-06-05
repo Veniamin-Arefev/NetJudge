@@ -1,6 +1,7 @@
 import os.path
 from . import *
 from .models import *
+from report_analyser.translator import translate
 
 def get_deadline(task_number=None, task_name=None):
     """Return deadline date for task
@@ -50,5 +51,28 @@ def add_report(email, report_path):
         report.grade = report.get_grade(deadline)
         session.commit()
 
-    print("Grade ", report.grade)
     session.close()
+
+
+def get_lines(email, report_name):
+    """Find report input and output"""
+
+    session = session_factory()
+    person = session.query(Person).filter(Person.email == email).first()
+    if not person:
+        return None
+
+    task_number = int(report_name[7:9])
+    task = session.query(Task).filter(Task.number == task_number).filter(Task.person_id == person.id).first()
+    if not task:
+        return None
+
+    report = session.query(Report).join(Task).filter(Task.person == person).filter(Report.name == report_name).first()
+    if not report:
+        return None
+    text = re.sub('\r', '', report.text)
+    lines = [translate(line) for line in text.split('\n') if line]
+    session.close()
+    return lines
+
+
