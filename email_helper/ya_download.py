@@ -8,7 +8,8 @@ from email_helper.deadlines import *
 
 __all__ = ['ya_download']
 
-def ya_download(download_dir='tasks'):
+
+def ya_download(download_dir='tasks', print_info=False):
     configs = load_configs('mailer_ya.cfg')
 
     mailbox = MailBox(configs['Server']['email server host'])
@@ -23,6 +24,8 @@ def ya_download(download_dir='tasks'):
     mailer_names = {}
 
     for homework_name, homework_files in homeworks_names_and_files.items():
+        if print_info:
+            print(f"Current parsing task : {homework_name}", end="\r")
         uids = mailer_utils.get_by_filenames(homework_files)
         for mail in mailer_utils.get_by_uids(uids):
             name = mail.headers['from'][0]
@@ -40,7 +43,8 @@ def ya_download(download_dir='tasks'):
         pass
 
     for homework_name in homeworks_names_and_files.keys():
-        # for homework_name in ['01_HardwareAndCommandline']:
+        if print_info:
+            print(f"Current download task : {homework_name}", end="\r")
         cur_dir = download_dir + os.sep + homework_name
         try:
             os.mkdir(cur_dir)

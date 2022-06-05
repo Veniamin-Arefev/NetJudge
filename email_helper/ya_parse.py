@@ -11,7 +11,7 @@ from email_helper.deadlines import *
 __all__ = ['ya_parse_main']
 
 
-def ya_parse_main():
+def ya_parse_main(print_info=False):
     configs = load_configs('mailer_ya.cfg')
 
     mailbox = MailBox(configs['Server']['email server host'])
@@ -26,6 +26,8 @@ def ya_parse_main():
     mailer_names = {}
 
     for homework_name, homework_files in homeworks_names_and_files.items():
+        if print_info:
+            print(f"Current task : {homework_name}", end="\r")
         uids = mailer_utils.get_by_filenames(homework_files)
         for mail in mailer_utils.get_by_uids(uids):
             name = mail.headers['from'][0]

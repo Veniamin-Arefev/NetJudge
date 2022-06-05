@@ -16,6 +16,6 @@ if __name__ == '__main__':
     elif args.type == 'fac_idle':
         fac_idle_main()
     elif args.type == 'ya_parse':
-        ya_parse_main()
+        ya_parse_main(print_info=True)
     elif args.type == 'ya_download':
-        ya_download()
+        ya_download(print_info=True)

@@ -39,6 +39,10 @@
                 max-width: 100%;
                 margin: auto;
             }
+            tbody tr th:first-child {
+                max-width: 40vw;
+                overflow: hidden;
+            }
         }
 
         .night-mode .bg-success {
