@@ -3,11 +3,11 @@ from sqlalchemy.orm import relationship
 import datetime
 import tarfile
 import re
-import os
 import hashlib
 
 from . import *
-from .translator import translate  # потом переделать
+from email_helper.deadlines import deadlines as deadlines_dict
+
 
 
 class Student(Base):
@@ -61,16 +61,16 @@ class Task(Base):
     student = relationship("Student", back_populates="tasks")
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
-    number = Column(Integer)
-    deadline = Column(Date)
-    grade = Column(Integer)
+    name = Column(String)
+    creation_date = Column(Date, default=datetime.date.today())
+    grade = Column(Integer, default=0)
+    is_plagiat = Column(Boolean, default=False)
 
-    def __init__(self, student, number, deadline):
+    def __init__(self, student, name):
         """Initialise task object."""
 
         self.student = student
-        self.number = number
-        self.deadline = deadline
+        self.name = name
 
     def json(self):
         """Dict (json) data from report"""
@@ -100,13 +100,13 @@ class Report(Base):
     text = Column(Text)
     create_date = Column(Date)
     hash = Column(String)
+    is_plagiat = Column(Boolean, default=False)
     grade = Column(Integer)  # 0, 1, 2, 4
 
     def __init__(self, task, file_path):
         """Initialise report object"""
 
         self.task = task
-        self.plagiat = False
         self.name = os.path.basename(file_path)
         file = tarfile.open(file_path)
         self.text = file.extractfile('./OUT.txt').read().decode()
@@ -149,9 +149,8 @@ class Report(Base):
     def get_grade(self):
         """Give report a grade"""
 
-        cur_deadline = self.task.deadline
-
-        if self.plagiat:
+        cur_deadline = self.get_deadline()
+        if self.is_plagiat:
             self.grade = 0
         else:
             if self.create_date < cur_deadline:
@@ -161,3 +160,20 @@ class Report(Base):
             else:
                 self.grade = 1
         return self.grade
+
+    def get_deadline(self):
+        """Return deadline date for task
+
+        :param task_name: Name of required task
+        :return: Deadline date as datetime.date object
+        """
+
+        task_name = self.task.name
+        if task_name is not None:
+            try:
+                index = list(deadlines_dict.keys()).index(task_name)
+            except ValueError:
+                return None
+            return list(deadlines_dict.values())[index].date()
+        else:
+            raise ValueError("not enough parameters")
