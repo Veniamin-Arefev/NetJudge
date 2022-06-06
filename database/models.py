@@ -89,8 +89,9 @@ class Report(Base):
         self.input = '\n'.join([line[1] for line in lines if line[0] == 'input'])
         self.output = '\n'.join([line[1] for line in lines if line[0] == 'output'])
         self.create_date = self.get_report_date(file)
-        self.get_report_date(file)
+        # self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
+        self.get_grade()
 
     def __repr__(self):
         """Report str"""
@@ -114,17 +115,18 @@ class Report(Base):
         else:  # едва ли это нужно
             raise ValueError()
 
-    def get_grade(self, deadline):
+    def get_grade(self):
         """Give report a grade"""
 
-        if self.plagiat:
-            grade = 0
-        else:
-            if (deadline - self.create_date).days < 7:
-                grade = 1
-            elif (deadline - self.create_date).days < 14:
-                grade = 0.5
-            else:
-                grade = 0.25
+        cur_deadline = self.task.deadline
 
-        return grade
+        if self.plagiat:
+            self.grade = 0
+        else:
+            if self.create_date < cur_deadline:
+                self.grade = 1
+            elif self.create_date < cur_deadline + datetime.timedelta(7):
+                self.grade = 0.5
+            else:
+                self.grade = 0.25
+        return self.grade

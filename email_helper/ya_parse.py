@@ -1,8 +1,7 @@
-import os
 from datetime import datetime
 from email.header import decode_header
-from imap_tools import MailBox
 
+import email_helper.mailer_utilities
 from email_helper.mailer_configs import *
 from email_helper.mailer_utilities import *
 from email_helper.table_utilities import *
@@ -14,10 +13,7 @@ __all__ = ['ya_parse_main']
 def ya_parse_main(print_info=False):
     configs = load_configs('mailer_ya.cfg')
 
-    mailbox = MailBox(configs['Server']['email server host'])
-    mailbox.login(configs['Credentials']['Username'],
-                  configs['Credentials']['Password']
-                  , initial_folder=configs['Server']['folder'])
+    mailbox = email_helper.mailer_utilities.connect_to_mailbox(configs)
 
     submitted = {name: list() for name in homeworks_names_and_files}
 

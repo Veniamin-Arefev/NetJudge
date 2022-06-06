@@ -1,11 +1,27 @@
-import imaplib
+import configparser
 import datetime
 from email.mime.text import MIMEText
+from email.header import decode_header
 from typing import Union
 
 from imap_tools import MailBox, AND, OR
 
-__all__ = ['MailerUtilities']
+__all__ = ['MailerUtilities', 'connect_to_mailbox', 'get_ya_mailbox']
+
+from email_helper.mailer_configs import load_configs
+
+
+def connect_to_mailbox(configs: configparser.ConfigParser):
+    con_mailbox = MailBox(configs['Server']['email server host'])
+    con_mailbox.login(configs['Credentials']['Username'],
+                      configs['Credentials']['Password']
+                      , initial_folder=configs['Server']['folder'])
+
+    return con_mailbox
+
+def get_ya_mailbox():
+    ya_configs = load_configs('mailer_ya.cfg')
+    return connect_to_mailbox(ya_configs)
 
 
 class MailerUtilities:
@@ -32,6 +48,12 @@ class MailerUtilities:
 
     def get_by_uids(self, uids: list[str]):
         return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True) if len(uids) > 0 else ()
+
+    def get_username_by_email(self, email: str):
+        for mail in self.mailbox.fetch(AND(from_=email), limit=1, mark_seen=False):
+            name = mail.headers['from'][0]
+            name, codec = decode_header(name[:name.index('<')].strip())[0]
+            return name.title() if codec is None else name.decode(codec).title()
 
     def transfer_mail_to_mailbox_and_archive(self, uids: Union["all", str, list[str]], target_mailbox: MailBox,
                                              print_info=False):

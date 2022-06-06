@@ -1,23 +1,12 @@
-import configparser
 import datetime
 import imaplib
 import ssl
 from time import sleep
 
-from imap_tools import MailBox
-
 from email_helper.mailer_configs import *
 from email_helper.mailer_utilities import *
 
 __all__ = ['fac_idle_main']
-
-def connect_to_mailbox(configs: configparser.ConfigParser):
-    con_mailbox = MailBox(configs['Server']['email server host'])
-    con_mailbox.login(configs['Credentials']['Username'],
-                      configs['Credentials']['Password']
-                      , initial_folder=configs['Server']['folder'])
-
-    return con_mailbox
 
 
 def fac_idle_main():
