@@ -88,14 +88,29 @@ def add_report(email, report_path):
             session.delete(task.reports[-1])
             session.commit()
 
-
     task.grade = max([report.grade for report in task.reports])
     session.commit()
     session.close()
 
 
-def add_all_reports_in_tree(reports_path):
-    pass
+def add_all_reports_in_tree(reports_path='tasks', print_info=False):
+    for homework_name in os.listdir(reports_path):
+        if print_info:
+            print(f"Current importing task : {homework_name}", end="\r")
+        for email in os.listdir(reports_path + os.sep + homework_name):
+            for report_try in os.listdir(reports_path + os.sep + homework_name + os.sep + email):
+                for filename in os.listdir(reports_path + os.sep
+                                           + homework_name + os.sep + email + os.sep + report_try):
+                    """Check the correctness of the file"""
+                    try:
+                        add_report(email,
+                                   reports_path + os.sep +
+                                   homework_name + os.sep +
+                                   email + os.sep +
+                                   report_try + os.sep +
+                                   filename)
+                    except Exception:
+                        pass
 
 
 def get_lines(report_name, email=None, name=None):
@@ -154,4 +169,3 @@ def get_all_grades():
     data = [student.json() for student in students]
     session.close()
     return data
-

@@ -42,7 +42,7 @@ def ya_download(download_dir='tasks', print_info=False):
     except FileExistsError:
         pass
 
-    for homework_name in homeworks_names_and_files.keys():
+    for homework_name, homeworks_files in homeworks_names_and_files.items():
         if print_info:
             print(f"Current download task : {homework_name}", end="\r")
         cur_dir = download_dir + os.sep + homework_name
@@ -56,12 +56,12 @@ def ya_download(download_dir='tasks', print_info=False):
                 os.mkdir(email_path)
             except FileExistsError:
                 pass
-            try_number = 1
-            while os.path.isdir(email_path + os.sep + str(try_number)):
-                try_number += 1
-            email_path += os.sep + str(try_number)
-            os.mkdir(email_path)
             for mail in mailer_utils.get_by_uids([uid]):
-                for attac in mail.attachments:
-                    with open(email_path + os.sep + attac.filename, 'wb') as f:
-                        f.write(attac.payload)
+                email_path += os.sep + str(mail.uid)
+                if os.path.exists(email_path):
+                    continue
+                os.mkdir(email_path)
+                for attachment in mail.attachments:
+                    if attachment.filename in homeworks_files:
+                        with open(email_path + os.sep + attachment.filename, 'wb') as f:
+                            f.write(attachment.payload)
