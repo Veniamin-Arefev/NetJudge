@@ -6,18 +6,18 @@ from .functions import *
 
 def get_people():
     session = session_factory()
-    people_query = session.query(Person)
+    people_query = session.query(Student)
     session.close()
     return people_query.first()
 
 
 def print_statistics():
     session = session_factory()
-    people_query = session.query(Person)
-    for person in people_query:
-        print(person)
+    people_query = session.query(Student)
+    for student in people_query:
+        print(student)
         print('-' * 10)
-        for task in person.tasks:
+        for task in student.tasks:
             print(task)
             for report in task.reports:
                 print(report)

@@ -10,28 +10,28 @@ from . import *
 from .translator import translate  # потом переделать
 
 
-class Person(Base):
-    """Class for one person."""
+class Student(Base):
+    """Class for one student."""
 
-    __tablename__ = 'person'
+    __tablename__ = 'student'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     email = Column(String)
-    tasks = relationship("Task", back_populates="person")
+    tasks = relationship("Task", back_populates="student")
 
     def __init__(self, name, email):
-        """Initialise person object
+        """Initialise student object
 
-        :param name: Person's name
-        :param email: Person's email
+        :param name: Student's name
+        :param email: Student's email
         """
 
         self.name = name
         self.email = email
 
     def __repr__(self):
-        """Person str"""
+        """Student str"""
 
         line = f"Name: {self.name}\nemail: {self.email}\n"
         line += f"Completed tasks: "
@@ -45,20 +45,35 @@ class Task(Base):
 
     __tablename__ = 'task'
 
-    person_id = Column(Integer, ForeignKey('person.id', ondelete='CASCADE'), nullable=False)
-    person = relationship("Person", back_populates="tasks")
+    student_id = Column(Integer, ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
+    student = relationship("Student", back_populates="tasks")
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     number = Column(Integer)
     deadline = Column(Date)
     grade = Column(Integer)
 
-    def __init__(self, person, number, deadline):
+    def __init__(self, student, number, deadline):
         """Initialise task object."""
 
-        self.person = person
+        self.student = student
         self.number = number
         self.deadline = deadline
+
+    def json(self):
+        """Dict (json) data from report"""
+
+        data = {
+            'student': {
+                'id': self.student_id,
+                'email': self.student.email,
+                'name': self.student.name
+            },
+            'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
+            'report_count': len(self.reports),
+            'grade': self.grade
+        }
+        return data
 
     def __repr__(self):
         return str(self.number) + ' ' + str(self.grade)
