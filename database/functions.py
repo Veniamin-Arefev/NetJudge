@@ -126,6 +126,13 @@ def rate_reports():
             if not task.is_plagiary:
                 task.grade = min([report.grade for report in task.reports]) if task.reports else 0
                 session.commit()
+
+        """Task is broken if it has not all of required reports"""
+        report_names = [report.name for report in task.reports]
+        if sorted(report_names) != sorted(homeworks_names_and_files[task.name]):
+            task.is_broken = True
+            session.commit()
+
     session.close()
     print("Finished")
 
