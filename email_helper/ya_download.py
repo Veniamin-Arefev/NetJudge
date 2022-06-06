@@ -5,6 +5,7 @@ from imap_tools import MailBox
 from email_helper.mailer_configs import *
 from email_helper.mailer_utilities import *
 from email_helper.deadlines import *
+from email_helper.report_fixer import report_fixer
 
 __all__ = ['ya_download']
 
@@ -65,3 +66,4 @@ def ya_download(download_dir='tasks', print_info=False):
                     if attachment.filename in homeworks_files:
                         with open(email_path + os.sep + attachment.filename, 'wb') as f:
                             f.write(attachment.payload)
+    report_fixer(download_dir)

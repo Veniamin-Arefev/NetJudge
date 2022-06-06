@@ -9,7 +9,6 @@ from . import *
 from email_helper.deadlines import deadlines as deadlines_dict
 
 
-
 class Student(Base):
     """Class for one student."""
 
@@ -62,7 +61,7 @@ class Task(Base):
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    creation_date = Column(Date, default=datetime.date.today())
+    creation_date = Column(DateTime, default=datetime.datetime.now())
     grade = Column(Integer, default=0)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
@@ -79,7 +78,7 @@ class Task(Base):
         data = {
             'id': self.id,
             'name': self.name,
-            'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
+            'creation_date': min([report.creation_date for report in self.reports]).strftime('%d-%m-%Y %H:%M:%S'),
             'grade': self.grade,
             'is_broken': self.is_broken,
             'is_plagiary': self.is_plagiary,
@@ -101,7 +100,7 @@ class Report(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)  # report.03.base
     text = Column(Text)
-    create_date = Column(Date)
+    creation_date = Column(DateTime)
     hash = Column(String)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
@@ -115,11 +114,11 @@ class Report(Base):
         try:
             file = tarfile.open(file_path)
             self.text = file.extractfile('./OUT.txt').read().decode()
-            self.create_date = self.get_report_date(file)
+            self.creation_date = self.get_report_date(file)
             self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         except Exception:
             self.text = ""
-            self.create_date = datetime.date.today()
+            self.creation_date = datetime.datetime.now()
             self.hash = ""
             self.is_broken = True
         self.set_grade()
@@ -128,7 +127,7 @@ class Report(Base):
         """Report str"""
 
         line = f"Name: {self.name}\n"
-        line += f"Creation date: {self.create_date.strftime('%d.%m.%y')}\n"
+        line += f"Creation date: {self.creation_date.isoformat()}\n"
         line += f"Hash: {self.hash}\n"
         line += f"Grade: {self.grade}"
         return line
@@ -141,7 +140,7 @@ class Report(Base):
             'name': self.name,
             'is_plagiary': self.is_plagiary,
             'is_broken': self.is_broken,
-            'create_date': self.create_date.strftime('%d.%m.%Y'),
+            'creation_date': self.creation_date.strftime('%d-%m-%Y %H:%M:%S'),
             'grade': self.grade,
             'hash': self.hash,
         }
@@ -151,23 +150,23 @@ class Report(Base):
         """Report creation date"""
 
         line = file.extractfile('./TIME.txt').read().decode().split('\n')[0]
-        time_lines = re.findall(r'START_TIME \d{4}-\d{2}-\d{2}', line)
+        time_lines = re.findall(r'START_TIME \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line)
         if time_lines:
-            create_date = re.findall(r'\d{4}-\d{2}-\d{2}', time_lines[0])[0]
-            year, month, day = create_date.split('-')
-            date = datetime.date(day=int(day), month=int(month), year=int(year))
-            return date
+            creation_date = re.findall(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', time_lines[0])[0]
+            return datetime.datetime.strptime(creation_date, '%Y-%m-%d %H:%M:%S')
 
     def set_grade(self):
         """Give report a grade"""
 
         cur_deadline = self.get_deadline()
+        # get offset-naive datetime
+        cur_deadline = datetime.datetime.strptime(cur_deadline.strftime('%d-%m-%Y %H:%M:%S'), '%d-%m-%Y %H:%M:%S')
         if self.is_plagiary:
             self.grade = 0
         else:
-            if self.create_date < cur_deadline:
+            if self.creation_date < cur_deadline:
                 self.grade = 4
-            elif self.create_date < cur_deadline + datetime.timedelta(7):
+            elif self.creation_date < cur_deadline + datetime.timedelta(7):
                 self.grade = 2
             else:
                 self.grade = 1
@@ -186,6 +185,6 @@ class Report(Base):
                 index = list(deadlines_dict.keys()).index(task_name)
             except ValueError:
                 return None
-            return list(deadlines_dict.values())[index].date()
+            return list(deadlines_dict.values())[index]
         else:
             raise ValueError("not enough parameters")

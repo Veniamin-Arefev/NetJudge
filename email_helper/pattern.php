@@ -49,7 +49,19 @@
             filter: invert(100%);
         }
 
+        .night-mode .bg-warning {
+            filter: invert(100%);
+        }
+
         .night-mode .bg-danger {
+            filter: invert(100%);
+        }
+
+        .night-mode .bg-primary {
+            filter: invert(100%);
+        }
+
+        .night-mode .bg-info {
             filter: invert(100%);
         }
 

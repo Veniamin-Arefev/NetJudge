@@ -72,7 +72,7 @@ def add_report(email, report_path):
 
         """Check new report date"""
         new_report = Report(task, report_path)
-        if new_report.create_date > report.create_date:
+        if new_report.creation_date > report.creation_date:
 
             """Replacing older report by new one"""
             session.delete(report)
@@ -85,7 +85,7 @@ def add_report(email, report_path):
             session.delete(task.reports[-1])
             session.commit()
 
-    task.creation_date = min([report.create_date for report in task.reports])
+    task.creation_date = min([report.creation_date for report in task.reports])
     if len([1 for report in task.reports if report.is_broken]):
         task.is_broken = True
     session.commit()

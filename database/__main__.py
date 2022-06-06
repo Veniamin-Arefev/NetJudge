@@ -25,4 +25,4 @@ def print_statistics():
 if __name__ == "__main__":
     add_all_reports_in_tree(print_info=True)
     rate_reports()
-    #print(collect_data())
+    # print(collect_data())

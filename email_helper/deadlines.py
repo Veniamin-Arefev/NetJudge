@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 __all__ = ['homeworks_names_and_files', 'deadlines']
 
 homeworks_names_and_files = {
-    '00_StackVirtualBox': ['image file'],
     '01_HardwareAndCommandline': ['report.01.base', 'report.01.clone'],
     '02_DataLink': ['report.02.base', 'report.02.clone'],
     '03_BridgeVlan': ['report.03.base', 'report.03.clone', 'report.03.bridge'],
@@ -27,7 +26,6 @@ def get_deadlines(keys: list[str], date: list[str]):
 
 # noinspection PyTypeChecker
 deadlines = get_deadlines(homeworks_names_and_files.keys(), [
-    '2022-02-16',
     '2022-02-23',
     '2022-03-02',
     '2022-03-09',
