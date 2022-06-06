@@ -10,28 +10,40 @@ from . import *
 from .translator import translate  # потом переделать
 
 
-class Person(Base):
-    """Class for one person."""
+class Student(Base):
+    """Class for one student."""
 
-    __tablename__ = 'person'
+    __tablename__ = 'student'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
     email = Column(String)
-    tasks = relationship("Task", back_populates="person")
+    tasks = relationship("Task", back_populates="student")
 
     def __init__(self, name, email):
-        """Initialise person object
+        """Initialise student object
 
-        :param name: Person's name
-        :param email: Person's email
+        :param name: Student's name
+        :param email: Student's email
         """
 
         self.name = name
         self.email = email
 
+    def json(self):
+        """Dict(json) data for student"""
+
+        data = {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'grade': sum([task.grade for task in self.tasks]),
+            'tasks': [task.json() for task in self.tasks],
+        }
+        return data
+
     def __repr__(self):
-        """Person str"""
+        """Student str"""
 
         line = f"Name: {self.name}\nemail: {self.email}\n"
         line += f"Completed tasks: "
@@ -45,19 +57,35 @@ class Task(Base):
 
     __tablename__ = 'task'
 
-    person_id = Column(Integer, ForeignKey('person.id', ondelete='CASCADE'), nullable=False)
-    person = relationship("Person", back_populates="tasks")
+    student_id = Column(Integer, ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
+    student = relationship("Student", back_populates="tasks")
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     number = Column(Integer)
     deadline = Column(Date)
+    grade = Column(Integer)
 
-    def __init__(self, person, number, deadline):
+    def __init__(self, student, number, deadline):
         """Initialise task object."""
 
-        self.person = person
+        self.student = student
         self.number = number
         self.deadline = deadline
+
+    def json(self):
+        """Dict (json) data from report"""
+
+        data = {
+            'id': self.id,
+            'number': self.number,
+            'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
+            'grade': self.grade,
+            'reports': [report.json() for report in self.reports],
+        }
+        return data
+
+    def __repr__(self):
+        return str(self.number) + ' ' + str(self.grade)
 
 
 class Report(Base):
@@ -70,11 +98,9 @@ class Report(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)  # report.03.base
     text = Column(Text)
-    input = Column(Text)
-    output = Column(Text)
     create_date = Column(Date)
     hash = Column(String)
-    grade = Column(Float)  # 0, 0.25, 0.5. 1
+    grade = Column(Integer)  # 0, 1, 2, 4
 
     def __init__(self, task, file_path):
         """Initialise report object"""
@@ -84,12 +110,7 @@ class Report(Base):
         self.name = os.path.basename(file_path)
         file = tarfile.open(file_path)
         self.text = file.extractfile('./OUT.txt').read().decode()
-        text = re.sub('\r', '', self.text)  # re.split работал не совсем так, как надо
-        lines = [translate(line) for line in text.split('\n') if line]
-        self.input = '\n'.join([line[1] for line in lines if line[0] == 'input'])
-        self.output = '\n'.join([line[1] for line in lines if line[0] == 'output'])
         self.create_date = self.get_report_date(file)
-        # self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         self.get_grade()
 
@@ -102,6 +123,18 @@ class Report(Base):
         line += f"Grade: {self.grade}"
         return line
 
+    def json(self):
+        """Dict (json) data from report"""
+
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'create_date': self.create_date.strftime('%d.%m.%Y'),
+            'grade': self.grade,
+            'hash': self.hash,
+        }
+        return data
+
     def get_report_date(self, file):
         """Report creation date"""
 
@@ -112,8 +145,6 @@ class Report(Base):
             year, month, day = create_date.split('-')
             date = datetime.date(day=int(day), month=int(month), year=int(year))
             return date
-        else:  # едва ли это нужно
-            raise ValueError()
 
     def get_grade(self):
         """Give report a grade"""
@@ -124,9 +155,9 @@ class Report(Base):
             self.grade = 0
         else:
             if self.create_date < cur_deadline:
-                self.grade = 1
+                self.grade = 4
             elif self.create_date < cur_deadline + datetime.timedelta(7):
-                self.grade = 0.5
+                self.grade = 2
             else:
-                self.grade = 0.25
+                self.grade = 1
         return self.grade
