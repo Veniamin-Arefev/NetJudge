@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -39,6 +40,7 @@
                 max-width: 100%;
                 margin: auto;
             }
+
             tbody tr th:first-child {
                 max-width: 40vw;
                 overflow: hidden;
@@ -114,15 +116,14 @@
         <table class="table table-hover table-striped table-bordered align-middle" id="main_table">
         </table>
     </div>
-
     <?php
     if ($is_admin) {
         echo
-    '
+        '
     <form action="data.php" method="POST" target="_blank" id="data_form" hidden>
-        <input type="text" name="username" id="form_username"/>
-        <input type="text" name="homework_name" id="form_homework_name"/>
-        <input type="submit" name="form_submit">
+    <input id="form_username" name="username" type="text"/>
+    <input id="form_homework_name" name="homework_name" type="text"/>
+    <input name="form_submit" type="submit"/>
     </form>
     <script>
         $(function () {
@@ -135,16 +136,15 @@
                     $("#data_form").trigger("submit");
                     console.log($("thead > tr > th")[col_index].innerText);
                     console.log(username);
-//                    window.open("?username=" + username, "_blank");
                 }
             });
         });
     </script>
 ';
-}
-?>
+    }
+    ?>
 
-    <h6 id="update-time"></h6>
+    <h6 id="update-time">Last updated: 07 Jun 02:12</h6>
 </div>
 <footer class="bg-transparent fixed-bottom-right">
     <div class="container-fluid">

@@ -40,11 +40,9 @@ def report_fixer(root_path):
             content = f.read()
         while not is_tar(content):
             if (i := content.find(b"login: ")) > -1:
-                print(f"Login: {file}")
                 content = content[i + 7:]
                 continue
             if b'\r\n' in content:
-                print(f"Try deTTYing {file}")
                 content = content.replace(b'\r\n', b'\n')
                 continue
             break
@@ -52,7 +50,3 @@ def report_fixer(root_path):
             with open(file, "wb") as f:
                 f.write(content)
             continue
-        if len(content) < 32:
-            print(f"Empty: {file}")
-        else:
-            print(f"Not tar: {file}")

@@ -61,7 +61,7 @@ class Task(Base):
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    creation_date = Column(DateTime, default=datetime.datetime.now())
+    creation_date = Column(DateTime, default=datetime.datetime.fromisoformat('2011-11-11 04:20:33'))
     grade = Column(Integer, default=0)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
@@ -118,7 +118,7 @@ class Report(Base):
             self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         except Exception:
             self.text = ""
-            self.creation_date = datetime.datetime.now()
+            self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
             self.hash = ""
             self.is_broken = True
         self.set_grade()
@@ -127,7 +127,7 @@ class Report(Base):
         """Report str"""
 
         line = f"Name: {self.name}\n"
-        line += f"Creation date: {self.creation_date.isoformat()}\n"
+        line += f"Creation date: {self.creation_date.strftime('%d-%m-%Y %H:%M:%S')}\n"
         line += f"Hash: {self.hash}\n"
         line += f"Grade: {self.grade}"
         return line

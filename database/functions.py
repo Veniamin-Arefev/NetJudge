@@ -154,12 +154,6 @@ def get_lines(report_name, email=None, name=None):
     else:
         return None
 
-    """Find task"""
-    task_number = int(report_name[7:9])
-    task = session.query(Task).filter(Task.number == task_number).filter(Task.student_id == student.id).first()
-    if not task:
-        return None
-
     """Find report"""
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
     if not report or report.is_broken:
@@ -168,6 +162,31 @@ def get_lines(report_name, email=None, name=None):
     lines = [translate(line) for line in text.split('\n') if line]
     session.close()
     return lines
+
+def get_report_text(report_name, email=None, name=None):
+    """Find report input and output"""
+
+    session = session_factory()
+
+    """Find student"""
+    if email:
+        student = session.query(Student).filter(Student.email == email).first()
+        if not student:
+            return None
+    elif name:
+        student = session.query(Student).filter(Student.name == name).first()
+        if not student:
+            return None
+    else:
+        return None
+
+    """Find report"""
+    report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
+    if not report or report.is_broken:
+        return None
+    text = re.sub('\r', '', report.text)
+    session.close()
+    return text
 
 
 def get_student_data(email):

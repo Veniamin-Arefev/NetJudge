@@ -44,8 +44,8 @@ def create_html_from_database(target_path, target_filename):
             body_tr.append(elem)
 
             submitted_tasks = {key: value for key, *value in
-                               session.query(Task.name, Task.creation_date, Task.grade).join(Student).filter(
-                                   Student.email == cur_email)}
+                               session.query(Task.name, Task.creation_date, Task.grade, Task.is_plagiary,
+                                             Task.is_broken).join(Student).filter(Student.email == cur_email)}
 
             for homework_name in email_helper.deadlines.homeworks_names_and_files.keys():
                 if homework_name in submitted_tasks.keys():
@@ -56,7 +56,8 @@ def create_html_from_database(target_path, target_filename):
                         color = 'bg-warning'
                     elif submitted_tasks[homework_name][1] == 1:
                         color = 'bg-danger'
-                    elif submitted_tasks[homework_name][1] == 0:  # not original
+                    elif submitted_tasks[homework_name][2] == 1 \
+                            and submitted_tasks[homework_name][3] == 0:  # not original and not broken
                         color = 'bg-primary'
                     else:
                         color = 'bg-info'

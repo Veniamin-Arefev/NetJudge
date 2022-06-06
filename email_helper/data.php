@@ -72,31 +72,22 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
         <table class="table table-hover table-striped table-bordered align-middle" id="main_table">
             <thead>
             <tr>
-                <th scope="col">№</th>
-                <th scope="col">Input</th>
-                <th scope="col">Output</th>
+                <th scope="col">File name</th>
+                <th scope="col">File text</th>
+<!--                <th scope="col">№</th>-->
+<!--                <th scope="col">Input</th>-->
+<!--                <th scope="col">Output</th>-->
             </tr>
             </thead>
             <tbody>
+            <?php
+            $command = escapeshellcmd("");
+            $output = shell_exec($command);
+            echo $output;
+            ?>
             <tr>
                 <th>1</th>
                 <th>lol</th>
-                <th>kek</th>
-            </tr>
-            <tr>
-                <th>1</th>
-                <th>lol</th>
-                <th>kek</th>
-            </tr>
-            <tr>
-                <th>1</th>
-                <th>lol</th>
-                <th>kek</th>
-            </tr>
-            <tr>
-                <th>1</th>
-                <th>lol</th>
-                <th>kek</th>
             </tr>
             </tbody>
         </table>
