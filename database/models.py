@@ -51,6 +51,7 @@ class Task(Base):
     id = Column(Integer, primary_key=True)
     number = Column(Integer)
     deadline = Column(Date)
+    grade = Column(Integer)
 
     def __init__(self, person, number, deadline):
         """Initialise task object."""
@@ -58,6 +59,9 @@ class Task(Base):
         self.person = person
         self.number = number
         self.deadline = deadline
+
+    def __repr__(self):
+        return str(self.number) + ' ' + str(self.grade)
 
 
 class Report(Base):
@@ -74,7 +78,7 @@ class Report(Base):
     output = Column(Text)
     create_date = Column(Date)
     hash = Column(String)
-    grade = Column(Float)  # 0, 0.25, 0.5. 1
+    grade = Column(Integer)  # 0, 1, 2, 4
 
     def __init__(self, task, file_path):
         """Initialise report object"""
@@ -124,9 +128,9 @@ class Report(Base):
             self.grade = 0
         else:
             if self.create_date < cur_deadline:
-                self.grade = 1
+                self.grade = 4
             elif self.create_date < cur_deadline + datetime.timedelta(7):
-                self.grade = 0.5
+                self.grade = 2
             else:
-                self.grade = 0.25
+                self.grade = 1
         return self.grade

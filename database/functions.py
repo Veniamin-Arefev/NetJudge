@@ -63,9 +63,10 @@ def add_report(email, report_path):
         session.commit()
 
         """Check plagiat"""
-        if session.query(Report).filter(Report.hash == report.hash).count() > 1:
-            report.plagiat = True
-            session.commit()
+        if (same_reports := session.query(Report).filter(Report.hash == report.hash)).count() > 1:
+            for clone in same_reports:
+                clone.plagiat = True
+                session.commit()
 
         """Rate report"""
         report.grade = report.get_grade()
@@ -79,7 +80,8 @@ def add_report(email, report_path):
             session.delete(new_report)
 
         session.commit()
-
+    task.grade = max([report.grade for report in task.reports])
+    session.commit()
     session.close()
 
 
@@ -107,3 +109,31 @@ def get_lines(email, report_name):
     lines = [translate(line) for line in text.split('\n') if line]
     session.close()
     return lines
+
+
+def get_student_grades(email):
+    """Find student's grades for each completed task"""
+
+    session = session_factory()
+    person = session.query(Person).filter(Person.email == email).first()
+    if not person:
+        return None
+
+    tasks = session.query(Task).filter(Task.person_id == person.id)
+    if not tasks:
+        return None
+
+    return {
+        'summary': sum([task.grade for task in tasks]),
+        'tasks': [{'task': task.number, 'grade': task.grade, 'report_count': len(task.reports)} for task in tasks]
+    }
+
+
+def get_all_grades():
+    """Find grades for every student"""
+
+    session = session_factory()
+    students = session.query(Person)
+    session.close()
+    return [{'email': student.email, 'data': get_student_grades(student.email)} for student in students]
+
