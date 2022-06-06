@@ -178,7 +178,7 @@ def get_student_data(email):
     return data
 
 
-def get_all_grades():
+def collect_data():
     """Find grades for every student"""
 
     session = session_factory()

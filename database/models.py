@@ -78,10 +78,11 @@ class Task(Base):
 
         data = {
             'id': self.id,
-            'number': self.number,
+            'name': self.name,
             'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
             'grade': self.grade,
             'is_broken': self.is_broken,
+            'is_plagiary': self.is_plagiary,
             'reports': [report.json() for report in self.reports],
         }
         return data
@@ -138,6 +139,7 @@ class Report(Base):
         data = {
             'id': self.id,
             'name': self.name,
+            'is_plagiary': self.is_plagiary,
             'is_broken': self.is_broken,
             'create_date': self.create_date.strftime('%d.%m.%Y'),
             'grade': self.grade,

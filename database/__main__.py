@@ -1,4 +1,5 @@
 from .functions import *
+import json
 
 
 def get_people():
@@ -24,3 +25,4 @@ def print_statistics():
 if __name__ == "__main__":
     add_all_reports_in_tree(print_info=True)
     rate_reports()
+    print(json.dumps(collect_data(), indent=4))
