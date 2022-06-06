@@ -1,30 +1,18 @@
 import os.path
 
 import email_helper.mailer_utilities
-from . import *
 from .models import *
 from report_analyser.translator import translate
-from email_helper.deadlines import deadlines as deadlines_dict
+from email_helper.deadlines import homeworks_names_and_files
 
 
-def get_deadline(task_number=None, task_name=None):
-    """Return deadline date for task
+def get_task_name(report_name):
+    """Find task name by one of it's reports"""
 
-    :param task_number: Number of required task
-    :param task_name: Name of required task
-    :return: Deadline date as datetime.date object
-    """
-
-    if task_number is not None:
-        return list(deadlines_dict.values())[task_number]
-    elif task_name is not None:
-        try:
-            index = list(deadlines_dict.keys()).index(task_name)
-        except ValueError:
-            return None
-        return list(deadlines_dict.values())[index]
-    else:
-        raise ValueError("not enough parameters")
+    task_number = report_name[7:9]  # позиции строго фиксированы
+    task_names = homeworks_names_and_files.keys()
+    tasks = [task_name for task_name in task_names if task_name.startswith(task_number)]
+    return tasks[0] if tasks else None
 
 
 def add_report(email, report_path):
@@ -48,11 +36,10 @@ def add_report(email, report_path):
 
     """Get or create task"""
     report_name = os.path.basename(report_path)
-    task_number = int(report_name[7:9])  # позиции строго фиксированы
-    deadline = get_deadline(task_number)
-    task = session.query(Task).filter(Task.number == task_number).filter(Task.student_id == student.id).first()
+    task_name = get_task_name(report_name)
+    task = session.query(Task).filter(Task.name == task_name).filter(Task.student_id == student.id).first()
     if not task:
-        task = Task(student, task_number, deadline)
+        task = Task(student, task_name)
         session.add(task)
         session.commit()
 
@@ -66,7 +53,9 @@ def add_report(email, report_path):
         """Check plagiat"""
         if (same_reports := session.query(Report).filter(Report.hash == report.hash)).count() > 1:
             for clone in same_reports:
-                clone.plagiat = True
+                clone.is_plagiat = True
+                clone.task.is_plagiat = True
+                clone.task.grade = 0
                 session.commit()
 
         """Rate report"""
@@ -76,19 +65,20 @@ def add_report(email, report_path):
         """Check new report date"""
         new_report = Report(task, report_path)
         if new_report.create_date > report.create_date:
-            """Adding new report"""
 
+            """Adding new report"""
             session.delete(report)
             session.commit()
             session.add(new_report)
             session.commit()
         else:
-            """New report is older"""
 
+            """New report is older"""
             session.delete(task.reports[-1])
             session.commit()
 
     task.grade = max([report.grade for report in task.reports])
+    task.creation_date = min([report.create_date for report in task.reports])
     session.commit()
     session.close()
 
@@ -109,7 +99,7 @@ def add_all_reports_in_tree(reports_path='tasks', print_info=False):
                                    email + os.sep +
                                    report_try + os.sep +
                                    filename)
-                    except Exception:
+                    except Exception as e:
                         pass
 
 
