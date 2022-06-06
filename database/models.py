@@ -30,6 +30,18 @@ class Student(Base):
         self.name = name
         self.email = email
 
+    def json(self):
+        """Dict(json) data for student"""
+
+        data = {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'grade': sum([task.grade for task in self.tasks]),
+            'tasks': [task.json() for task in self.tasks],
+        }
+        return data
+
     def __repr__(self):
         """Student str"""
 
@@ -64,14 +76,10 @@ class Task(Base):
         """Dict (json) data from report"""
 
         data = {
-            'student': {
-                'id': self.student_id,
-                'email': self.student.email,
-                'name': self.student.name
-            },
+            'id': self.id,
             'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
-            'report_count': len(self.reports),
-            'grade': self.grade
+            'grade': self.grade,
+            'reports': [report.json() for report in self.reports],
         }
         return data
 
@@ -108,7 +116,6 @@ class Report(Base):
         self.input = '\n'.join([line[1] for line in lines if line[0] == 'input'])
         self.output = '\n'.join([line[1] for line in lines if line[0] == 'output'])
         self.create_date = self.get_report_date(file)
-        # self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         self.get_grade()
 
@@ -121,6 +128,18 @@ class Report(Base):
         line += f"Grade: {self.grade}"
         return line
 
+    def json(self):
+        """Dict (json) data from report"""
+
+        data = {
+            'id': self.id,
+            'name': self.name,
+            'create_date': self.create_date.strftime('%d.%m.%Y'),
+            'grade': self.grade,
+            'hash': self.hash,
+        }
+        return data
+
     def get_report_date(self, file):
         """Report creation date"""
 
@@ -131,8 +150,6 @@ class Report(Base):
             year, month, day = create_date.split('-')
             date = datetime.date(day=int(day), month=int(month), year=int(year))
             return date
-        else:  # едва ли это нужно
-            raise ValueError()
 
     def get_grade(self):
         """Give report a grade"""

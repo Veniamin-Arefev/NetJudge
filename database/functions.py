@@ -75,12 +75,20 @@ def add_report(email, report_path):
     else:
         """Check new report date"""
         new_report = Report(task, report_path)
-        if new_report.create_date >= report.create_date:
-            session.delete(report)
-        else:
-            session.delete(new_report)
+        if new_report.create_date > report.create_date:
+            """Adding new report"""
 
-        session.commit()
+            session.delete(report)
+            session.commit()
+            session.add(new_report)
+            session.commit()
+        else:
+            """New report is older"""
+
+            session.delete(task.reports[-1])
+            session.commit()
+
+
     task.grade = max([report.grade for report in task.reports])
     session.commit()
     session.close()
@@ -94,19 +102,15 @@ def get_lines(email, report_name):
     """Find report input and output"""
 
     session = session_factory()
-
-    """Find student"""
     student = session.query(Student).filter(Student.email == email).first()
     if not student:
         return None
 
-    """Find task"""
     task_number = int(report_name[7:9])
     task = session.query(Task).filter(Task.number == task_number).filter(Task.student_id == student.id).first()
     if not task:
         return None
 
-    """Find report"""
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
     if not report:
         return None
@@ -116,7 +120,7 @@ def get_lines(email, report_name):
     return lines
 
 
-def get_student_grades(email):
+def get_student_data(email):
     """Find student's grades for each completed task"""
 
     session = session_factory()
@@ -126,16 +130,9 @@ def get_student_grades(email):
     if not student:
         return None
 
-    """Find tasks"""
-    tasks = session.query(Task).filter(Task.student_id == student.id)
-    if not tasks:
-        return None
-
-    """Make summary"""
-    return {
-        'summary': sum([task.grade for task in tasks]),
-        'tasks': [task.json() for task in tasks]
-    }
+    data = student.json()
+    session.close()
+    return data
 
 
 def get_all_grades():
@@ -143,6 +140,7 @@ def get_all_grades():
 
     session = session_factory()
     students = session.query(Student)
+    data = [student.json() for student in students]
     session.close()
-    return [{'email': student.email, 'data': get_student_grades(student.email)} for student in students]
+    return data
 

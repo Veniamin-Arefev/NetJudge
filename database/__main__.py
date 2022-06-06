@@ -1,4 +1,5 @@
 import datetime
+import json
 from .models import *
 from . import *
 from .functions import *
@@ -26,9 +27,10 @@ def print_statistics():
 
 
 if __name__ == "__main__":
-    add_report("shrek@dreamworks.com", '/home/dmitry/Documents/netjudge_tests/report5/report_05.router')
+    add_report("shrek@dreamworks.com", '/home/dmitry/Documents/netjudge_tests/report5/report_05_client1.client1')
     #add_report("shrek@dreamworks.com", 'tasks' + os.sep + '01_HardwareAndCommandline' + os.sep + 'veniamin.arefev@mail.ru'
                #+ os.sep + '1' + os.sep + 'report.01.clone')
     print_statistics()
-    print(get_student_grades("shrek@dreamworks.com"))
-    print(get_all_grades())
+    #print(get_student_data("shrek@dreamworks.com"))
+    print(json.dumps(get_all_grades(), indent=4))
+    print(get_lines("shrek@dreamworks.com", "report_05_client1.client1"))
