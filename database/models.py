@@ -77,6 +77,7 @@ class Task(Base):
 
         data = {
             'id': self.id,
+            'number': self.number,
             'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
             'grade': self.grade,
             'reports': [report.json() for report in self.reports],
@@ -97,8 +98,6 @@ class Report(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)  # report.03.base
     text = Column(Text)
-    input = Column(Text)
-    output = Column(Text)
     create_date = Column(Date)
     hash = Column(String)
     grade = Column(Integer)  # 0, 1, 2, 4
@@ -111,10 +110,6 @@ class Report(Base):
         self.name = os.path.basename(file_path)
         file = tarfile.open(file_path)
         self.text = file.extractfile('./OUT.txt').read().decode()
-        text = re.sub('\r', '', self.text)  # re.split работал не совсем так, как надо
-        lines = [translate(line) for line in text.split('\n') if line]
-        self.input = '\n'.join([line[1] for line in lines if line[0] == 'input'])
-        self.output = '\n'.join([line[1] for line in lines if line[0] == 'output'])
         self.create_date = self.get_report_date(file)
         self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         self.get_grade()
