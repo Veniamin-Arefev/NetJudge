@@ -15,6 +15,23 @@ def get_task_name(report_name):
     return tasks[0] if tasks else None
 
 
+def add_all_reports_in_tree(reports_path='tasks', print_info=False):
+    for homework_name in os.listdir(reports_path):
+        if print_info:
+            print(f"Current importing task : {homework_name}", end="\r")
+        for email in os.listdir(reports_path + os.sep + homework_name):
+            for report_try in os.listdir(reports_path + os.sep + homework_name + os.sep + email):
+                for filename in os.listdir(reports_path + os.sep
+                                           + homework_name + os.sep + email + os.sep + report_try):
+                    """Check the correctness of the file"""
+                    add_report(email,
+                               reports_path + os.sep +
+                               homework_name + os.sep +
+                               email + os.sep +
+                               report_try + os.sep +
+                               filename)
+
+
 def add_report(email, report_path):
     """Adds report to student"""
 
@@ -46,27 +63,18 @@ def add_report(email, report_path):
     """Add report if it isn't already added"""
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
     if not report:
+
+        """Add completely new report"""
         report = Report(task, report_path)
         session.add(report)
         session.commit()
-
-        """Check plagiat"""
-        if (same_reports := session.query(Report).filter(Report.hash == report.hash)).count() > 1:
-            for clone in same_reports:
-                clone.is_plagiat = True
-                clone.task.is_plagiat = True
-                clone.task.grade = 0
-                session.commit()
-
-        """Rate report"""
-        report.grade = report.get_grade()
-        session.commit()
     else:
+
         """Check new report date"""
         new_report = Report(task, report_path)
         if new_report.create_date > report.create_date:
 
-            """Adding new report"""
+            """Replacing older report by new one"""
             session.delete(report)
             session.commit()
             session.add(new_report)
@@ -77,30 +85,49 @@ def add_report(email, report_path):
             session.delete(task.reports[-1])
             session.commit()
 
-    task.grade = max([report.grade for report in task.reports])
     task.creation_date = min([report.create_date for report in task.reports])
+    if len([1 for report in task.reports if report.is_broken]):
+        task.is_broken = True
     session.commit()
     session.close()
 
 
-def add_all_reports_in_tree(reports_path='tasks', print_info=False):
-    for homework_name in os.listdir(reports_path):
-        if print_info:
-            print(f"Current importing task : {homework_name}", end="\r")
-        for email in os.listdir(reports_path + os.sep + homework_name):
-            for report_try in os.listdir(reports_path + os.sep + homework_name + os.sep + email):
-                for filename in os.listdir(reports_path + os.sep
-                                           + homework_name + os.sep + email + os.sep + report_try):
-                    """Check the correctness of the file"""
-                    try:
-                        add_report(email,
-                                   reports_path + os.sep +
-                                   homework_name + os.sep +
-                                   email + os.sep +
-                                   report_try + os.sep +
-                                   filename)
-                    except Exception as e:
-                        pass
+def rate_reports():
+    """Gives grade to every report and check plagiary"""
+
+    session = session_factory()
+    tasks = session.query(Task)
+    print(f"Rating reports", end="\r")
+    for task in tasks:
+
+        """Task is confirmed plagiary"""
+        if task.is_plagiary:
+            task.grade = 0
+            for report in task.reports:
+                report.is_plagiary = True
+                report.grade = 0
+            session.commit()
+        else:
+            """Check originality"""
+            for report in task.reports:
+                if (same_reports := session.query(Report).filter(Report.hash == report.hash)).count() > 1:
+                    """Found new plagiary"""
+                    for clone in same_reports:
+                        clone.task.is_plagiary = True
+                        clone.task.grade = 0
+                        for report in clone.task.reports:
+                            report.is_plagiary = True
+                            report.grade = 0
+                    session.commit()
+                else:
+                    """Report seems to pe original"""
+                    report.set_grade()
+                    session.commit()
+            if not task.is_plagiary:
+                task.grade = min([report.grade for report in task.reports]) if task.reports else 0
+                session.commit()
+    session.close()
+    print("Finished")
 
 
 def get_lines(report_name, email=None, name=None):
@@ -128,7 +155,7 @@ def get_lines(report_name, email=None, name=None):
 
     """Find report"""
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
-    if not report:
+    if not report or report.is_broken:
         return None
     text = re.sub('\r', '', report.text)
     lines = [translate(line) for line in text.split('\n') if line]
@@ -151,7 +178,7 @@ def get_student_data(email):
     return data
 
 
-def get_all_grades():
+def collect_data():
     """Find grades for every student"""
 
     session = session_factory()

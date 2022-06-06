@@ -1,4 +1,5 @@
 from .functions import *
+import json
 
 
 def get_people():
@@ -22,8 +23,6 @@ def print_statistics():
 
 
 if __name__ == "__main__":
-    # add_report("shrek@dreamworks.com", '/home/dmitry/Documents/netjudge_tests/report4/report.04.base')
-    # add_report("shrek@dreamworks.com", 'tasks' + os.sep + '01_HardwareAndCommandline' + os.sep + 'veniamin.arefev@mail.ru'
-    #            + os.sep + '1' + os.sep + 'report.01.clone')
     add_all_reports_in_tree(print_info=True)
-    # print_statistics()
+    rate_reports()
+    print(json.dumps(collect_data(), indent=4))

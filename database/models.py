@@ -64,7 +64,8 @@ class Task(Base):
     name = Column(String)
     creation_date = Column(Date, default=datetime.date.today())
     grade = Column(Integer, default=0)
-    is_plagiat = Column(Boolean, default=False)
+    is_plagiary = Column(Boolean, default=False)
+    is_broken = Column(Boolean, default=False)
 
     def __init__(self, student, name):
         """Initialise task object."""
@@ -77,9 +78,11 @@ class Task(Base):
 
         data = {
             'id': self.id,
-            'number': self.number,
+            'name': self.name,
             'create_date': min([report.create_date for report in self.reports]).strftime('%d.%m.%Y'),
             'grade': self.grade,
+            'is_broken': self.is_broken,
+            'is_plagiary': self.is_plagiary,
             'reports': [report.json() for report in self.reports],
         }
         return data
@@ -100,7 +103,8 @@ class Report(Base):
     text = Column(Text)
     create_date = Column(Date)
     hash = Column(String)
-    is_plagiat = Column(Boolean, default=False)
+    is_plagiary = Column(Boolean, default=False)
+    is_broken = Column(Boolean, default=False)
     grade = Column(Integer)  # 0, 1, 2, 4
 
     def __init__(self, task, file_path):
@@ -108,11 +112,17 @@ class Report(Base):
 
         self.task = task
         self.name = os.path.basename(file_path)
-        file = tarfile.open(file_path)
-        self.text = file.extractfile('./OUT.txt').read().decode()
-        self.create_date = self.get_report_date(file)
-        self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
-        self.get_grade()
+        try:
+            file = tarfile.open(file_path)
+            self.text = file.extractfile('./OUT.txt').read().decode()
+            self.create_date = self.get_report_date(file)
+            self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
+        except Exception:
+            self.text = ""
+            self.create_date = datetime.date.today()
+            self.hash = ""
+            self.is_broken = True
+        self.set_grade()
 
     def __repr__(self):
         """Report str"""
@@ -129,6 +139,8 @@ class Report(Base):
         data = {
             'id': self.id,
             'name': self.name,
+            'is_plagiary': self.is_plagiary,
+            'is_broken': self.is_broken,
             'create_date': self.create_date.strftime('%d.%m.%Y'),
             'grade': self.grade,
             'hash': self.hash,
@@ -146,11 +158,11 @@ class Report(Base):
             date = datetime.date(day=int(day), month=int(month), year=int(year))
             return date
 
-    def get_grade(self):
+    def set_grade(self):
         """Give report a grade"""
 
         cur_deadline = self.get_deadline()
-        if self.is_plagiat:
+        if self.is_plagiary:
             self.grade = 0
         else:
             if self.create_date < cur_deadline:
