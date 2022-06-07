@@ -88,6 +88,8 @@ def add_report(email, report_path):
     task.creation_date = min([report.creation_date for report in task.reports])
     if sum([1 for report in task.reports if report.is_broken]):
         task.is_broken = True
+    else:
+        task.is_broken = False
     session.commit()
     session.close()
 
@@ -126,6 +128,12 @@ def rate_reports():
             if not task.is_plagiary:
                 task.grade = min([report.grade for report in task.reports]) if task.reports else 0
                 session.commit()
+
+        """Task is broken if it has not all of required reports"""
+        report_names = [report.name for report in task.reports]
+        if sorted(report_names) != sorted(homeworks_names_and_files[task.name]):
+            task.is_broken = True
+            session.commit()
 
         if task.is_broken:
             task.grade = 0
