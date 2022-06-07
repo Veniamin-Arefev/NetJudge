@@ -125,7 +125,7 @@ class Report(Base):
             except Exception:
                 self.text = ""
                 self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
-                self.hash = ""
+                self.hash = hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest()  # секунды с милисекундами, совпасть не может
                 self.is_broken = True
         self.set_grade()
 
