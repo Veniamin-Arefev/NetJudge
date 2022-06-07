@@ -117,10 +117,16 @@ class Report(Base):
             self.creation_date = self.get_report_date(file)
             self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
         except Exception:
-            self.text = ""
-            self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
-            self.hash = ""
-            self.is_broken = True
+            try:
+                file = tarfile.open(file_path)
+                self.text = file.extractfile('./OUT.txt').read().decode('cp1251')
+                self.creation_date = self.get_report_date(file)
+                self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
+            except Exception:
+                self.text = ""
+                self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
+                self.hash = hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest()  # секунды с милисекундами, совпасть не может
+                self.is_broken = True
         self.set_grade()
 
     def __repr__(self):
