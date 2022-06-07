@@ -86,8 +86,10 @@ def add_report(email, report_path):
             session.commit()
 
     task.creation_date = min([report.creation_date for report in task.reports])
-    if len([1 for report in task.reports if report.is_broken]):
+    if sum([1 for report in task.reports if report.is_broken]):
         task.is_broken = True
+    else:
+        task.is_broken = False
     session.commit()
     session.close()
 
@@ -131,6 +133,10 @@ def rate_reports():
         report_names = [report.name for report in task.reports]
         if sorted(report_names) != sorted(homeworks_names_and_files[task.name]):
             task.is_broken = True
+            session.commit()
+
+        if task.is_broken:
+            task.grade = 0
             session.commit()
 
     session.close()
