@@ -59,11 +59,17 @@ GL_Regex = []
   GL_Regex[0] = regular expression
   GL_Regex[1] = files, it is applied to'''
 RegexPlay_Regex = []
+GL_DataBase = []
+''' GL_DataBase is struct, that we get from base,
+containing info on participants, and their tasks'''
 GL_Mode = "brief"
+GL_Source = "dir"
 '''Detailability of ouput'''
+
 
 def import_files_from_dir(dir_paths):
     '''Add keys to GF_Files'''
+    GL_Source = "dir"
     once = True
     for dir_path in dir_paths:
         '''Find all dirs = users'''
@@ -93,6 +99,41 @@ def import_files_from_dir(dir_paths):
                 GL_Result_2[user_dir][filename] = [0, 0]
         
 
+def import_files_from_base(dir_paths):
+    '''Add keys to GF_Files'''
+    GL_Source = "database"
+    once = True
+
+    GL_DataBase # = database.functions.collect_data()   TODO: GET STRUCTURE FROM BASE
+
+    for user in GL_DataBase:
+        '''Iterate by users. Each user is dict'''
+        for task in user['tasks']:
+            # try:
+            #     file_names = [filename for filename in os.listdir(user_dir) if
+            #                   re.fullmatch(r"report.\d+.[^\.:]*", filename)] 
+            # except FileNotFoundError as E:
+            #     print_red(E)
+            #     continue
+            # else:
+            #     if once:
+            #         print_green(_('Success'))
+            #         once = False
+            for report in task['reports']:
+                checkname = report['name'].split(".")
+                if checkname[0] != "report":
+                    print_red(f"ERROR: Wrong file format \'{report['name']}\'. It should start with \'report\'!")
+                    continue
+                try:
+                    checknumber = int(checkname[1])
+                except Exception as E:
+                    print_red(f"ERROR: Wrong file format \'{report['name']}\'. Report number should be integer!")
+                    continue
+                print(colored(user['email']+" "+user['name'], attrs=['bold']), " ", report['name'])
+                GL_Files[user['email']+" "+user['name']][report['name']] = ""
+                GL_Result_2[user['email']+" "+user['name']][report['name']] = [0, 0]
+
+
 def import_instructions_from_json(json_paths):
     '''Add keys to GF_Instr'''
     once = True
@@ -121,7 +162,7 @@ def import_instructions_from_json(json_paths):
             print_red(E)
             continue
 
-def Syntax_correct():
+def Syntax_correct(source):
     # TODO: Dima's function to proceed data
     """Parse files & Write score in GL_Result_1"""
     machines = {}
@@ -132,17 +173,23 @@ def Syntax_correct():
             filename = user_dir + "/" + userfile
             print(filename)
             number = filename.split(".")[-2]
-            machine_name = filename.split("/")[-1]
-            obj = tarfile.open(filename)
-            obj_members = obj.getmembers()
-            text = obj.extractfile('./OUT.txt').read().decode()
+            # machine_name = filename.split("/")[-1]
+            if source == "dir":
+                obj = tarfile.open(filename)
+                obj_members = obj.getmembers()
+                text = obj.extractfile('./OUT.txt').read().decode()
+            else:
+                # text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1]) TODO: DIMA
+                pass
             text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
             lines = [translate(line) for line in text.split('\n') if line]
             GL_Files[user_dir][userfile] = lines
-            machines[machine_name + number] = Machine(machine_name, number, lines)
-        print(f'Task number: {int(number)}')
-        for machine in machines.values():
-            machine.print_log()
+            # machines[machine_name + number] = Machine(machine_name, number, lines)
+            # print(text)
+        # print(f'Task number: {int(number)}')
+        # for machine in machines.values():
+            # machine.print_log()
+
         # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
         # GL_Result_1 = 1    If files complete Syntax_correct() without issues
         # GL_Result_1 = 0    Otherwise
@@ -229,7 +276,7 @@ class Repl_Regex(cmd.Cmd):
         
         Note, that in 'regextest' mode, results are not saved, only displayed.
         """
-        global RegexPlay_Regex, GL_Files
+        global RegexPlay_Regex, GL_Files, GL_Source
         args = shlex.split(arg, comments=True)
         if len(args) < 2:
             print_red(_("Not enough arguments"))
@@ -246,7 +293,7 @@ class Repl_Regex(cmd.Cmd):
             RegexPlay_Regex.append(record)
             print_green(_('Testing regex:'))
             print_regex_record(record)
-            Syntax_correct()
+            Syntax_correct(GL_Source)
             print_cyan(_("  =[ CHECKING... ]="))
             Semantic_check(GL_Files, RegexPlay_Regex, save_results=False) 
             print_cyan(_("  ==[ CHECK ENDED ]=="))  
@@ -466,7 +513,7 @@ class Repl(cmd.Cmd):
             print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
             if steps > 0: 
                 print_cyan(_("  =[ SYNTAX CHECK ]="))
-                Syntax_correct() 
+                Syntax_correct(GL_Source) 
             if steps > 1: 
                 print_cyan(_("  =[ SEMANTIC CHECK ]="))
                 global GL_Result_2
@@ -477,14 +524,14 @@ class Repl(cmd.Cmd):
         return [s for s in ["1", "2",] if s.startswith(text)]
 
     def do_conclude(self, arg):
-        """Function prints general result for each task number presented in collection.
+        """Function prints general result for each task number presented in collection, and saves this data.
         Usage: conclude
         
         Note, that conclude accumulates all the results during application run, except
         those made in 'regextest' mode.
         """
         print_cyan(_("  ==[ RESULTS ]=="))
-        global GL_Result_1, GL_Result_2
+        global GL_Result_1, GL_Result_2, GL_DataBase, GL_Source
         for username, reportdict in GL_Files.items():
             print_blue(colored(_("Participant '{}' results:\n").format(username), attrs=['bold']))
             for reportname, lines in reportdict.items():
@@ -495,3 +542,10 @@ class Repl(cmd.Cmd):
                     checkeq = colored(checkeq, 'red')
                 print_blue(_("  {}:\t{}").format(reportname, checkeq))
             print("")
+        """Save results"""
+        if GL_Source == "database":
+            for userind, user in enumerate(GL_DataBase):
+                for taskind, task in enumerate(user['tasks']):
+                    for reportind, report in enumerate(task['reports']):
+                        GL_DataBase[userind][taskind][reportind]["result_tuple"] = [user['email']+" "+user['name']][report['name']]
+            # TODO: DIMA Save this in database
