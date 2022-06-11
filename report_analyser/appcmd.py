@@ -64,7 +64,8 @@ RegexPlay_Regex = []
 GL_DataBase = []
 ''' GL_DataBase is struct, that we get from base,
 containing info on participants, and their tasks'''
-GL_Mode = "brief"
+GL_Mode = "verbose"
+'''Detailability of ouput'''
 GL_Source = "dir"
 '''Detailability of ouput'''
 
@@ -107,22 +108,10 @@ def import_files_from_base():
     global GL_Source, GL_DataBase
     GL_Source = "database"
     once = True
-
     GL_DataBase = collect_data()
-
     for user in GL_DataBase:
         '''Iterate by users. Each user is dict'''
         for task in user['tasks']:
-            # try:
-            #     file_names = [filename for filename in os.listdir(user_dir) if
-            #                   re.fullmatch(r"report.\d+.[^\.:]*", filename)] 
-            # except FileNotFoundError as E:
-            #     print_red(E)
-            #     continue
-            # else:
-            #     if once:
-            #         print_green(_('Success'))
-            #         once = False
             for report in task['reports']:
                 checkname = report['name'].split(".")
                 if checkname[0] != "report":
@@ -136,7 +125,6 @@ def import_files_from_base():
                 print(colored(user['email']+" "+user['name'], attrs=['bold']), " ", report['name'])
                 GL_Files[user['email']+" "+user['name']][report['name']] = ""
                 GL_Result_2[user['email']+" "+user['name']][report['name']] = [0, 0]
-
 
 
 def import_instructions_from_json(json_paths):
@@ -168,30 +156,26 @@ def import_instructions_from_json(json_paths):
             continue
 
 def Syntax_correct(source):
-    # TODO: Dima's function to proceed data
     """Parse files & Write score in GL_Result_1"""
-    machines = {}
     for user_dir, userfiles in GL_Files.items():
         print("Participant: '", user_dir, "', his files:\n\t", end="")
         for userfile in userfiles.keys():
-            # TODO: FORDIMA: Modernize this fun
             filename = user_dir + "/" + userfile
             print(filename)
             number = filename.split(".")[-2]
-            # machine_name = filename.split("/")[-1]
             if source == "dir":
                 obj = tarfile.open(filename)
                 obj_members = obj.getmembers()
                 text = obj.extractfile('./OUT.txt').read().decode()
             else:
                 text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1])
-            text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
-            lines = [translate(line) for line in text.split('\n') if line]
-            GL_Files[user_dir][userfile] = lines
-
-        # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
-        # GL_Result_1 = 1    If files complete Syntax_correct() without issues
-        # GL_Result_1 = 0    Otherwise
+            text = re.sub('\r', '', text)
+            try:
+                lines = [translate(line) for line in text.split('\n') if line]
+                GL_Files[user_dir][userfile] = lines
+                GL_Result_1[user_dir][userfile] = [1, 1]
+            except Exception as E:
+                GL_Result_1[user_dir][userfile] = [0, 1]
 
 def Semantic_check(GFiles, GRegex, save_results):
     """Write score in GL_Result_2"""
@@ -245,14 +229,6 @@ def print_regex_record(record):
 
 def print_exit_message():
     print_cyan(_("\n ==[ Exiting! ]=="))
-
-def print_help():
-    pass 
-    # TODO: Add help for all the cmd variety
-
-def print_help_regex():
-    pass 
-    # TODO: Add help for all the cmd variety
 
 class Repl_Regex(cmd.Cmd):
     prompt = colored(_("[ RegexTest ]:~$ "), 'magenta')
@@ -308,7 +284,6 @@ class Repl_Regex(cmd.Cmd):
         Usage: exint
         """
         return True
-    # TODO: Make cmd history recover after exiting regex mode
 
 class Repl(cmd.Cmd):
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
@@ -459,7 +434,7 @@ class Repl(cmd.Cmd):
 
     def do_mode(self, arg):
         """Modify verbosity mode
-        mode ['quiet'/'brief'/'verbose']
+        mode ['quiet'/'verbose']
         """
         args = shlex.split(arg, comments=True)
         global GL_Mode
@@ -531,7 +506,6 @@ class Repl(cmd.Cmd):
         """
         print_cyan(_("  ==[ RESULTS ]=="))
         global GL_Result_1, GL_Result_2, GL_Source, GL_DataBase
-        print("SOURCE", GL_Source)
         for username, reportdict in GL_Files.items():
             print_blue(colored(_("Participant '{}' results:\n").format(username), attrs=['bold']))
             for reportname, lines in reportdict.items():
@@ -542,7 +516,13 @@ class Repl(cmd.Cmd):
                     checkeq = colored(checkeq, 'red')
                 print_blue(_("  {}:\t{}").format(reportname, checkeq))
             print("")
-        """Save results"""
+    
+    def do_saveres(self, arg):
+        """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments,
+        contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
+        Usage: saveres {[FILE]}
+        """
+        global GL_Result_1, GL_Result_2, GL_Source, GL_DataBase
         if GL_Source == "database":
             session = session_factory()
             for user in GL_DataBase:
@@ -559,3 +539,16 @@ class Repl(cmd.Cmd):
                         database_task.regex_total += regex_score[1]
                         session.commit()
             session.close()
+        else:
+            args = shlex.split(arg, comments=True)
+            if len(args) not in [1]:
+                print_red(_("Wrong number of arguments"))
+            else:
+                try:
+                    with open(args[0], 'w') as f:
+                        GL_Result_2["participant name"]["report name"] = ["current grade", "maximum grade"]
+                        json.dump(GL_Result_2, f, indent = 6)
+                except FileNotFoundError as E:
+                    print_red(E)
+                else:
+                    print_green(_("Success: Saved results in {}").format(args[0]))

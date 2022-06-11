@@ -1,0 +1,32 @@
+{
+      "input_example/veniamin": {
+            "report.03.base": [
+                  1,
+                  1
+            ],
+            "report.03.bridge": [
+                  1,
+                  1
+            ]
+      },
+      "input_example/dima": {
+            "report.03.clone": [
+                  0,
+                  1
+            ],
+            "report.03.base": [
+                  1,
+                  1
+            ],
+            "report.03.bridge": [
+                  1,
+                  1
+            ]
+      },
+      "participant name": {
+            "report name": [
+                  "current grade",
+                  "maximum grade"
+            ]
+      }
+}
