@@ -5,7 +5,7 @@ import argparse
 arg_parser = argparse.ArgumentParser(prog='NET-Judge',
                                      description='Check imported reports with imported instructions.')
                                      
-arg_parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
+arg_parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.1')
 arg_parser.add_argument('-q', '--quiet', action='store_true', help='show only final marks.') # Not implemented yet
 
 arg_parser.add_argument('reports_source_type', metavar='SOURCE_TYPE', nargs='?', type=str, default='',
@@ -26,8 +26,8 @@ if __name__ == '__main__':
             sys.exit()
         elif args.reports_source_type == "DIR":
             import_files_from_dir([args.reports_directory,])
-            if args.instructions_directory != '':
-                import_instructions_from_json([args.instructions_directory,])
+            if args.instructions_file != '':
+                import_instructions_from_json([args.instructions_file,])
         elif args.reports_source_type == "DATABASE":
             import_files_from_base()
             Repl().cmdloop() # Решил сделать, чтобы регулярки можно было вставлять только с локальной системы, поэтому дальше переходим в режим проверки через cli
