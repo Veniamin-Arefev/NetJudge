@@ -65,6 +65,8 @@ class Task(Base):
     grade = Column(Integer, default=0)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
+    regex_passed = Column(Integer, default=-1)
+    regex_total = Column(Integer, default=-1)
 
     def __init__(self, student, name):
         """Initialise task object."""
@@ -82,6 +84,8 @@ class Task(Base):
             'grade': self.grade,
             'is_broken': self.is_broken,
             'is_plagiary': self.is_plagiary,
+            'regex_passed': self.regex_passed,
+            'regex_total': self.regex_total,
             'reports': [report.json() for report in self.reports],
         }
         return data
@@ -105,6 +109,8 @@ class Report(Base):
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
     grade = Column(Integer)  # 0, 1, 2, 4
+    regex_passed = Column(Integer, default=-1)
+    regex_total = Column(Integer, default=-1)
 
     def __init__(self, task, file_path):
         """Initialise report object"""
@@ -148,6 +154,8 @@ class Report(Base):
             'is_broken': self.is_broken,
             'creation_date': self.creation_date.strftime('%d-%m-%Y %H:%M:%S'),
             'grade': self.grade,
+            'regex_passed': self.regex_passed,
+            'regex_total': self.regex_total,
             'hash': self.hash,
         }
         return data
