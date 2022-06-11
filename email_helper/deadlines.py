@@ -16,7 +16,7 @@ homeworks_names_and_files = {
 }
 
 
-def get_deadlines(keys: list[str], date: list[str]):
+def get_deadlines(keys: list, date: list):
     deadlines_format = '%Y-%m-%d %z'
     return_dict = {}
     for index, key in enumerate(keys):

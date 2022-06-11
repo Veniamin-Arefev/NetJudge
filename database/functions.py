@@ -178,18 +178,18 @@ def get_report_text(report_name, email=None, name=None):
     if email:
         student = session.query(Student).filter(Student.email == email).first()
         if not student:
-            return None
+            return ''
     elif name:
         student = session.query(Student).filter(Student.name == name).first()
         if not student:
-            return None
+            return ''
     else:
-        return None
+        return ''
 
     """Find report"""
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
     if not report or report.is_broken:
-        return None
+        return ''
     text = re.sub('\r', '', report.text)
     session.close()
     return text

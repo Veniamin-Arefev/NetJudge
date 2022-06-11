@@ -184,16 +184,10 @@ def Syntax_correct(source):
                 obj_members = obj.getmembers()
                 text = obj.extractfile('./OUT.txt').read().decode()
             else:
-                # text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1]) TODO: DIMA
-                pass
+                text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1])
             text = re.sub('\r', '', text)  # re.split работал не совсем так, как надо
             lines = [translate(line) for line in text.split('\n') if line]
             GL_Files[user_dir][userfile] = lines
-            # machines[machine_name + number] = Machine(machine_name, number, lines)
-            # print(text)
-        # print(f'Task number: {int(number)}')
-        # for machine in machines.values():
-            # machine.print_log()
 
         # TODO: FORDIMA: Fill GL_Result_1 with score of syntax check. Keys are filenames, same as GL_Files.keys()
         # GL_Result_1 = 1    If files complete Syntax_correct() without issues

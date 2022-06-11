@@ -40,13 +40,13 @@ class MailerUtilities:
         criteria_encoded = f'HEADER Content-Disposition "{self.encode_mime_header_filename(filename)}"'
         return set(self.mailbox.uids(str(OR(criteria, criteria_encoded))))
 
-    def get_by_filenames(self, filenames: list[str]):
+    def get_by_filenames(self, filenames: list):
         uids = []
         for file in filenames:
             uids.append(self.get_uids_for_file(file))
         return set.intersection(*uids)
 
-    def get_by_uids(self, uids: list[str]):
+    def get_by_uids(self, uids: list):
         return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True) if len(uids) > 0 else ()
 
     def get_username_by_email(self, email: str):
@@ -55,7 +55,7 @@ class MailerUtilities:
             name, codec = decode_header(name[:name.index('<')].strip())[0]
             return name.title() if codec is None else name.decode(codec).title()
 
-    def transfer_mail_to_mailbox_and_archive(self, uids: Union["all", str, list[str]], target_mailbox: MailBox,
+    def transfer_mail_to_mailbox_and_archive(self, uids: Union["all", str, list], target_mailbox: MailBox,
                                              print_info=False):
         if uids == 'all':
             mails = self.mailbox.fetch(AND(all=True), bulk=True, mark_seen=False)
