@@ -13,8 +13,10 @@ import shlex
 import cmd
 import gettext
 import json
-from report_analyser.input_checker.Machine_config import Machine
 from .translator import translate
+from database import *
+from database.models import *
+from database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
 
@@ -69,6 +71,7 @@ GL_Source = "dir"
 
 def import_files_from_dir(dir_paths):
     '''Add keys to GF_Files'''
+    global GL_Source
     GL_Source = "dir"
     once = True
     for dir_path in dir_paths:
@@ -99,12 +102,13 @@ def import_files_from_dir(dir_paths):
                 GL_Result_2[user_dir][filename] = [0, 0]
         
 
-def import_files_from_base(dir_paths):
+def import_files_from_base():
     '''Add keys to GF_Files'''
+    global GL_Source, GL_DataBase
     GL_Source = "database"
     once = True
 
-    GL_DataBase # = database.functions.collect_data()   TODO: GET STRUCTURE FROM BASE
+    GL_DataBase = collect_data()
 
     for user in GL_DataBase:
         '''Iterate by users. Each user is dict'''
@@ -132,6 +136,7 @@ def import_files_from_base(dir_paths):
                 print(colored(user['email']+" "+user['name'], attrs=['bold']), " ", report['name'])
                 GL_Files[user['email']+" "+user['name']][report['name']] = ""
                 GL_Result_2[user['email']+" "+user['name']][report['name']] = [0, 0]
+
 
 
 def import_instructions_from_json(json_paths):
@@ -276,7 +281,7 @@ class Repl_Regex(cmd.Cmd):
         
         Note, that in 'regextest' mode, results are not saved, only displayed.
         """
-        global RegexPlay_Regex, GL_Files, GL_Source
+        global RegexPlay_Regex, GL_Files
         args = shlex.split(arg, comments=True)
         if len(args) < 2:
             print_red(_("Not enough arguments"))
@@ -531,7 +536,8 @@ class Repl(cmd.Cmd):
         those made in 'regextest' mode.
         """
         print_cyan(_("  ==[ RESULTS ]=="))
-        global GL_Result_1, GL_Result_2, GL_DataBase, GL_Source
+        global GL_Result_1, GL_Result_2, GL_Source, GL_DataBase
+        print("SOURCE", GL_Source)
         for username, reportdict in GL_Files.items():
             print_blue(colored(_("Participant '{}' results:\n").format(username), attrs=['bold']))
             for reportname, lines in reportdict.items():
@@ -544,8 +550,18 @@ class Repl(cmd.Cmd):
             print("")
         """Save results"""
         if GL_Source == "database":
-            for userind, user in enumerate(GL_DataBase):
-                for taskind, task in enumerate(user['tasks']):
-                    for reportind, report in enumerate(task['reports']):
-                        GL_DataBase[userind][taskind][reportind]["result_tuple"] = [user['email']+" "+user['name']][report['name']]
-            # TODO: DIMA Save this in database
+            session = session_factory()
+            for user in GL_DataBase:
+                for task in user['tasks']:
+                    database_task = session.query(Task).get(task['id'])
+                    database_task.regex_passed = 0
+                    database_task.regex_total = 0
+                    for report in task['reports']:
+                        regex_score = GL_Result_2[user['email']+" "+user['name']][report['name']]
+                        database_report = session.query(Report).get(report['id'])
+                        database_report.regex_passed = regex_score[0]
+                        database_report.regex_total = regex_score[1]
+                        database_task.regex_passed += regex_score[0]
+                        database_task.regex_total += regex_score[1]
+                        session.commit()
+            session.close()
