@@ -47,7 +47,15 @@
             }
         }
 
+        .bg-purple {
+            background-color: #7B68EE !important;
+        }
+
         .night-mode .bg-success {
+            filter: invert(100%);
+        }
+
+        .night-mode  .bg-purple {
             filter: invert(100%);
         }
 
@@ -97,8 +105,13 @@
         <div class="col">
             <textarea id="cookie_textarea" placeholder="Type your cookie here"></textarea>
         </div>
+        <div class="col"><text class="p-2 bg-success">Passed on time</text></div>
+        <div class="col"><text class="p-2 bg-warning">Overdue for a week</text></div>
+        <div class="col"><text class="p-2 bg-danger">Overdue more than a week</text></div>
+        <div class="col"><text class="p-2 bg-primary">Plagiarism</text></div>
+        <div class="col"><text class="p-2 bg-info">Bag archive</text></div>
         <div class="col">
-            <button class="btn btn-info" id="cookie-button" type="button">Set cookie</button>
+            <button class="btn bg-purple" id="cookie-button" type="button">Set cookie</button>
             <script>
                 $(function () {
                     let cookie_textarea = $("#cookie_textarea");
@@ -121,11 +134,11 @@
         echo
         '
     <form action="data.php" method="POST" target="_blank" id="data_form" hidden>
-    <input id="form_username" name="username" type="text"/>
-    <input id="form_homework_name" name="homework_name" type="text"/>
-    <input name="form_submit" type="submit"/>
-    </form>
-    <script>
+<input id="form_username" name="username" type="text"/>
+<input id="form_homework_name" name="homework_name" type="text"/>
+<input name="form_submit" type="submit"/>
+
+<script>
         $(function () {
             $("tbody > tr > th").on("click", function (e) {
                 let username = $(e.currentTarget).parent().children()[0].innerText.replace("&nbsp;", " ")
@@ -144,7 +157,7 @@
     }
     ?>
 
-    <h6 id="update-time">Last updated: 07 Jun 02:12</h6>
+    <h6 id="update-time">Last updated: 12 Jun 08:50</h6>
 </div>
 <footer class="bg-transparent fixed-bottom-right">
     <div class="container-fluid">

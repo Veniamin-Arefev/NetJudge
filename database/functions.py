@@ -3,6 +3,7 @@ import os.path
 from .models import *
 from report_analyser.translator import translate
 from email_helper.deadlines import homeworks_names_and_files
+from email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
 
 
 def get_task_name(report_name):
@@ -40,8 +41,7 @@ def add_report(email, report_path):
     student = session.query(Student).filter(Student.email == email).first()
     if not student:
         try:
-            mailer_utilities = email_helper.mailer_utilities.MailerUtilities(
-                email_helper.mailer_utilities.get_ya_mailbox())
+            mailer_utilities = MailerUtilities(get_ya_mailbox())
             username = mailer_utilities.get_username_by_email(email)
         except Exception:
             username = "Undefined"
@@ -167,6 +167,7 @@ def get_lines(report_name, email=None, name=None):
     lines = [translate(line) for line in text.split('\n') if line]
     session.close()
     return lines
+
 
 def get_report_text(report_name, email=None, name=None):
     """Find report input and output"""
