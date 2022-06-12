@@ -7,7 +7,7 @@
 
 </p>
 
-### **Net Judge** is a check enviroment for Linux Network oriented courses. 
+### **Net Judge** is a check environment for Linux Network oriented courses. 
 
 Course host may use this project to check how course participants progress solve tasks. **Net Judge** is initially used in [«Working with network protocols in Linux»](http://uneex.ru/LecturesCMC/LinuxNetwork2022) course. The system provides following workflow:
 
@@ -40,6 +40,14 @@ Course host may use this project to check how course participants progress solve
 
 Project interface includes both [**notification table**](https://uneex.veniamin.space/) for course participants, and interactive `command line` for course commander & moderators.
 
+## **Available scripts after installation:**
+ * netjudge-fac_idle - Fetch all mail from faculty mail, redirect it to yandex mail and enter idle
+ * netjudge-ya_idle - Fetch all mail from yandex mail, update database and enter idle
+ * netjudge-download - Download all letters attachments from yandex mail
+ * netjudge-database - Parse all attachments and populate database
+ * netjudge-ya_parse - Create html(actually php) view of database data
+ * netjudge-report_analyser -Start cmdline for regex selection
+
 ## **Usage example:**
 
 The project supports following alternatives:
@@ -50,13 +58,11 @@ The project supports following alternatives:
 Here are some usage examples:
 1. Running Net-Judge with one command without database interference:
 ```
-cd NetJudge
-python3 -m report_analyser DIR input_example/ input_example/instruction.json
+netjudge-report_analyser DIR input_example/ input_example/instruction.json
 ```
 2. Running Net-Judge without database interference:
 ```
-cd NetJudge
-python3 -m report_analyser CMD
+netjudge-report_analyser CMD
 [ NetJu ]:~$ addrep input_example
 [ NetJu ]:~$ addins input_example/instruction.json
 [ NetJu ]:~$ start 2
@@ -66,8 +72,7 @@ python3 -m report_analyser CMD
 ```
 3. Running Net-Judge using reports from database:
 ```
-cd NetJudge
-python3 -m report_analyser DATABASE
+netjudge-report_analyser DATABASE
 [ NetJu ]:~$ addins input_example/instruction.json
 [ NetJu ]:~$ start 2
 [ NetJu ]:~$ conclude
@@ -76,8 +81,7 @@ python3 -m report_analyser DATABASE
 ```
 4. Testing a regex, then saving it in filesystem:
 ```
-cd NetJudge
-python3 -m report_analyser CMD
+netjudge-report_analyser CMD
 [ NetJu ]:~$ addrep input_example
 [ NetJu ]:~$ regextest
 [ RegexTest ]:~$ re 10 in report.03.base
@@ -89,15 +93,15 @@ python3 -m report_analyser CMD
 ```
 5. Being confused :d
 ```
-cd NetJudge
-python3 -m report_analyser CMD
+netjudge-report_analyser CMD
 [ NetJu ]:~$ help
 ```
 
 ## **Dependencies:**
 
 Python libs/modules:
-- `beautifulsoup4`, `re`, `shlex`, `tarfile`, `configparser`, `sqlalchemy`, `imap_tools`
+- `bs4`, `sqlalchemy`, `imap_tools`, `termcolor`
+- python version >= 3.10
 
 ## **Authors:**
 
