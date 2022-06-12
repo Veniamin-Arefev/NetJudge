@@ -1,11 +1,11 @@
 import argparse
 
 from email_helper.mailer_configs import load_configs
-from .fac_idle import fac_idle_main
-from .ya_idle import ya_idle_main
-from .ya_download import ya_download
-from .ya_parse import ya_parse_main
-from .table_utilities import create_html_from_database
+from email_helper.fac_idle import fac_idle_main
+from email_helper.ya_idle import ya_idle_main
+from email_helper.ya_download import ya_download
+from email_helper.ya_parse import ya_parse_main
+from email_helper.table_utilities import create_html_from_database
 
 arg_parser = argparse.ArgumentParser()
 
@@ -19,7 +19,7 @@ if __name__ == '__main__':
     elif args.type == 'fac_idle':
         fac_idle_main()
     elif args.type == 'ya_parse':
-        ya_parse_main(print_info=True)
+        ya_parse_main()
     elif args.type == 'ya_download':
         ya_download(print_info=True)
     elif args.type == 'ya_parse_database':

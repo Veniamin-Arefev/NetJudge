@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as Soup
 
 __all__ = ['create_html']
 
-import email_helper.deadlines
+from email_helper.deadlines import *
 
 
 def create_html_from_database(target_path, target_filename):
@@ -25,7 +25,7 @@ def create_html_from_database(target_path, target_filename):
 
         mails = [item[0] for item in session.query(Student.email)]
 
-        for i in ['Username', 'Email', *email_helper.deadlines.homeworks_names_and_files.keys(), 'Total\xa0grade']:
+        for i in ['Username', 'Email', *deadlines.homeworks_names_and_files.keys(), 'Total\xa0grade']:
             elem = soup.new_tag('th', attrs={'scope': 'col'})
             elem.string = i
             head_tr.append(elem)

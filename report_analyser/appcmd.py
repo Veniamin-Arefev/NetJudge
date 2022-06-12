@@ -4,18 +4,10 @@ appcmd.py
 Console
 """
 
-import argparse
-import tarfile
-import sys
-import os
-import re
 import shlex
 import cmd
 import gettext
 import json
-from .translator import translate
-from database import *
-from database.models import *
 from database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
@@ -80,7 +72,7 @@ def import_files_from_dir(dir_paths):
         for user_dir in [dir[0] for dir in os.walk(dir_path)]:
             try:
                 file_names = [filename for filename in os.listdir(user_dir) if
-                              re.fullmatch(r"report.\d+.[^\.:]*", filename)] 
+                              re.fullmatch(r"report.\d+.[^\.:]*", filename)]
             except FileNotFoundError as E:
                 print_red(E)
                 continue
@@ -101,7 +93,7 @@ def import_files_from_dir(dir_paths):
                 print(colored(user_dir, attrs=['bold']), " ", filename)
                 GL_Files[user_dir][filename] = ""
                 GL_Result_2[user_dir][filename] = [0, 0]
-        
+
 
 def import_files_from_base():
     '''Add keys to GF_Files'''
@@ -122,9 +114,9 @@ def import_files_from_base():
                 except Exception as E:
                     print_red(f"ERROR: Wrong file format \'{report['name']}\'. Report number should be integer!")
                     continue
-                print(colored(user['email']+" "+user['name'], attrs=['bold']), " ", report['name'])
-                GL_Files[user['email']+" "+user['name']][report['name']] = ""
-                GL_Result_2[user['email']+" "+user['name']][report['name']] = [0, 0]
+                print(colored(user['email'] + " " + user['name'], attrs=['bold']), " ", report['name'])
+                GL_Files[user['email'] + " " + user['name']][report['name']] = ""
+                GL_Result_2[user['email'] + " " + user['name']][report['name']] = [0, 0]
 
 
 def import_instructions_from_json(json_paths):
@@ -155,6 +147,7 @@ def import_instructions_from_json(json_paths):
             print_red(E)
             continue
 
+
 def Syntax_correct(source):
     """Parse files & Write score in GL_Result_1"""
     for user_dir, userfiles in GL_Files.items():
@@ -177,6 +170,7 @@ def Syntax_correct(source):
             except Exception as E:
                 GL_Result_1[user_dir][userfile] = [0, 1]
 
+
 def Semantic_check(GFiles, GRegex, save_results):
     """Write score in GL_Result_2"""
     global GL_Result_2
@@ -196,7 +190,8 @@ def Semantic_check(GFiles, GRegex, save_results):
                         for match in patt.findall(line[1]):
                             find = True
                             matchind += 1
-                            print("      "+colored(_("Match {} in line {}:").format(matchind, lineind), attrs=["bold"]))
+                            print(
+                                "      " + colored(_("Match {} in line {}:").format(matchind, lineind), attrs=["bold"]))
                             linewithmatch = colored(match, "green", attrs=["underline"]).join(line[1].split(match))
                             print(_("        {}").format(colored(linewithmatch)))
                             linenumber = lineind + 1
@@ -211,11 +206,13 @@ def Semantic_check(GFiles, GRegex, save_results):
                 checkeq = colored(checkeq, 'green')
             else:
                 checkeq = colored(checkeq, 'red')
-            print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'), colored(reportname, 'blue', attrs=['bold'])))
+            print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'),
+                                              colored(reportname, 'blue', attrs=['bold'])))
             if save_results:
                 for i in range(0, 2):
                     GL_Result_2[username][reportname][i] += listed_results[i]
         print_blue("\n")
+
 
 def print_regex_record(record):
     print(_(" Re: {}").format(colored(record['regex'], attrs=['bold'])))
@@ -227,8 +224,10 @@ def print_regex_record(record):
         print(_("   Every imported file ({}put).").format(record['inout']), end="\t")
     print("")
 
+
 def print_exit_message():
     print_cyan(_("\n ==[ Exiting! ]=="))
+
 
 class Repl_Regex(cmd.Cmd):
     prompt = colored(_("[ RegexTest ]:~$ "), 'magenta')
@@ -270,8 +269,8 @@ class Repl_Regex(cmd.Cmd):
             print_regex_record(record)
             Syntax_correct(GL_Source)
             print_cyan(_("  =[ CHECKING... ]="))
-            Semantic_check(GL_Files, RegexPlay_Regex, save_results=False) 
-            print_cyan(_("  ==[ CHECK ENDED ]=="))  
+            Semantic_check(GL_Files, RegexPlay_Regex, save_results=False)
+            print_cyan(_("  ==[ CHECK ENDED ]=="))
 
     def do_q(self, arg):
         """Easier exit from regex testing mode.
@@ -284,6 +283,7 @@ class Repl_Regex(cmd.Cmd):
         Usage: exint
         """
         return True
+
 
 class Repl(cmd.Cmd):
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
@@ -361,7 +361,7 @@ class Repl(cmd.Cmd):
             print_red(_("Not enough arguments"))
         else:
             dir_paths = args[0:]
-            import_files_from_dir(dir_paths)            
+            import_files_from_dir(dir_paths)
 
     def do_addins(self, arg):
         """Add 1 or more instruction files to the regex collection.
@@ -374,7 +374,7 @@ class Repl(cmd.Cmd):
             print_red(_("Not enough arguments"))
         else:
             json_path = args[0:]
-            import_instructions_from_json(json_path)  
+            import_instructions_from_json(json_path)
 
     def do_saveins(self, arg):
         """Save regular expressions imported in project in file in json format.
@@ -388,7 +388,7 @@ class Repl(cmd.Cmd):
         else:
             try:
                 with open(args[0], 'w') as f:
-                    json.dump(GL_Regex, f, indent = 6)
+                    json.dump(GL_Regex, f, indent=6)
             except FileNotFoundError as E:
                 print_red(E)
             else:
@@ -449,7 +449,7 @@ class Repl(cmd.Cmd):
         self.lastcmd = ''
 
     def complete_mode(self, text, allcommand, beg, end):
-        return [s for s in ["quiet", "brief", "verbose",] if s.startswith(text)]
+        return [s for s in ["quiet", "brief", "verbose", ] if s.startswith(text)]
 
     def do_start(self, arg):
         """Main function to start checking process. Checking steps:
@@ -467,7 +467,7 @@ class Repl(cmd.Cmd):
         args = shlex.split(arg, comments=True)
         if len(args) not in [0, 1]:
             print_red(_("Wrong number of arguments"))
-        else: 
+        else:
             if len(args) == 1:
                 if args[0] not in ["1", "2"]:
                     print_yellow(_("Wrong number of steps to be done: {}").format(args[0]))
@@ -478,24 +478,26 @@ class Repl(cmd.Cmd):
                 steps = 2
             if not GL_Files.keys():
                 steps = min(steps, 0)
-                print_yellow(_('''No report files imported! => No steps would be done!\nUse \'addf REPORT_USERS_DIR\''''))
+                print_yellow(
+                    _('''No report files imported! => No steps would be done!\nUse \'addf REPORT_USERS_DIR\''''))
             if not GL_Regex:
                 steps = min(steps, 1)
-                print_yellow(_('''No instructions imported! => Second step is skipped\nUse \'addins INSTRUCTION_FILE\''''))
+                print_yellow(
+                    _('''No instructions imported! => Second step is skipped\nUse \'addins INSTRUCTION_FILE\''''))
                 print_yellow(_('''Or  \'addreg REGEX, FILE1, FILE2...\''''))
 
             print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
-            if steps > 0: 
+            if steps > 0:
                 print_cyan(_("  =[ SYNTAX CHECK ]="))
-                Syntax_correct(GL_Source) 
-            if steps > 1: 
+                Syntax_correct(GL_Source)
+            if steps > 1:
                 print_cyan(_("  =[ SEMANTIC CHECK ]="))
                 global GL_Result_2
-                Semantic_check(GL_Files, GL_Regex, save_results=True) 
-            print_cyan(_("  ==[ CHECK ENDED ]=="))   
+                Semantic_check(GL_Files, GL_Regex, save_results=True)
+            print_cyan(_("  ==[ CHECK ENDED ]=="))
 
     def complete_start(self, text, allcommand, beg, end):
-        return [s for s in ["1", "2",] if s.startswith(text)]
+        return [s for s in ["1", "2", ] if s.startswith(text)]
 
     def do_conclude(self, arg):
         """Function prints general result for each task number presented in collection, and saves this data.
@@ -516,7 +518,7 @@ class Repl(cmd.Cmd):
                     checkeq = colored(checkeq, 'red')
                 print_blue(_("  {}:\t{}").format(reportname, checkeq))
             print("")
-    
+
     def do_saveres(self, arg):
         """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments,
         contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
@@ -531,7 +533,7 @@ class Repl(cmd.Cmd):
                     database_task.regex_passed = 0
                     database_task.regex_total = 0
                     for report in task['reports']:
-                        regex_score = GL_Result_2[user['email']+" "+user['name']][report['name']]
+                        regex_score = GL_Result_2[user['email'] + " " + user['name']][report['name']]
                         database_report = session.query(Report).get(report['id'])
                         database_report.regex_passed = regex_score[0]
                         database_report.regex_total = regex_score[1]
@@ -547,7 +549,7 @@ class Repl(cmd.Cmd):
                 try:
                     with open(args[0], 'w') as f:
                         GL_Result_2["participant name"]["report name"] = ["current grade", "maximum grade"]
-                        json.dump(GL_Result_2, f, indent = 6)
+                        json.dump(GL_Result_2, f, indent=6)
                 except FileNotFoundError as E:
                     print_red(E)
                 else:

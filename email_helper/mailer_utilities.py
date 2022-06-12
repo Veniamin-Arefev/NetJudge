@@ -3,12 +3,11 @@ import datetime
 from email.mime.text import MIMEText
 from email.header import decode_header
 from typing import Union
-
 from imap_tools import MailBox, AND, OR
 
 __all__ = ['MailerUtilities', 'connect_to_mailbox', 'get_ya_mailbox']
 
-from email_helper.mailer_configs import load_configs
+from .mailer_configs import load_configs
 
 
 def connect_to_mailbox(configs: configparser.ConfigParser):

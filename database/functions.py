@@ -1,6 +1,5 @@
 import os.path
 
-import email_helper.mailer_utilities
 from .models import *
 from report_analyser.translator import translate
 from email_helper.deadlines import homeworks_names_and_files

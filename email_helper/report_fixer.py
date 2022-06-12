@@ -24,20 +24,28 @@ def traverse(root_path, final=True):
 
 
 def is_tar(btext):
-    f = tempfile.NamedTemporaryFile()
+    f = tempfile.NamedTemporaryFile(delete=False)
     f.write(btext)
-    f.flush()
+    f.close()
+    is_tar_file = True
     try:
-        tarfile.is_tarfile(f) and tarfile.open(f.name).getmembers()
+        is_tar_file = tarfile.is_tarfile(f.name) and len(tarfile.open(f.name).getmembers()) == 6
+        # print(tarfile.open(f.name).getmembers())
     except Exception:
-        return False
-    return True
+        is_tar_file = False
+    try:
+        os.remove(f.name)
+    except Exception:
+        pass
+    return is_tar_file
 
 
 def report_fixer(root_path):
     for file, *tail in traverse(root_path, final=False):
         with open(file, "rb") as f:
-            content = f.read()
+            orig_content = content = f.read()
+        if is_tar(content):
+            continue
         while not is_tar(content):
             if (i := content.find(b"login: ")) > -1:
                 content = content[i + 7:]
@@ -46,7 +54,12 @@ def report_fixer(root_path):
                 content = content.replace(b'\r\n', b'\n')
                 continue
             break
-        else:
-            with open(file, "wb") as f:
-                f.write(content)
-            continue
+        print(f"Fixed {file}")
+        with open(file, "wb") as f:
+            f.write(content)
+        # print(f"{is_tar(content)} --- {file}")
+
+
+if __name__ == "__main__":
+    # report_fixer("to_fix")
+    report_fixer("tasks")

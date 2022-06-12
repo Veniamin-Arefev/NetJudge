@@ -8,7 +8,6 @@ def translate(code: str) -> (str, str):
     Ouput: (type of line, processed line without control sequences)
     """
 
-
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     new_line = ''

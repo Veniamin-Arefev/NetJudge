@@ -1,0 +1,8 @@
+[build-system]
+requires = ["setuptools", "build", "wheel", "babel", "doit", "bs4", "sqlalchemy", "imap_tools", "termcolor"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "NetJudge"
+version = "1.0.0"
+dependencies = ["bs4", "sqlalchemy", "imap_tools", "termcolor"]

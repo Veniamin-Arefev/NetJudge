@@ -10,7 +10,7 @@ from email_helper.report_fixer import report_fixer
 __all__ = ['ya_download']
 
 
-def ya_download(download_dir='tasks', print_info=False):
+def ya_download(download_dir='tasks', print_info=True):
     configs = load_configs('mailer_ya.cfg')
 
     mailbox = MailBox(configs['Server']['email server host'])

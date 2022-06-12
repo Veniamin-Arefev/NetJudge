@@ -2,6 +2,8 @@
 if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] === "LinuxNetwork2022"
     && isset($_POST['username']) && isset($_POST["homework_name"])) {
     //all iis nice
+    $username = str_replace(" ", " ", $_POST['username']);;
+    $homework_name = $_POST["homework_name"];
 } else {
     header('Location:index.php');
     exit();
@@ -51,6 +53,10 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
             }
         }
 
+        table {
+            text-align:left;
+        }
+
         .my_fit {
             height: 80vh;
         !important;
@@ -63,8 +69,8 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
     <?php
     echo "
     <div>
-        <h5>Username is: ".$_POST['username']."</h5>
-        <h5>Current task name is: ".$_POST['homework_name']."</h5>
+        <h5>Username is: " . $username . "</h5>
+        <h5>Current task name is: " . $homework_name . "</h5>
     </div>
     "
     ?>
@@ -74,21 +80,20 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
             <tr>
                 <th scope="col">File name</th>
                 <th scope="col">File text</th>
-<!--                <th scope="col">№</th>-->
-<!--                <th scope="col">Input</th>-->
-<!--                <th scope="col">Output</th>-->
+                <!--                <th scope="col">№</th>-->
+                <!--                <th scope="col">Input</th>-->
+                <!--                <th scope="col">Output</th>-->
             </tr>
             </thead>
             <tbody>
             <?php
-            $command = escapeshellcmd("");
+            chdir("C:\\Users\\venia\\Desktop\\Emailer");
+            $command = "python -m database getinfo \""
+                . mb_convert_encoding($username, 'UTF-8', 'CP866') . "\" " . $homework_name;
             $output = shell_exec($command);
+            $output = iconv('CP866', 'UTF-8', $output);
             echo $output;
             ?>
-            <tr>
-                <th>1</th>
-                <th>lol</th>
-            </tr>
             </tbody>
         </table>
     </div>
