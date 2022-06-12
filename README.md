@@ -97,7 +97,8 @@ python3 -m report_analyser CMD
 ## **Dependencies:**
 
 Python libs/modules:
-- `beautifulsoup4`, `re`, `shlex`, `tarfile`, `configparser`, `sqlalchemy`, `imap_tools`
+- `bs4`, `sqlalchemy`, `imap_tools`, `termcolor`
+- python version >= 3.10
 
 ## **Authors:**
 
