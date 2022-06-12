@@ -3,7 +3,7 @@ appcmd.py
 =====================================
 Console
 """
-
+import locale
 import shlex
 import cmd
 import gettext
@@ -13,7 +13,7 @@ from collections import defaultdict
 from termcolor import colored, cprint
 
 '''Project l10n & i18n'''
-translation = gettext.translation('netjudge', 'po', fallback=True)
+translation = gettext.translation('netjudge', 'report_analyser/po', fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
 '''Cmd colors'''

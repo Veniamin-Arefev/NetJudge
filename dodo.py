@@ -1,7 +1,7 @@
 DOIT_CONFIG = {'default_tasks': ['babel', 'test', 'wheel', 'sdist']}
 domain = "netjudge"
 version = "1.0.0"
-podir = "po"
+podir = "report_analyser/po"
 
 def task_babel():
     """Update and compile translation"""

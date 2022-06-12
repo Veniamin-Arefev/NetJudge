@@ -7,33 +7,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.0\n"
 "Report-Msgid-Bugs-To: a3.okonishnikov@mail.ru\n"
-"POT-Creation-Date: 2022-05-01 14:41+0300\n"
+"POT-Creation-Date: 2022-06-12 08:33+0300\n"
 "PO-Revision-Date: 2022-04-11 18:57+0300\n"
 "Last-Translator: @Uberariy Okonishnikov Ariy <a3.okonishnikov@mail.ru>\n"
 "Language: ru\n"
 "Language-Team: ru <LL@li.org>\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.9.1\n"
+"Generated-By: Babel 2.10.1\n"
 
-#: ../report_analyser/__main__.py:26
+#: build/lib/report_analyser/__main__.py:27 report_analyser/__main__.py:27
 #, fuzzy
 msgid "Not enough arguments, see '--help'"
 msgstr "Добавить бы ещё аргументов..."
 
-#: ../report_analyser/appcmd.py:79 ../report_analyser/appcmd.py:116
-#: ../report_analyser/appcmd.py:400
+#: build/lib/report_analyser/appcmd.py:81
+#: build/lib/report_analyser/appcmd.py:142
+#: build/lib/report_analyser/appcmd.py:421 report_analyser/appcmd.py:81
+#: report_analyser/appcmd.py:142 report_analyser/appcmd.py:421
 msgid "Success"
 msgstr "Успешно!"
 
-#: ../report_analyser/appcmd.py:111
+#: build/lib/report_analyser/appcmd.py:137 report_analyser/appcmd.py:137
 msgid "Instruction json file contains invalid structures!"
 msgstr "Файл с инструкциями содержит некорректные структуры!"
 
-#: ../report_analyser/appcmd.py:112
+#: build/lib/report_analyser/appcmd.py:138 report_analyser/appcmd.py:138
 msgid ""
 "It must be list: [{'regex': STRING, 'inout': in/out 'files': [STRING, "
 "STRING]}, ..."
@@ -41,11 +43,11 @@ msgstr ""
 "Должен быть список: [{'regex': STRING, 'inout': in/out 'files': [STRING, "
 "STRING]}, ..."
 
-#: ../report_analyser/appcmd.py:154
+#: build/lib/report_analyser/appcmd.py:178 report_analyser/appcmd.py:178
 msgid "Checking participant '{}':"
 msgstr "Проверка участника '{}':"
 
-#: ../report_analyser/appcmd.py:156
+#: build/lib/report_analyser/appcmd.py:180 report_analyser/appcmd.py:180
 msgid ""
 "\n"
 "  Checking file {}:"
@@ -53,39 +55,39 @@ msgstr ""
 "\n"
 "  Проверяем файл {}:"
 
-#: ../report_analyser/appcmd.py:159
+#: build/lib/report_analyser/appcmd.py:183 report_analyser/appcmd.py:183
 msgid "    RE {}: '{}' ({}put)."
 msgstr "    RE {}: '{}' ({}put)."
 
-#: ../report_analyser/appcmd.py:169
+#: build/lib/report_analyser/appcmd.py:194 report_analyser/appcmd.py:194
 msgid "Match {} in line {}:"
 msgstr "Соответствие {} на строке {}:"
 
-#: ../report_analyser/appcmd.py:171
+#: build/lib/report_analyser/appcmd.py:196 report_analyser/appcmd.py:196
 msgid "        {}"
 msgstr "        {}"
 
-#: ../report_analyser/appcmd.py:175
+#: build/lib/report_analyser/appcmd.py:200 report_analyser/appcmd.py:200
 msgid "      No matches in {} lines!"
 msgstr "      Нет соответствий, хотя просмотрели {} строк файла!"
 
-#: ../report_analyser/appcmd.py:184
+#: build/lib/report_analyser/appcmd.py:209 report_analyser/appcmd.py:209
 msgid "  {} {} {}"
 msgstr "  {} {} {}"
 
-#: ../report_analyser/appcmd.py:191
+#: build/lib/report_analyser/appcmd.py:218 report_analyser/appcmd.py:218
 msgid " Re: {}"
 msgstr " Re: {}"
 
-#: ../report_analyser/appcmd.py:193
+#: build/lib/report_analyser/appcmd.py:220 report_analyser/appcmd.py:220
 msgid "   Files ({}put):"
 msgstr "   Для файлов ({}put):"
 
-#: ../report_analyser/appcmd.py:197
+#: build/lib/report_analyser/appcmd.py:224 report_analyser/appcmd.py:224
 msgid "   Every imported file ({}put)."
 msgstr "   Для всех файлов ({}put)."
 
-#: ../report_analyser/appcmd.py:201
+#: build/lib/report_analyser/appcmd.py:229 report_analyser/appcmd.py:229
 msgid ""
 "\n"
 " ==[ Exiting! ]=="
@@ -93,99 +95,113 @@ msgstr ""
 "\n"
 " ==[ Исход проверяльщика. ]=="
 
-#: ../report_analyser/appcmd.py:212
+#: build/lib/report_analyser/appcmd.py:233 report_analyser/appcmd.py:233
 #, fuzzy
 msgid "[ RegexTest ]:~$ "
 msgstr "[ ИнетДжа ]:~$ "
 
-#: ../report_analyser/appcmd.py:235 ../report_analyser/appcmd.py:340
-#: ../report_analyser/appcmd.py:353 ../report_analyser/appcmd.py:388
+#: build/lib/report_analyser/appcmd.py:256
+#: build/lib/report_analyser/appcmd.py:361
+#: build/lib/report_analyser/appcmd.py:374
+#: build/lib/report_analyser/appcmd.py:409 report_analyser/appcmd.py:256
+#: report_analyser/appcmd.py:361 report_analyser/appcmd.py:374
+#: report_analyser/appcmd.py:409
 msgid "Not enough arguments"
 msgstr "Добавить бы ещё аргументов..."
 
-#: ../report_analyser/appcmd.py:237 ../report_analyser/appcmd.py:390
+#: build/lib/report_analyser/appcmd.py:258
+#: build/lib/report_analyser/appcmd.py:411 report_analyser/appcmd.py:258
+#: report_analyser/appcmd.py:411
 msgid "Wrong argument {}. Use in/out."
 msgstr "Неправильный параметр {}. Используйте in/out."
 
-#: ../report_analyser/appcmd.py:247
+#: build/lib/report_analyser/appcmd.py:268 report_analyser/appcmd.py:268
 msgid "Testing regex:"
 msgstr "Тестируем регулярку:"
 
-#: ../report_analyser/appcmd.py:250
+#: build/lib/report_analyser/appcmd.py:271 report_analyser/appcmd.py:271
 msgid "  =[ CHECKING... ]="
 msgstr "  =[ ПРОВЕРЯЕМ... ]="
 
-#: ../report_analyser/appcmd.py:252 ../report_analyser/appcmd.py:474
+#: build/lib/report_analyser/appcmd.py:273
+#: build/lib/report_analyser/appcmd.py:497 report_analyser/appcmd.py:273
+#: report_analyser/appcmd.py:497
 msgid "  ==[ CHECK ENDED ]=="
 msgstr "  ==[ ПРОВЕРКА ОКОНЧЕНА ]=="
 
-#: ../report_analyser/appcmd.py:268
+#: build/lib/report_analyser/appcmd.py:289 report_analyser/appcmd.py:289
 msgid "[ NetJu ]:~$ "
 msgstr "[ ИнетДжа ]:~$ "
 
-#: ../report_analyser/appcmd.py:269
+#: build/lib/report_analyser/appcmd.py:290 report_analyser/appcmd.py:290
 msgid " ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"
 msgstr ""
 " ==[ Добро Пожаловать в ИНЕТ-ДЖАДЖ - Среда проверки задач для библиотеки "
 "iproute2! ]==\n"
 
-#: ../report_analyser/appcmd.py:300
+#: build/lib/report_analyser/appcmd.py:321 report_analyser/appcmd.py:321
 msgid " ==[ All progress is reset!! ]==\n"
 msgstr " ==[ Весь прогресс работы сброшен!! ]==\n"
 
-#: ../report_analyser/appcmd.py:307
+#: build/lib/report_analyser/appcmd.py:328 report_analyser/appcmd.py:328
 msgid "  =[ No reports imported ]="
 msgstr "  =[ Отчёты в систему не добавлены ]="
 
-#: ../report_analyser/appcmd.py:309
+#: build/lib/report_analyser/appcmd.py:330 report_analyser/appcmd.py:330
 msgid "  =[ Imported reports: ]="
 msgstr "  =[ Добавленные отчёты: ]="
 
-#: ../report_analyser/appcmd.py:311
+#: build/lib/report_analyser/appcmd.py:332 report_analyser/appcmd.py:332
 msgid ""
 "Participant: {} His files:\n"
 "\t"
 msgstr ""
 
-#: ../report_analyser/appcmd.py:321
+#: build/lib/report_analyser/appcmd.py:342 report_analyser/appcmd.py:342
 msgid "  =[ No instructions imported ]="
 msgstr "  =[ Инструкций в систему не добавлено ]="
 
-#: ../report_analyser/appcmd.py:323
+#: build/lib/report_analyser/appcmd.py:344 report_analyser/appcmd.py:344
 msgid "  =[ Imported instructions: ]="
 msgstr "  =[ Добавленные инструкции: ]="
 
-#: ../report_analyser/appcmd.py:366 ../report_analyser/appcmd.py:421
-#: ../report_analyser/appcmd.py:448
+#: build/lib/report_analyser/appcmd.py:387
+#: build/lib/report_analyser/appcmd.py:442
+#: build/lib/report_analyser/appcmd.py:469
+#: build/lib/report_analyser/appcmd.py:547 report_analyser/appcmd.py:387
+#: report_analyser/appcmd.py:442 report_analyser/appcmd.py:469
+#: report_analyser/appcmd.py:547
 #, fuzzy
 msgid "Wrong number of arguments"
 msgstr "Добавить бы ещё аргументов..."
 
-#: ../report_analyser/appcmd.py:374
+#: build/lib/report_analyser/appcmd.py:395 report_analyser/appcmd.py:395
 msgid "Success: Saved REGEXs in {}"
 msgstr "Успех: Сохранили регулярки в {}"
 
-#: ../report_analyser/appcmd.py:408
+#: build/lib/report_analyser/appcmd.py:429 report_analyser/appcmd.py:429
 msgid "  ==[ ENTERING REGEX TESTING MODE: ]=="
 msgstr "  ==[ ПЕРЕХОДИМ В РЕЖИМ ТЕСТИРОВАНИЯ РЕГУЛЯРОК: ]=="
 
-#: ../report_analyser/appcmd.py:410
+#: build/lib/report_analyser/appcmd.py:431 report_analyser/appcmd.py:431
 msgid "  ==[ EXITING REGEX TESTING MODE: ]=="
 msgstr "  ==[ ПОКИДАЕМ РЕЖИМ ТЕСТИРОВАНИЯ РЕГУЛЯРОК: ]=="
 
-#: ../report_analyser/appcmd.py:424
+#: build/lib/report_analyser/appcmd.py:445 report_analyser/appcmd.py:445
 msgid "Wrong argument. Use one of \"quiet\", \"brief\", \"verbose\""
-msgstr "Неправильный параметр. Используйте один из \"quiet\", \"brief\", \"verbose\""
+msgstr ""
+"Неправильный параметр. Используйте один из \"quiet\", \"brief\", "
+"\"verbose\""
 
-#: ../report_analyser/appcmd.py:427
+#: build/lib/report_analyser/appcmd.py:448 report_analyser/appcmd.py:448
 msgid "'{}' mode is set."
 msgstr "Установленный режим: '{}'."
 
-#: ../report_analyser/appcmd.py:452
+#: build/lib/report_analyser/appcmd.py:473 report_analyser/appcmd.py:473
 msgid "Wrong number of steps to be done: {}"
 msgstr "Введено неправильное число шагов проверки: {}"
 
-#: ../report_analyser/appcmd.py:460
+#: build/lib/report_analyser/appcmd.py:482 report_analyser/appcmd.py:482
 #, fuzzy
 msgid ""
 "No report files imported! => No steps would be done!\n"
@@ -194,7 +210,7 @@ msgstr ""
 "Отчётов в системе нет! => Проверки не будет!\n"
 "    Используйте 'addf ДИРЕКТОРИЯ_ОТЧЕТОВ'"
 
-#: ../report_analyser/appcmd.py:463
+#: build/lib/report_analyser/appcmd.py:486 report_analyser/appcmd.py:486
 #, fuzzy
 msgid ""
 "No instructions imported! => Second step is skipped\n"
@@ -203,33 +219,38 @@ msgstr ""
 "Инструкций в системе нет! => Пропускаем третий этап проверки!\n"
 "    Используйте 'addf ФАЙЛ_ИНСТРУКЦИЙ'"
 
-#: ../report_analyser/appcmd.py:464
+#: build/lib/report_analyser/appcmd.py:487 report_analyser/appcmd.py:487
 msgid "Or  'addreg REGEX, FILE1, FILE2...'"
 msgstr "Или  'addreg REGEX, FILE1, FILE2...'"
 
-#: ../report_analyser/appcmd.py:466
+#: build/lib/report_analyser/appcmd.py:489 report_analyser/appcmd.py:489
 msgid "  ==[ CHECK STARTS:  Going through {} steps ]=="
 msgstr "  ==[ НАЧИНАЕТСЯ ПРОВЕРКА:  Нас ожидает {} этапов ]=="
 
-#: ../report_analyser/appcmd.py:468
+#: build/lib/report_analyser/appcmd.py:491 report_analyser/appcmd.py:491
 msgid "  =[ SYNTAX CHECK ]="
 msgstr "  =[ ПРОВЕРКА СИНТАКСИСА ]="
 
-#: ../report_analyser/appcmd.py:471
+#: build/lib/report_analyser/appcmd.py:494 report_analyser/appcmd.py:494
 msgid "  =[ SEMANTIC CHECK ]="
 msgstr "  =[ ПРОВЕРКА СЕМАНТИКИ ]="
 
-#: ../report_analyser/appcmd.py:486
+#: build/lib/report_analyser/appcmd.py:509 report_analyser/appcmd.py:509
 msgid "  ==[ RESULTS ]=="
 msgstr "  ==[ РЕЗУЛЬТАТЫ ]=="
 
-#: ../report_analyser/appcmd.py:489
+#: build/lib/report_analyser/appcmd.py:512 report_analyser/appcmd.py:512
 msgid "Participant '{}' results:\n"
 msgstr "Результаты участника '{}':\n"
 
-#: ../report_analyser/appcmd.py:496
+#: build/lib/report_analyser/appcmd.py:519 report_analyser/appcmd.py:519
 msgid "  {}:\t{}"
 msgstr "  {}:\t{}"
+
+#: build/lib/report_analyser/appcmd.py:556 report_analyser/appcmd.py:556
+#, fuzzy
+msgid "Success: Saved results in {}"
+msgstr "Успех: Сохранили регулярки в {}"
 
 #~ msgid "  =[ INNET SEMANTIC CHECK ]="
 #~ msgstr "  =[ ПРОВЕРКА СМЫСЛА ОТДЕЛЬНЫХ КОМАНД ]="
