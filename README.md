@@ -46,7 +46,7 @@ Project interface includes both [**notification table**](https://uneex.veniamin.
  * netjudge-download - Download all letters attachments from yandex mail
  * netjudge-database - Parse all attachments and populate database
  * netjudge-ya_parse - Create html(actually php) view of database data
- * netjudge-report_analyser -Start cmdline for regex selection
+ * netjudge-report_analyser - Start cmdline for regex selection
 
 ## **Usage example:**
 
