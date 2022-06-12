@@ -7,7 +7,7 @@
 
 </p>
 
-### **Net Judge** is a check enviroment for Linux Network oriented courses. 
+### **Net Judge** is a check environment for Linux Network oriented courses. 
 
 Course host may use this project to check how course participants progress solve tasks. **Net Judge** is initially used in [«Working with network protocols in Linux»](http://uneex.ru/LecturesCMC/LinuxNetwork2022) course. The system provides following workflow:
 
