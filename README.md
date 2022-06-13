@@ -55,7 +55,7 @@ If you don't have it, you may run any command that interact with mail and create
 ## **Report analyser usage example:**
 
 The project supports following alternatives:
- * Importing reports from host email / local directory;
+ * Importing reports from database / local directory;
  * Importing instruction file from local directory;
  * Saving results in database;
 
