@@ -43,7 +43,7 @@ def is_tar(btext):
 def report_fixer(root_path):
     for file, *tail in traverse(root_path, final=False):
         with open(file, "rb") as f:
-            orig_content = content = f.read()
+            content = f.read()
         if is_tar(content):
             continue
         while not is_tar(content):

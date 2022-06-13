@@ -3,6 +3,7 @@ domain = "netjudge"
 version = "1.0.0"
 podir = "report_analyser/po"
 
+
 def task_babel():
     """Update and compile translation"""
     return {
@@ -13,11 +14,13 @@ def task_babel():
         "clean": True,
     }
 
+
 def task_test():
     """Run tests"""
     return {
         "actions": ["python -m unittest -v"],
     }
+
 
 def task_wheel():
     """Build a wheel"""
@@ -27,6 +30,7 @@ def task_wheel():
         "targets": [f"dist/{domain}-{version}-py3-none-any.whl"]
     }
 
+
 def task_sdist():
     """Build a cdist"""
     return {
@@ -34,6 +38,7 @@ def task_sdist():
         "file_dep": [f"{podir}/ru/LC_MESSAGES/{domain}.mo"],
         "targets": [f"dist/{domain}-{version}.tar.gz"]
     }
+
 
 def task_cleanup():
     """Remove all"""

@@ -41,15 +41,6 @@ class Student(Base):
         }
         return data
 
-    def __repr__(self):
-        """Student str"""
-
-        line = f"Name: {self.name}\nemail: {self.email}\n"
-        line += f"Completed tasks: "
-        for task in self.tasks:
-            line += str(task.number) + ','
-        return line
-
 
 class Task(Base):
     """One task with all report files"""
@@ -90,9 +81,6 @@ class Task(Base):
         }
         return data
 
-    def __repr__(self):
-        return str(self.number) + ' ' + str(self.grade)
-
 
 class Report(Base):
     """Report files and info"""
@@ -131,18 +119,9 @@ class Report(Base):
             except Exception:
                 self.text = ""
                 self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
-                self.hash = hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest()  # секунды с милисекундами, совпасть не может
+                self.hash = hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest()
                 self.is_broken = True
         self.set_grade()
-
-    def __repr__(self):
-        """Report str"""
-
-        line = f"Name: {self.name}\n"
-        line += f"Creation date: {self.creation_date.strftime('%d-%m-%Y %H:%M:%S')}\n"
-        line += f"Hash: {self.hash}\n"
-        line += f"Grade: {self.grade}"
-        return line
 
     def json(self):
         """Dict (json) data from report"""
