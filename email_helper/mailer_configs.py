@@ -1,3 +1,5 @@
+"""Creating mail configs."""
+
 import configparser
 import os.path
 
@@ -7,6 +9,7 @@ default_config_file_name = 'mailer.cfg'
 
 
 def create_default_configs_file():
+    """Create default configs."""
     config = configparser.ConfigParser()
     config['Credentials'] = {
         'Username': 'User',
@@ -31,6 +34,7 @@ def create_default_configs_file():
 
 
 def load_configs(config_file_name: str = default_config_file_name) -> configparser.ConfigParser:
+    """Load configs."""
     if os.path.isfile(config_file_name):
         config = configparser.ConfigParser()
         with open(config_file_name, 'r') as configfile:

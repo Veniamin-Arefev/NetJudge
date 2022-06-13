@@ -2,7 +2,7 @@
    sphinx-quickstart on Thu Apr  7 19:08:40 2022.
 
 
-.. mdinclude:: ../../README.md
+.. mdinclude:: ../README.md
 
 Contents
 --------
@@ -10,8 +10,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   tech_docs
-   license
+   source/tech_docs
+   source/license
 
 Indices and tables
 ------------------

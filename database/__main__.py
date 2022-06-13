@@ -1,28 +1,10 @@
+"""Database module main."""
 import sys
 from .functions import *
 
 
-def get_people():
-    session = session_factory()
-    people_query = session.query(Student)
-    session.close()
-    return people_query.first()
-
-
-def print_statistics():
-    session = session_factory()
-    people_query = session.query(Student)
-    for person in people_query:
-        print(person)
-        print('-' * 10)
-        for task in person.tasks:
-            print(task)
-            for report in task.reports:
-                print(report)
-    session.close()
-
-
 def main():
+    """Main function."""
     if len(sys.argv) > 3:
         if sys.argv[-3] == 'getinfo':
             output = []

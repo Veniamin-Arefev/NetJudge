@@ -1,7 +1,0 @@
-# vim: ft=dosini
-[flake8]
-max-line-length = 120
-# Enable under and over-indenting of continuations
-ignore = E128, E117, E126, F405, F403, W504, W291, E731, F401, W293
-# Prevent gettext _ from being reported as missing
-builtins = _, ngettext

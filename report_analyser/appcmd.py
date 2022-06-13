@@ -1,5 +1,5 @@
-"""
-appcmd.py
+"""appcmd.py
+
 =====================================
 Console
 """
@@ -12,63 +12,63 @@ from database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
 
-'''Project l10n & i18n'''
+"""Project l10n & i18n"""
 translation = gettext.translation('netjudge', 'report_analyser/po', fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
-'''Cmd colors'''
+"""Cmd colors"""
 print_cyan = lambda x: cprint(x, 'cyan')
-'''  For standart system output'''
+"""  For standart system output"""
 print_green = lambda x: cprint(x, 'green')
-'''  For positive user experience'''
+"""  For positive user experience"""
 print_red = lambda x: cprint(x, 'red')
-'''  For negative user experience'''
+"""  For negative user experience"""
 print_yellow = lambda x: cprint(x, 'yellow')
-'''  For undefined user experience'''
+"""  For undefined user experience"""
 print_blue = lambda x: cprint(x, 'blue')
-'''  Standart prompt'''
+"""  Standart prompt"""
 print_magenta = lambda x: cprint(x, 'magenta')
-'''  Regex prompt'''
+"""  Regex prompt"""
 
-''' Global structures'''
+""" Global structures"""
 GL_Files = defaultdict(dict)
-''' GL_Files:
+""" GL_Files:
   key = participant name (if imported from dir -
                           name of dir with reports)
   value = python3 dictionary:
     key = report name
-    value = participant data on this report'''
+    value = participant data on this report"""
 GL_Result_1 = defaultdict(dict)
 GL_Result_2 = defaultdict(dict)
-''' GL_Files, GL_Result_#:
+""" GL_Files, GL_Result_#:
   key = participant name (if imported from dir -
                           name of dir with reports)
   value = python3 dictionary:
     key = report name
     value = list:
       list[0] = current grade
-      list[1] = maximum grade'''
+      list[1] = maximum grade"""
 GL_Regex = []
-''' GL_Regex holds regexes used for checking
+""" GL_Regex holds regexes used for checking
   GL_Regex[0] = regular expression
-  GL_Regex[1] = files, it is applied to'''
+  GL_Regex[1] = files, it is applied to"""
 RegexPlay_Regex = []
 GL_DataBase = []
-''' GL_DataBase is struct, that we get from base,
-containing info on participants, and their tasks'''
+""" GL_DataBase is struct, that we get from base,
+containing info on participants, and their tasks"""
 GL_Mode = "verbose"
-'''Detailability of ouput'''
+"""Detailability of ouput"""
 GL_Source = "dir"
-'''Detailability of ouput'''
+"""Detailability of ouput"""
 
 
 def import_files_from_dir(dir_paths):
-    '''Add keys to GF_Files'''
+    """Add keys to GF_Files"""
     global GL_Source
     GL_Source = "dir"
     once = True
     for dir_path in dir_paths:
-        '''Find all dirs = users'''
+        """Find all dirs = users"""
         for user_dir in [dir[0] for dir in os.walk(dir_path)]:
             try:
                 file_names = [filename for filename in os.listdir(user_dir) if
@@ -94,12 +94,12 @@ def import_files_from_dir(dir_paths):
 
 
 def import_files_from_base():
-    '''Add keys to GF_Files'''
+    """Add keys to GF_Files"""
     global GL_Source, GL_DataBase
     GL_Source = "database"
     GL_DataBase = collect_data()
     for user in GL_DataBase:
-        '''Iterate by users. Each user is dict'''
+        """Iterate by users. Each user is dict"""
         for task in user['tasks']:
             for report in task['reports']:
                 checkname = report['name'].split(".")
@@ -115,7 +115,7 @@ def import_files_from_base():
 
 
 def import_instructions_from_json(json_paths):
-    '''Add keys to GF_Instr'''
+    """Add keys to GF_Instr"""
     once = True
     global GL_Regex
     for filename in json_paths:
@@ -208,6 +208,7 @@ def Semantic_check(GFiles, GRegex, save_results):
 
 
 def print_regex_record(record):
+    """Print file result."""
     print(_(" Re: {}").format(colored(record['regex'], attrs=['bold'])))
     if record['files'] != ['']:
         print(_("   Files ({}put):").format(record['inout']), end="\t")
@@ -219,10 +220,13 @@ def print_regex_record(record):
 
 
 def print_exit_message():
+    """Exit message."""
     print_cyan(_("\n ==[ Exiting! ]=="))
 
 
 class Repl_Regex(cmd.Cmd):
+    """Regex repl class."""
+
     prompt = colored(_("[ RegexTest ]:~$ "), 'magenta')
     mode = "brief"
 
@@ -234,6 +238,7 @@ class Repl_Regex(cmd.Cmd):
 
     def do_re(self, arg):
         """Test regex on imported reports in regextest mode.
+
         Usage: re [REGEX] ['in'/'out'] {[FILE]}
            or: re [REGEX] ['in'/'out']
 
@@ -267,31 +272,35 @@ class Repl_Regex(cmd.Cmd):
 
     def do_q(self, arg):
         """Easier exit from regex testing mode.
+
         Usage: q
         """
         return True
 
     def do_exit(self, arg):
         """Exit regex testing mode.
+
         Usage: exint
         """
         return True
 
 
 class Repl(cmd.Cmd):
+    """Main cmd class."""
+
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
     print_cyan(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
     lastcmd = ''
 
     def emptyline(self):
-        """Override: Called when an empty line is entered in response to the prompt.
-        """
+        """Override: Called when an empty line is entered in response to the prompt."""
         if self.lastcmd:
             self.lastcmd = ""
             return self.onecmd('\n')
 
     def do_q(self, arg):
         """Shorter variant of 'exit' command.
+
         Usage: q
         """
         print_exit_message()
@@ -299,13 +308,15 @@ class Repl(cmd.Cmd):
 
     def do_exit(self, arg):
         """Exit application. All unsaved data would be lost!
+
         Usage: exit
         """
         print_exit_message()
         return True
 
     def do_reset(self, arg):
-        """This function clears all results achieved and imports made.
+        """Function that clears all results achieved and imports made.
+
         Usage: reset
         """
         global GL_Files, GL_Result_1, GL_Result_2, GL_Regex
@@ -315,6 +326,7 @@ class Repl(cmd.Cmd):
 
     def do_importedreports(self, arg):
         """Print imported report files.
+
         Usage: impoertedreports
         """
         if not GL_Files:
@@ -329,6 +341,7 @@ class Repl(cmd.Cmd):
 
     def do_importedinstructions(self, arg):
         """Print imported instruction files
+
         Usage: importedinstructions
         """
         if not GL_Regex:
@@ -340,6 +353,7 @@ class Repl(cmd.Cmd):
 
     def do_addrep(self, arg):
         """Add files to check to the collection from 1 or more dirs.
+
         Usage: addrep {[DIR]}
 
         Scheme of directory:
@@ -358,6 +372,7 @@ class Repl(cmd.Cmd):
 
     def do_addins(self, arg):
         """Add 1 or more instruction files to the regex collection.
+
         Usage: addins {[FILE]}
 
         Instr. files contain regex to check if smth is present in report.
@@ -371,6 +386,7 @@ class Repl(cmd.Cmd):
 
     def do_saveins(self, arg):
         """Save regular expressions imported in project in file in json format.
+
         Usage: saveins [FILE]
 
         If file is present, it will be overrided, otherwise, we create new file
@@ -389,6 +405,7 @@ class Repl(cmd.Cmd):
 
     def do_addreg(self, arg):
         """Add a single regular expression to collection.
+
         Usage: re [REGEX] ['in'/'out'] {[FILE]}
            or: re [REGEX] ['in'/'out']
 
@@ -416,17 +433,19 @@ class Repl(cmd.Cmd):
 
     def do_regextest(self, arg):
         """Enter regex mode and test your regex :)
+
         Usage: regextest
         """
         print_cyan(_("  ==[ ENTERING REGEX TESTING MODE: ]=="))
         Repl_Regex().cmdloop()
         print_cyan(_("  ==[ EXITING REGEX TESTING MODE: ]=="))
-        '''Otherwise last cmd is called after return'''
+        """Otherwise last cmd is called after return"""
         self.lastcmd = 'nothing'
 
     def do_mode(self, arg):
-        """Modify verbosity mode
-        mode ['quiet'/'verbose']
+        """Modify verbosity mode mode:
+
+        ['quiet'/'verbose']
         """
         args = shlex.split(arg, comments=True)
         global GL_Mode
@@ -441,10 +460,12 @@ class Repl(cmd.Cmd):
         self.lastcmd = ''
 
     def complete_mode(self, text, allcommand, beg, end):
+        """Mode."""
         return [s for s in ["quiet", "brief", "verbose", ] if s.startswith(text)]
 
     def do_start(self, arg):
         """Main function to start checking process. Checking steps:
+
         Usage: start ['1'/'2']
 
         1. Parsing & Syntax check;
@@ -489,12 +510,13 @@ class Repl(cmd.Cmd):
             print_cyan(_("  ==[ CHECK ENDED ]=="))
 
     def complete_start(self, text, allcommand, beg, end):
+        """Start."""
         return [s for s in ["1", "2", ] if s.startswith(text)]
 
     def do_conclude(self, arg):
         """Function prints general result for each task number presented in collection, and saves this data.
-        Usage: conclude
 
+        Usage: conclude
         Note, that conclude accumulates all the results during application run, except
         those made in 'regextest' mode.
         """
@@ -513,6 +535,7 @@ class Repl(cmd.Cmd):
 
     def do_saveres(self, arg):
         """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments,
+
         contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
         Usage: saveres {[FILE]}
         """

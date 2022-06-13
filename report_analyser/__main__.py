@@ -1,3 +1,4 @@
+"""Report analyser."""
 import sys
 from .appcmd import import_files_from_dir, import_instructions_from_json, Repl, print_red, _, \
     import_files_from_base
@@ -20,6 +21,7 @@ arg_parser.add_argument('instructions_file', metavar='INS_DIR', nargs='?', type=
 
 
 def main():
+    """Main cmd function."""
     args = arg_parser.parse_args()
     if args.reports_source_type in ["CMD", ""]:
         Repl().cmdloop()

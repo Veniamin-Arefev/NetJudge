@@ -1,3 +1,4 @@
+"""Yandex downloader."""
 import os
 from email.header import decode_header
 from imap_tools import MailBox
@@ -11,6 +12,7 @@ __all__ = ['ya_download']
 
 
 def ya_download(download_dir='tasks', print_info=True):
+    """Download."""
     configs = load_configs('mailer_ya.cfg')
 
     mailbox = MailBox(configs['Server']['email server host'])

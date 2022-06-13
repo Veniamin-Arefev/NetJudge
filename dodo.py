@@ -1,4 +1,6 @@
-DOIT_CONFIG = {'default_tasks': ['babel', 'test', 'wheel', 'sdist']}
+"""Doit function."""
+import glob
+DOIT_CONFIG = {'default_tasks': ['babel', 'style', 'docstyle', 'docs', 'test', 'wheel', 'sdist']}
 domain = "netjudge"
 version = "1.0.0"
 podir = "report_analyser/po"
@@ -45,4 +47,28 @@ def task_cleanup():
     return {
         "actions": [f"rm {podir}/{domain}.pot",
                     f"rm {podir}/ru/LC_MESSAGES/{domain}.mo"]
+    }
+
+
+def task_style():
+    """Check style against flake8."""
+    return {
+        "actions": ["flake8"]
+    }
+
+
+def task_docstyle():
+    """Check docstrings against pydocstyle."""
+    return {
+        "actions": ["pydocstyle"]
+    }
+
+
+def task_docs():
+    """Make HTML documentation."""
+    return {
+        "actions": ["sphinx-build -M html docs docs/_build"],
+        "file_dep": glob.glob("*py") + glob.glob("*rst"),
+        "targets": ["_build"],
+        "clean": True,
     }

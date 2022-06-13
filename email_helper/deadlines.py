@@ -1,3 +1,4 @@
+"""Task deadlines and names."""
 from datetime import datetime, timedelta
 
 __all__ = ['homeworks_names_and_files', 'deadlines']
@@ -17,6 +18,7 @@ homeworks_names_and_files = {
 
 
 def get_deadlines(keys: list, date: list):
+    """Get task deadline."""
     deadlines_format = '%Y-%m-%d %z'
     return_dict = {}
     for index, key in enumerate(keys):
