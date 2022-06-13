@@ -15,7 +15,10 @@ def translate(code: str) -> (str, str):
     state = 'standard'
     position = 0
     line_type = 'input' if (re.search(r'\[[\s|\S]*~\]#', code) or
-                            re.search(r'\(reverse-i-search\)`[\s |\S]*\':', code)) else 'output'
+                            re.search(r'\(reverse-i-search\)`[\s |\S]*\':', code) or
+                            re.search(r'\[[\s|\S]*~\]\$', code)) \
+        else 'output'
+
     if line_type == 'input':
         code = re.sub(r'\S*\[[\s|\S]*~\]# ', '', code)  # иногда в начале бывают лишние символы
         code = re.sub(r'\(reverse-i-search\)`[\s |\S]*\':', '', code)
