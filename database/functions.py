@@ -191,7 +191,8 @@ def get_report_text(report_name, email=None, name=None):
     lines = [translate(line) for line in text.split('\n') if line]
     text = ''
     for line in lines:
-        text += line[1] + '\n'
+        # if len(line[1].strip()) > 0:
+        text += ("in | " if line[0] == 'input' else "out| ") + line[1] + '\n'
     session.close()
     return text
 

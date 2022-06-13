@@ -1,4 +1,6 @@
 import argparse
+from sys import platform
+
 from .functions import *
 
 
@@ -20,7 +22,10 @@ def main():
         export_to_csv(args.first_argument)
     elif args.action == "getinfo":
         output = []
-        true_username = args.first_argument.encode('cp866').decode('utf-8')
+        if platform.startswith('win'):
+            true_username = args.first_argument.encode('cp866').decode('utf-8')
+        else:
+            true_username = args.first_argument
         for file_name in homeworks_names_and_files[args.report_name]:
             output.append(f"""            
                         <tr> 
@@ -29,7 +34,7 @@ def main():
                             </pre></th>
                         </tr>""")
 
-            print(''.join(output))
+        print(''.join(output))
 
 
 if __name__ == "__main__":
