@@ -26,13 +26,14 @@ def main():
     if args.reports_source_type in ["CMD", ""]:
         Repl().cmdloop()
     elif args.reports_source_type in ["DIR", "DATABASE"]:
-        if args.reports_directory == '':
-            print_red(_("Not enough arguments, see '--help'"))
-            sys.exit()
-        elif args.reports_source_type == "DIR":
-            import_files_from_dir([args.reports_directory, ])
-            if args.instructions_file != '':
-                import_instructions_from_json([args.instructions_file, ])
+        if args.reports_source_type == "DIR":
+            if args.reports_directory == '':
+                print_red(_("Not enough arguments, see '--help'"))
+                sys.exit()
+            else:
+                import_files_from_dir([args.reports_directory, ])
+                if args.instructions_file != '':
+                    import_instructions_from_json([args.instructions_file, ])
         elif args.reports_source_type == "DATABASE":
             import_files_from_base()
             Repl().cmdloop()
