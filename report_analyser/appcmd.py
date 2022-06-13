@@ -85,9 +85,7 @@ def import_files_from_dir(dir_paths):
                 if checkname[0] != "report":
                     print_red(f"ERROR: Wrong file format \'{filename}\'. It should start with \'report\'!")
                     continue
-                try:
-                    checknumber = int(checkname[1])
-                except Exception as E:
+                if not checkname[1].isdigit():
                     print_red(f"ERROR: Wrong file format \'{filename}\'. Report number should be integer!")
                     continue
                 print(colored(user_dir, attrs=['bold']), " ", filename)
@@ -99,7 +97,6 @@ def import_files_from_base():
     '''Add keys to GF_Files'''
     global GL_Source, GL_DataBase
     GL_Source = "database"
-    once = True
     GL_DataBase = collect_data()
     for user in GL_DataBase:
         '''Iterate by users. Each user is dict'''
@@ -109,9 +106,7 @@ def import_files_from_base():
                 if checkname[0] != "report":
                     print_red(f"ERROR: Wrong file format \'{report['name']}\'. It should start with \'report\'!")
                     continue
-                try:
-                    checknumber = int(checkname[1])
-                except Exception as E:
+                if not checkname[1].isdigit():
                     print_red(f"ERROR: Wrong file format \'{report['name']}\'. Report number should be integer!")
                     continue
                 print(colored(user['email'] + " " + user['name'], attrs=['bold']), " ", report['name'])
@@ -133,7 +128,7 @@ def import_instructions_from_json(json_paths):
                         record['inout']
                         record['files']
                         assert record['inout'] in ['in', 'out']
-                except Exception as E:
+                except Exception:
                     print_red(_('Instruction json file contains invalid structures!'))
                     print_red(_("It must be list: [{'regex': STRING, 'inout': in/out 'files': [STRING, STRING]}, ..."))
                 else:
@@ -155,10 +150,8 @@ def Syntax_correct(source):
         for userfile in userfiles.keys():
             filename = user_dir + "/" + userfile
             print(filename)
-            number = filename.split(".")[-2]
             if source == "dir":
                 obj = tarfile.open(filename)
-                obj_members = obj.getmembers()
                 text = obj.extractfile('./OUT.txt').read().decode()
             else:
                 text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1])
@@ -167,7 +160,7 @@ def Syntax_correct(source):
                 lines = [translate(line) for line in text.split('\n') if line]
                 GL_Files[user_dir][userfile] = lines
                 GL_Result_1[user_dir][userfile] = [1, 1]
-            except Exception as E:
+            except Exception:
                 GL_Result_1[user_dir][userfile] = [0, 1]
 
 
@@ -247,7 +240,7 @@ class Repl_Regex(cmd.Cmd):
         Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
         If FILE is not set, every imported file is checked with this regex!
         REGEX and 'in'/'out' parameters must be set!
-        
+
         Note, that in 'regextest' mode, results are not saved, only displayed.
         """
         global RegexPlay_Regex, GL_Files
@@ -348,7 +341,7 @@ class Repl(cmd.Cmd):
     def do_addrep(self, arg):
         """Add files to check to the collection from 1 or more dirs.
         Usage: addrep {[DIR]}
-        
+
         Scheme of directory:
             [DIR]---[USER1]---[REPORT1]
                   |         |
@@ -425,7 +418,6 @@ class Repl(cmd.Cmd):
         """Enter regex mode and test your regex :)
         Usage: regextest
         """
-        args = shlex.split(arg, comments=True)
         print_cyan(_("  ==[ ENTERING REGEX TESTING MODE: ]=="))
         Repl_Regex().cmdloop()
         print_cyan(_("  ==[ EXITING REGEX TESTING MODE: ]=="))
@@ -461,7 +453,7 @@ class Repl(cmd.Cmd):
         No files in collection:              # # steps done
         Files present in collection:         1 # steps done
         Instructions present in collection:  1 2 steps done
-        
+
         Results are saved and can be shown with 'conclude'.
         """
         args = shlex.split(arg, comments=True)
@@ -502,7 +494,7 @@ class Repl(cmd.Cmd):
     def do_conclude(self, arg):
         """Function prints general result for each task number presented in collection, and saves this data.
         Usage: conclude
-        
+
         Note, that conclude accumulates all the results during application run, except
         those made in 'regextest' mode.
         """

@@ -15,8 +15,8 @@ def ya_download(download_dir='tasks', print_info=True):
 
     mailbox = MailBox(configs['Server']['email server host'])
     mailbox.login(configs['Credentials']['Username'],
-                  configs['Credentials']['Password']
-                  , initial_folder=configs['Server']['folder'])
+                  configs['Credentials']['Password'],
+                  initial_folder=configs['Server']['folder'])
 
     submitted = {name: list() for name in homeworks_names_and_files}
 

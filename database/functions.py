@@ -21,8 +21,8 @@ def add_all_reports_in_tree(reports_path='tasks', print_info=False):
             print(f"Current importing task : {homework_name}", end="\r")
         for email in os.listdir(reports_path + os.sep + homework_name):
             for report_try in os.listdir(reports_path + os.sep + homework_name + os.sep + email):
-                for filename in os.listdir(reports_path + os.sep
-                                           + homework_name + os.sep + email + os.sep + report_try):
+                for filename in os.listdir(reports_path + os.sep + homework_name + os.sep +
+                                           email + os.sep + report_try):
                     """Check the correctness of the file"""
                     add_report(email,
                                reports_path + os.sep +
@@ -98,7 +98,7 @@ def rate_reports():
 
     session = session_factory()
     tasks = session.query(Task)
-    print(f"Rating reports", end="\r")
+    print("Rating reports", end="\r")
     for task in tasks:
 
         """Task is confirmed plagiary"""

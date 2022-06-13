@@ -13,10 +13,11 @@ from .mailer_configs import load_configs
 def connect_to_mailbox(configs: configparser.ConfigParser):
     con_mailbox = MailBox(configs['Server']['email server host'])
     con_mailbox.login(configs['Credentials']['Username'],
-                      configs['Credentials']['Password']
-                      , initial_folder=configs['Server']['folder'])
+                      configs['Credentials']['Password'],
+                      initial_folder=configs['Server']['folder'])
 
     return con_mailbox
+
 
 def get_ya_mailbox():
     ya_configs = load_configs('mailer_ya.cfg')
