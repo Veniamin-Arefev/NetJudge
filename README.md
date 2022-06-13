@@ -48,7 +48,7 @@ Project interface includes both [**notification table**](https://uneex.veniamin.
  * netjudge-ya_parse - Create html(actually php) view of database data
  * netjudge-report_analyser - Start cmdline for regex selection
 
-## **Usage example:**
+## **Report analyser usage example:**
 
 The project supports following alternatives:
  * Importing reports from host email / local directory;
