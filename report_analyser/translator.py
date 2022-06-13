@@ -64,10 +64,6 @@ def translate(code: str) -> (str, str):
                 digit = ''
                 new_line = new_line[:position] + chr(1234) * number + new_line[position:]
                 state = 'standard'
-            elif letter == 'm':
-                pass
-            elif letter == ';':
-                pass
             else:
                 return line_type, 'WARNING: UNPARSED ' + code
 
