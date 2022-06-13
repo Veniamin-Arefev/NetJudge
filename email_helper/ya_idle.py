@@ -1,3 +1,4 @@
+"""Yandex idle."""
 import datetime
 import imaplib
 import ssl
@@ -10,6 +11,7 @@ __all__ = ['ya_idle_main']
 
 
 def update():
+    """Update."""
     print(f'[{datetime.datetime.now().strftime("%H:%M")}] Update!')
     try:
         from email_helper.ya_parse import ya_parse_main
@@ -19,6 +21,7 @@ def update():
 
 
 def ya_idle_main():
+    """Main function."""
     ya_configs = load_configs('mailer_ya.cfg')
 
     ya_mailbox = connect_to_mailbox(ya_configs)

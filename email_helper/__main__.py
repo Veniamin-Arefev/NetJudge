@@ -1,3 +1,4 @@
+"""Email main."""
 import argparse
 
 from email_helper.mailer_configs import load_configs

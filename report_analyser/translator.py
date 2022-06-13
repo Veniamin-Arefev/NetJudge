@@ -1,13 +1,13 @@
+"""REmove escape-sequences from text."""
 import re
 
 
 def translate(code: str) -> (str, str):
-    """Translates text with bash escape sequences to normal text
+    """Translates text with bash escape sequences to normal text.
 
-    Input: raw shell input
-    Ouput: (type of line, processed line without control sequences)
+    Input: raw shell input.
+    Ouput: tuple: (type of line, processed line without control sequences).
     """
-
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     new_line = ''

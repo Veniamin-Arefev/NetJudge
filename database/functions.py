@@ -1,3 +1,4 @@
+"""Misc database functions."""
 import os.path
 
 from .models import *
@@ -8,7 +9,6 @@ from email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
 
 def get_task_name(report_name):
     """Find task name by one of it's reports"""
-
     task_number = report_name[7:9]  # позиции строго фиксированы
     task_names = homeworks_names_and_files.keys()
     tasks = [task_name for task_name in task_names if task_name.startswith(task_number)]
@@ -16,6 +16,7 @@ def get_task_name(report_name):
 
 
 def add_all_reports_in_tree(reports_path='tasks', print_info=False):
+    """Store all reports as file tree."""
     for homework_name in os.listdir(reports_path):
         if print_info:
             print(f"Current importing task : {homework_name}", end="\r")
@@ -34,7 +35,6 @@ def add_all_reports_in_tree(reports_path='tasks', print_info=False):
 
 def add_report(email, report_path):
     """Adds report to student"""
-
     session = session_factory()
 
     """Get or create student"""
@@ -95,7 +95,6 @@ def add_report(email, report_path):
 
 def rate_reports():
     """Gives grade to every report and check plagiary"""
-
     session = session_factory()
     tasks = session.query(Task)
     print("Rating reports", end="\r")
@@ -144,7 +143,6 @@ def rate_reports():
 
 def get_lines(report_name, email=None, name=None):
     """Find report input and output"""
-
     session = session_factory()
 
     """Find student"""
@@ -171,7 +169,6 @@ def get_lines(report_name, email=None, name=None):
 
 def get_report_text(report_name, email=None, name=None):
     """Find report input and output"""
-
     session = session_factory()
 
     """Find student"""
@@ -196,11 +193,10 @@ def get_report_text(report_name, email=None, name=None):
 
 
 def get_student_data(email):
-    """Find student's grades for each completed task"""
-
+    """Find student's grades for each completed task."""
     session = session_factory()
 
-    """Find student"""
+    """Find student."""
     student = session.query(Student).filter(Student.email == email).first()
     if not student:
         return None
@@ -211,8 +207,7 @@ def get_student_data(email):
 
 
 def collect_data():
-    """Find grades for every student"""
-
+    """Find grades for every student."""
     session = session_factory()
     students = session.query(Student)
     data = [student.json() for student in students]

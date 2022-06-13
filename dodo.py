@@ -1,3 +1,4 @@
+"""Doit function."""
 DOIT_CONFIG = {'default_tasks': ['babel', 'test', 'wheel', 'sdist']}
 domain = "netjudge"
 version = "1.0.0"

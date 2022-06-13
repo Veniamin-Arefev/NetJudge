@@ -1,3 +1,4 @@
+"""Fac idle."""
 import datetime
 import imaplib
 import ssl
@@ -10,6 +11,7 @@ __all__ = ['fac_idle_main']
 
 
 def fac_idle_main():
+    """Main function."""
     fac_configs = load_configs('mailer_fac.cfg')
     ya_configs = load_configs('mailer_ya.cfg')
 

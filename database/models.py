@@ -1,3 +1,4 @@
+"""All database models."""
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 import datetime
@@ -25,13 +26,11 @@ class Student(Base):
         :param name: Student's name
         :param email: Student's email
         """
-
         self.name = name
         self.email = email
 
     def json(self):
-        """Dict(json) data for student"""
-
+        """Dict(json) data for student."""
         data = {
             'id': self.id,
             'email': self.email,
@@ -43,7 +42,7 @@ class Student(Base):
 
 
 class Task(Base):
-    """One task with all report files"""
+    """One task with all report files."""
 
     __tablename__ = 'task'
 
@@ -61,13 +60,11 @@ class Task(Base):
 
     def __init__(self, student, name):
         """Initialise task object."""
-
         self.student = student
         self.name = name
 
     def json(self):
-        """Dict (json) data from report"""
-
+        """Dict (json) data from report."""
         data = {
             'id': self.id,
             'name': self.name,
@@ -83,7 +80,7 @@ class Task(Base):
 
 
 class Report(Base):
-    """Report files and info"""
+    """Report files and info."""
 
     __tablename__ = 'report'
 
@@ -101,8 +98,7 @@ class Report(Base):
     regex_total = Column(Integer, default=-1)
 
     def __init__(self, task, file_path):
-        """Initialise report object"""
-
+        """Initialise report object."""
         self.task = task
         self.name = os.path.basename(file_path)
         try:
@@ -124,8 +120,7 @@ class Report(Base):
         self.set_grade()
 
     def json(self):
-        """Dict (json) data from report"""
-
+        """Dict (json) data from report."""
         data = {
             'id': self.id,
             'name': self.name,
@@ -140,8 +135,7 @@ class Report(Base):
         return data
 
     def get_report_date(self, file):
-        """Report creation date"""
-
+        """Report creation date."""
         line = file.extractfile('./TIME.txt').read().decode().split('\n')[0]
         time_lines = re.findall(r'START_TIME \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line)
         if time_lines:
@@ -149,8 +143,7 @@ class Report(Base):
             return datetime.datetime.strptime(creation_date, '%Y-%m-%d %H:%M:%S')
 
     def set_grade(self):
-        """Give report a grade"""
-
+        """Give report a grade."""
         cur_deadline = self.get_deadline()
         # get offset-naive datetime
         cur_deadline = datetime.datetime.strptime(cur_deadline.strftime('%d-%m-%Y %H:%M:%S'), '%d-%m-%Y %H:%M:%S')
@@ -171,7 +164,6 @@ class Report(Base):
         :param task_name: Name of required task
         :return: Deadline date as datetime.date object
         """
-
         task_name = self.task.name
         if task_name is not None:
             try:

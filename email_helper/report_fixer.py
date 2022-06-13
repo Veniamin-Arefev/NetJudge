@@ -1,9 +1,11 @@
+"""Fix broken reports."""
 import os
 import tarfile
 import tempfile
 
 
 def traverse(root_path, final=True):
+    """Traverse."""
     for path, dirs, files in os.walk(root_path):
         if path[-1].isdigit() and files:
             task = Try = user = report = ""
@@ -24,6 +26,7 @@ def traverse(root_path, final=True):
 
 
 def is_tar(btext):
+    """Is file tar."""
     f = tempfile.NamedTemporaryFile(delete=False)
     f.write(btext)
     f.close()
@@ -41,6 +44,7 @@ def is_tar(btext):
 
 
 def report_fixer(root_path):
+    """Fix report."""
     for file, *tail in traverse(root_path, final=False):
         with open(file, "rb") as f:
             content = f.read()

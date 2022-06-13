@@ -1,3 +1,4 @@
+"""Mail utilities."""
 import configparser
 import datetime
 from email.mime.text import MIMEText
@@ -11,6 +12,7 @@ from .mailer_configs import load_configs
 
 
 def connect_to_mailbox(configs: configparser.ConfigParser):
+    """Connect to mailbox."""
     con_mailbox = MailBox(configs['Server']['email server host'])
     con_mailbox.login(configs['Credentials']['Username'],
                       configs['Credentials']['Password'],
@@ -20,36 +22,45 @@ def connect_to_mailbox(configs: configparser.ConfigParser):
 
 
 def get_ya_mailbox():
+    """Get Yandex mailbox."""
     ya_configs = load_configs('mailer_ya.cfg')
     return connect_to_mailbox(ya_configs)
 
 
 class MailerUtilities:
+    """Mail class."""
+
     mailbox: MailBox = None
 
     def __init__(self, mailbox):
+        """Initialise class."""
         self.mailbox = mailbox
 
     @staticmethod
     def encode_mime_header_filename(filename: str):
+        """Encode filename."""
         msg = MIMEText(filename, 'plain', 'utf-8')
         return msg.as_string().split()[-1]
 
     def get_uids_for_file(self, filename):
+        """Get uids."""
         criteria = f'HEADER Content-Disposition "{filename}"'
         criteria_encoded = f'HEADER Content-Disposition "{self.encode_mime_header_filename(filename)}"'
         return set(self.mailbox.uids(str(OR(criteria, criteria_encoded))))
 
     def get_by_filenames(self, filenames: list):
+        """Get by filenames."""
         uids = []
         for file in filenames:
             uids.append(self.get_uids_for_file(file))
         return set.intersection(*uids)
 
     def get_by_uids(self, uids: list):
+        """Get by uids."""
         return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True) if len(uids) > 0 else ()
 
     def get_username_by_email(self, email: str):
+        """Get student's name from email."""
         for mail in self.mailbox.fetch(AND(from_=email), limit=1, mark_seen=False):
             name = mail.headers['from'][0]
             name, codec = decode_header(name[:name.index('<')].strip())[0]
@@ -57,6 +68,7 @@ class MailerUtilities:
 
     def transfer_mail_to_mailbox_and_archive(self, uids: Union["all", str, list], target_mailbox: MailBox,
                                              print_info=False):
+        """Transfer and archive mail."""
         if uids == 'all':
             mails = self.mailbox.fetch(AND(all=True), bulk=True, mark_seen=False)
         elif type(uids) == str:
