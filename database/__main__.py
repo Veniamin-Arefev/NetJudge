@@ -1,3 +1,4 @@
+"""Database."""
 import argparse
 from sys import platform
 
@@ -6,7 +7,6 @@ from .functions import *
 
 def main():
     """Main function."""
-
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('action', type=str, default='parse', choices=['parse', 'export', 'getinfo', 'printinfo'])
     arg_parser.add_argument('first_argument', nargs='?', type=str, default='',

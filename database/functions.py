@@ -222,7 +222,6 @@ def collect_data():
 
 def export_to_csv(filename):
     """Find grades for every student."""
-
     with open(filename, 'w', encoding='utf-8', newline='') as outfile:
         out_csv = csv.writer(outfile)
         session = session_factory()
