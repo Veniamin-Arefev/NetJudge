@@ -87,8 +87,8 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
             </thead>
             <tbody>
             <?php
-            chdir("C:\\Users\\venia\\Desktop\\Emailer");
-            $command = "python -m database getinfo \""
+            chdir(WORKING_DIR_TO_CHANGE);
+            $command = "netjudge-database getinfo \""
                 . mb_convert_encoding($username, 'UTF-8', 'CP866') . "\" " . $homework_name;
             $output = shell_exec($command);
             $output = iconv('CP866', 'UTF-8', $output);

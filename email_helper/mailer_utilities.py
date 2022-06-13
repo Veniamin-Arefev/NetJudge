@@ -3,7 +3,6 @@ import configparser
 import datetime
 from email.mime.text import MIMEText
 from email.header import decode_header
-from typing import Union
 from imap_tools import MailBox, AND, OR
 
 __all__ = ['MailerUtilities', 'connect_to_mailbox', 'get_ya_mailbox']
@@ -66,7 +65,7 @@ class MailerUtilities:
             name, codec = decode_header(name[:name.index('<')].strip())[0]
             return name.title() if codec is None else name.decode(codec).title()
 
-    def transfer_mail_to_mailbox_and_archive(self, uids: Union["all", str, list], target_mailbox: MailBox,
+    def transfer_mail_to_mailbox_and_archive(self, uids, target_mailbox: MailBox,
                                              print_info=False):
         """Transfer and archive mail."""
         if uids == 'all':

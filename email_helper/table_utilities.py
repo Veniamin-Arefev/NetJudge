@@ -81,4 +81,4 @@ def create_html_from_database(target_path, target_filename):
     session.close()
     with open(os.path.join(os.path.dirname(__file__), 'data.php'), 'r', encoding='utf-8') as in_file:
         with open(target_path + os.sep + 'data.php', 'w', encoding='utf-8') as out_file:
-            out_file.write(in_file.read())
+            out_file.write(in_file.read().replace('WORKING_DIR_TO_CHANGE', '"'+os.getcwd()+'"'))

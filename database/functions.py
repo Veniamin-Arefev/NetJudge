@@ -1,6 +1,6 @@
 """Misc database functions."""
 import os.path
-
+import csv
 from .models import *
 from report_analyser.translator import translate
 from email_helper.deadlines import homeworks_names_and_files
@@ -213,3 +213,21 @@ def collect_data():
     data = [student.json() for student in students]
     session.close()
     return data
+
+
+def export_to_csv(filename):
+    """Find grades for every student."""
+
+    with open(filename, 'w', encoding='utf-8', newline='') as outfile:
+        out_csv = csv.writer(outfile)
+        session = session_factory()
+
+        tasks = session.query(Task)
+        out_csv.writerow(['Student name', 'Student email', 'Task name', 'Task creating date', 'Task grade', 'Is broken',
+                          'Is plagiary', 'Regex passed', 'Regex total'])
+        for task in tasks.all():
+            out_csv.writerow(
+                [task.student.name, task.student.email, task.name, task.creation_date, task.grade, task.is_broken,
+                 task.is_plagiary, task.regex_passed, task.regex_total])
+
+        session.close()
