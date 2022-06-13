@@ -44,6 +44,14 @@ Project interface includes both [**notification table**](https://uneex.veniamin.
 Current project uses two config file for work. File names is `mailer_fac.cfg` and `mailer_ya.cfg`.
 If you don't have it, you may run any command that interact with mail and create default config file named `mailer.cfg`.
 
+## **Available scripts after installation:**
+ * netjudge-fac_idle - Fetch all mail from faculty mail, redirect it to yandex mail and enter idle
+ * netjudge-ya_idle - Fetch all mail from yandex mail, update database and enter idle
+ * netjudge-download - Download all letters attachments from yandex mail
+ * netjudge-database - Parse all attachments and populate database
+ * netjudge-ya_parse - Create html(actually php) view of database data
+ * netjudge-report_analyser - Start cmdline for regex selection
+
 ## **Report analyser usage example:**
 
 The project supports following alternatives:
