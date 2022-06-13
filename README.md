@@ -18,17 +18,17 @@ Course host may use this project to check how course participants progress solve
                    |                 V
                    |               eMAIL ---> NOTIFICATION TABLE <---+
                    |                 |                               |
-                   |                 V                               |
-                   |              PARSING <-- [LOCAL DIRECTORY]      |
                    |                 |                               |
-                   |                 V                               |
+                   |                 | +----- [REPORTs from DIR]     |
+                   |                 | |                             |
+                   |                 V V                             |
                    |            SYNTAX CHECK ------------------------+
-                   |                 |                               |
-                   |                 V                               |
+                   |                  |                              |
+                   |                  V                              |
                    +--------> SEMANTICS CHECK -----------------------+
-                                     |
-                                     V
-                                 [RESULTS]
+                                      |
+                                      V
+                                  [RESULTS]
 
 - **Test kit** is a file with rules (regular expression) for each task, that determines what insides should report have;
 - **Report** is a file with commands executing actions needed to solve the task;
@@ -60,11 +60,23 @@ The project supports following alternatives:
  * Saving results in database;
 
 Here are some usage examples:
-1. Running Net-Judge with one command without database interference:
+1. Running Net-Judge using reports from database:
+```
+netjudje-download
+netjudge-database
+netjudge-report_analyser DATABASE
+[ NetJu ]:~$ addins input_example/instruction.json
+[ NetJu ]:~$ start 2
+[ NetJu ]:~$ conclude
+[ NetJu ]:~$ saveres
+[ NetJu ]:~$ q
+```
+## Additional possibillities:
+2. Running Net-Judge with one command without database interference:
 ```
 netjudge-report_analyser DIR input_example/ input_example/instruction.json
 ```
-2. Running Net-Judge without database interference:
+3. Running Net-Judge without database interference:
 ```
 netjudge-report_analyser CMD
 [ NetJu ]:~$ addrep input_example
@@ -72,15 +84,6 @@ netjudge-report_analyser CMD
 [ NetJu ]:~$ start 2
 [ NetJu ]:~$ conclude
 [ NetJu ]:~$ saveres input_example/results.json
-[ NetJu ]:~$ q
-```
-3. Running Net-Judge using reports from database:
-```
-netjudge-report_analyser DATABASE
-[ NetJu ]:~$ addins input_example/instruction.json
-[ NetJu ]:~$ start 2
-[ NetJu ]:~$ conclude
-[ NetJu ]:~$ saveres
 [ NetJu ]:~$ q
 ```
 4. Testing a regex, then saving it in filesystem:
