@@ -12,9 +12,9 @@ def translate(code: str) -> (str, str):
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     """Removing color sequences"""
     try:
-        code = re.sub(r'\x1b\[\dm', '', code)
-        code = re.sub(r'x1b\[\d;\dm', '', code)
-        code = re.sub(r'x1b\[\d;\d;\dm', '', code)
+        code = re.sub(r'\x1b\[\d*m', '', code)
+        code = re.sub(r'\x1b\[\d*;\d*m\*', '', code)
+        code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*m', '', code)
     except Exception:
         pass
     new_line = ''
@@ -64,12 +64,8 @@ def translate(code: str) -> (str, str):
                 digit = ''
                 new_line = new_line[:position] + chr(1234) * number + new_line[position:]
                 state = 'standard'
-            elif letter == 'm':
-                pass
-            elif letter == ';':
-                pass
             else:
-                return line_type, 'WARNING: UNPARSED' + code
+                return line_type, 'WARNING: UNPARSED ' + code
 
     if new_line and new_line[-1] == '\r':
         new_line = new_line[:-1]
