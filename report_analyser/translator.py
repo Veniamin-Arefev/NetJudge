@@ -10,6 +10,13 @@ def translate(code: str) -> (str, str):
     """
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
+    """Removing color sequences"""
+    try:
+        code = re.sub(r'\x1b\[\dm', '', code)
+        code = re.sub(r'x1b\[\d;\dm', '', code)
+        code = re.sub(r'x1b\[\d;\d;\dm', '', code)
+    except Exception:
+        pass
     new_line = ''
     digit = ''
     state = 'standard'
@@ -59,10 +66,13 @@ def translate(code: str) -> (str, str):
                 state = 'standard'
             elif letter == 'm':
                 pass
+            elif letter == ';':
+                pass
             else:
-                return line_type, code + 'WARNING: UNPARSED'
+                return line_type, 'WARNING: UNPARSED' + code
 
     if new_line and new_line[-1] == '\r':
         new_line = new_line[:-1]
         new_line = re.sub(r'(\s|\S)*\r', '', new_line)  # \r - это еще и возврат каретки
+        new_line = re.sub(r'\[[\s|\S]*~\]\$', '', new_line)
     return line_type, new_line.strip()
