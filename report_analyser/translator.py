@@ -11,12 +11,11 @@ def translate(code: str) -> (str, str):
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     """Removing color sequences"""
-    try:
-        code = re.sub(r'\x1b\[\d*m', '', code)
-        code = re.sub(r'\x1b\[\d*;\d*m\*', '', code)
-        code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*m', '', code)
-    except Exception:
-        pass
+    code = re.sub(r'\x1b\[\d*m', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*m\*', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*m', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*m*', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*m', '', code)
     new_line = ''
     digit = ''
     state = 'standard'
