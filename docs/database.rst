@@ -1,8 +1,8 @@
 Database
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
 
 Models
-====================
+======
 
 .. automodule:: database.models
    :members:
@@ -11,7 +11,7 @@ Models
 
 
 Functions
-====================
+=========
 .. automodule:: database.functions
    :members:
    :private-members:
