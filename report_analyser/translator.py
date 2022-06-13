@@ -14,7 +14,7 @@ def translate(code: str) -> (str, str):
     try:
         code = re.sub(r'\x1b\[\dm', '', code)
         code = re.sub(r'x1b\[\d;\dm', '', code)
-        code = re.sub(r'x1b\[\d;\dm;\dm', '', code)
+        code = re.sub(r'x1b\[\d;\d;\dm', '', code)
     except Exception:
         pass
     new_line = ''
