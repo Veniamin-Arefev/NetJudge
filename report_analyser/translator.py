@@ -54,10 +54,11 @@ def translate(code: str) -> (str, str):
                 digit = ''
                 new_line = new_line[:position] + chr(1234) * number + new_line[position:]
                 state = 'standard'
-            elif line_type == 'input':
-                return line_type, code  # unable to parse line
+            elif letter == 'm':
+                pass
             else:
-                return line_type, ''
+                return line_type, code + 'WARNING: UNPARSED'
+
     if new_line and new_line[-1] == '\r':
         new_line = new_line[:-1]
         new_line = re.sub(r'(\s|\S)*\r', '', new_line)  # \r - это еще и возврат каретки
