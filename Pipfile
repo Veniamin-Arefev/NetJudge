@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+sqlalchemy = "*"
+bs4 = "*"
+imap-tools = "*"
+
+[dev-packages]
+flake8 = "*"
+sphinx = "*"
+build = "*"
+toml = "*"
+doit = "*"
+pydocstyle = "*"
+
+[requires]
+python_version = "3.8"
