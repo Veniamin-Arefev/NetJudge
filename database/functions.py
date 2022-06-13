@@ -188,6 +188,10 @@ def get_report_text(report_name, email=None, name=None):
     if not report or report.is_broken:
         return ''
     text = re.sub('\r', '', report.text)
+    lines = [translate(line) for line in text.split('\n') if line]
+    text = ''
+    for line in lines:
+        text += line[1] + '\n'
     session.close()
     return text
 
