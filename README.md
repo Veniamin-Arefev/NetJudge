@@ -62,7 +62,7 @@ The project supports following alternatives:
 Here are some usage examples:
 1. Running Net-Judge using reports from database:
 ```
-netjudje-download
+netjudge-download
 netjudge-database
 netjudge-report_analyser DATABASE
 [ NetJu ]:~$ addins input_example/instruction.json
