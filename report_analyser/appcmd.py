@@ -143,6 +143,14 @@ def Syntax_correct(source, mode):
                     except Exception:
                         text = ''
 
+                if not text:
+                    GL_Result_1[user_dir][userfile] = [0, 1]
+                    continue
+                text = re.sub('\r', '', text)
+                lines = [translate(line) for line in text.split('\n') if line]
+                GL_Files[user_dir][userfile] = lines
+                GL_Result_1[user_dir][userfile] = [1, 1]
+
             else:
                 try:
                     lines = get_lines(userfile, user_dir.split()[0], user_dir.split()[1])
