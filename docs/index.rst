@@ -11,6 +11,9 @@ Contents
    :maxdepth: 2
 
    source/tech_docs
+   database
+   email_helper
+   report_analyser
    source/license
 
 Indices and tables

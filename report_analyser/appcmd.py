@@ -1,8 +1,4 @@
-"""appcmd.py
-
-=====================================
-Console
-"""
+"""Commandline functions"""
 import locale
 import shlex
 import cmd
@@ -18,48 +14,28 @@ _, ngettext = translation.gettext, translation.ngettext
 
 """Cmd colors"""
 print_cyan = lambda x: cprint(x, 'cyan')
-"""  For standart system output"""
+""" For standart system output"""
 print_green = lambda x: cprint(x, 'green')
-"""  For positive user experience"""
+""" For positive user experience"""
 print_red = lambda x: cprint(x, 'red')
-"""  For negative user experience"""
+""" For negative user experience"""
 print_yellow = lambda x: cprint(x, 'yellow')
-"""  For undefined user experience"""
+""" For undefined user experience"""
 print_blue = lambda x: cprint(x, 'blue')
-"""  Standart prompt"""
+""" Standart prompt"""
 print_magenta = lambda x: cprint(x, 'magenta')
-"""  Regex prompt"""
+""" Regex prompt"""
 
-""" Global structures"""
+
+"""Global structures"""
 GL_Files = defaultdict(dict)
-""" GL_Files:
-  key = participant name (if imported from dir -
-                          name of dir with reports)
-  value = python3 dictionary:
-    key = report name
-    value = participant data on this report"""
 GL_Result_1 = defaultdict(dict)
 GL_Result_2 = defaultdict(dict)
-""" GL_Files, GL_Result_#:
-  key = participant name (if imported from dir -
-                          name of dir with reports)
-  value = python3 dictionary:
-    key = report name
-    value = list:
-      list[0] = current grade
-      list[1] = maximum grade"""
 GL_Regex = []
-""" GL_Regex holds regexes used for checking
-  GL_Regex[0] = regular expression
-  GL_Regex[1] = files, it is applied to"""
 RegexPlay_Regex = []
 GL_DataBase = []
-""" GL_DataBase is struct, that we get from base,
-containing info on participants, and their tasks"""
 GL_Mode = "verbose"
-"""Detailability of ouput"""
 GL_Source = "dir"
-"""Detailability of ouput"""
 
 
 def import_files_from_dir(dir_paths):

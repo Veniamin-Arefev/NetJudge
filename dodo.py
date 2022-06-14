@@ -1,9 +1,17 @@
 """Doit function."""
 import glob
+from sys import platform
+
 DOIT_CONFIG = {'default_tasks': ['babel', 'style', 'docstyle', 'docs', 'test', 'wheel', 'sdist']}
 domain = "netjudge"
 version = "1.0.0"
 podir = "report_analyser/po"
+python_exec = ''
+
+if platform.startswith('linux'):
+    python_exec = 'python3'
+elif platform.startswith('win'):
+    python_exec = 'python'
 
 
 def task_babel():
@@ -20,14 +28,14 @@ def task_babel():
 def task_test():
     """Run tests"""
     return {
-        "actions": ["python -m unittest -v report_analyser.test_appcmd"],
+        "actions": [f"{python_exec} -m unittest -v report_analyser.test_appcmd"],
     }
 
 
 def task_wheel():
     """Build a wheel"""
     return {
-        "actions": ["python -m build -w"],
+        "actions": [f"{python_exec} -m build -w"],
         "file_dep": [f"{podir}/ru/LC_MESSAGES/{domain}.mo"],
         "targets": [f"dist/{domain}-{version}-py3-none-any.whl"]
     }
@@ -36,7 +44,7 @@ def task_wheel():
 def task_sdist():
     """Build a cdist"""
     return {
-        "actions": ["python -m build -s"],
+        "actions": [f"{python_exec} -m build -s"],
         "file_dep": [f"{podir}/ru/LC_MESSAGES/{domain}.mo"],
         "targets": [f"dist/{domain}-{version}.tar.gz"]
     }

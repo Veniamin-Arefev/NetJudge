@@ -10,12 +10,21 @@ def translate(code: str) -> (str, str):
     """
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
+    """Removing color sequences"""
+    code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*m', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*m*', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*m', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*m\*', '', code)
+    code = re.sub(r'\x1b\[\d*m', '', code)
     new_line = ''
     digit = ''
     state = 'standard'
     position = 0
     line_type = 'input' if (re.search(r'\[[\s|\S]*~\]#', code) or
-                            re.search(r'\(reverse-i-search\)`[\s |\S]*\':', code)) else 'output'
+                            re.search(r'\(reverse-i-search\)`[\s |\S]*\':', code) or
+                            re.search(r'\[[\s|\S]*~\]\$', code)) \
+        else 'output'
+
     if line_type == 'input':
         code = re.sub(r'\S*\[[\s|\S]*~\]# ', '', code)  # иногда в начале бывают лишние символы
         code = re.sub(r'\(reverse-i-search\)`[\s |\S]*\':', '', code)
@@ -55,8 +64,10 @@ def translate(code: str) -> (str, str):
                 new_line = new_line[:position] + chr(1234) * number + new_line[position:]
                 state = 'standard'
             else:
-                return code  # unable to parse line
+                return line_type, 'WARNING: UNPARSED ' + code
+
     if new_line and new_line[-1] == '\r':
         new_line = new_line[:-1]
         new_line = re.sub(r'(\s|\S)*\r', '', new_line)  # \r - это еще и возврат каретки
+        new_line = re.sub(r'\[[\s|\S]*~\]\$', '', new_line)
     return line_type, new_line.strip()
