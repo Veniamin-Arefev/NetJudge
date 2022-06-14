@@ -45,7 +45,7 @@ def import_files_from_dir(dir_paths):
     once = True
     for dir_path in dir_paths:
         """Find all dirs = users"""
-        for user_dir in [dir[0] for dir in os.walk(dir_path)]:
+        for user_dir in sorted([dir[0] for dir in os.walk(dir_path)])[::-1]:
             try:
                 file_names = sorted([filename for filename in os.listdir(user_dir) if
                               re.fullmatch(r"report.\d+.[^\.:]*", filename)])
