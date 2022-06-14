@@ -226,12 +226,37 @@ def export_to_csv(filename):
         out_csv = csv.writer(outfile)
         session = session_factory()
 
-        tasks = session.query(Task)
-        out_csv.writerow(['Student name', 'Student email', 'Task name', 'Task creating date', 'Task grade', 'Is broken',
-                          'Is plagiary', 'Regex passed', 'Regex total'])
-        for task in tasks.all():
-            out_csv.writerow(
-                [task.student.name, task.student.email, task.name, task.creation_date, task.grade, task.is_broken,
-                 task.is_plagiary, task.regex_passed, task.regex_total])
+        out_csv.writerow(['Username', 'Email', *homeworks_names_and_files.keys(), 'Total grade'])
+
+        mails = [item[0] for item in session.query(Student.email)]
+
+        for cur_email in mails:
+            elems = []
+            elems.append(session.query(Student.name).filter(Student.email == cur_email).first()[0])
+            name, domain = cur_email.split('@')
+            elems.append(f'{name[:3]}*@{domain}')
+
+            submitted_tasks = {key: value for key, *value in
+                               session.query(Task.name, Task.creation_date, Task.grade, Task.is_plagiary,
+                                             Task.is_broken).join(Student).filter(Student.email == cur_email)}
+
+            for homework_name in homeworks_names_and_files.keys():
+                if homework_name in submitted_tasks.keys():
+                    if submitted_tasks[homework_name][1] == 4:
+                        elems.append('on time')
+                    elif submitted_tasks[homework_name][1] == 2:
+                        elems.append('week')
+                    elif submitted_tasks[homework_name][1] == 1:
+                        elems.append('fortnight')
+                    elif submitted_tasks[homework_name][2] == 1 \
+                            and submitted_tasks[homework_name][3] == 0:  # not original and not broken
+                        elems.append('plagiarism')
+                    else:
+                        elems.append('broken')
+                else:
+                    elems.append('nope')
+            elems.append(str(sum([item[1] for item in submitted_tasks.values()])))
+
+            out_csv.writerow(elems)
 
         session.close()

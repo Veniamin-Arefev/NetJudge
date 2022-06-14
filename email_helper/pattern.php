@@ -109,7 +109,7 @@
         <div class="col"><text class="p-2 bg-warning">Overdue for a week</text></div>
         <div class="col"><text class="p-2 bg-danger">Overdue more than a week</text></div>
         <div class="col"><text class="p-2 bg-primary">Plagiarism</text></div>
-        <div class="col"><text class="p-2 bg-info">Bag archive</text></div>
+        <div class="col"><text class="p-2 bg-info">Bad archive</text></div>
         <div class="col">
             <button class="btn bg-purple" id="cookie-button" type="button">Set cookie</button>
             <script>

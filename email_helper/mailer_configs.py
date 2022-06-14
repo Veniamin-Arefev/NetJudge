@@ -14,7 +14,6 @@ def create_default_configs_file():
     config['Credentials'] = {
         'Username': 'User',
         'Password': 'Password',
-        'Token': "Token",
     }
     config['Server'] = {
         'email server host': 'imap.yandex.ru',
