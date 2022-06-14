@@ -144,14 +144,12 @@ def Syntax_correct(source, mode):
                         text = ''
 
             else:
-                text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1])
-            text = re.sub('\r', '', text)
-            try:
-                lines = [translate(line) for line in text.split('\n') if line]
-                GL_Files[user_dir][userfile] = lines
-                GL_Result_1[user_dir][userfile] = [1, 1]
-            except Exception:
-                GL_Result_1[user_dir][userfile] = [0, 1]
+                try:
+                    lines = get_lines(userfile, user_dir.split()[0], user_dir.split()[1])
+                    GL_Files[user_dir][userfile] = lines
+                    GL_Result_1[user_dir][userfile] = [1, 1]
+                except Exception:
+                    GL_Result_1[user_dir][userfile] = [0, 1]
     GL_IsImported = True
 
 
