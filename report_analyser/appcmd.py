@@ -70,6 +70,7 @@ def import_files_from_dir(dir_paths):
                 GL_Result_2[user_dir][filename] = [0, 0]
         if once:
             print_red(_('No such file or directory'))
+    GL_IsImported = False
 
 
 def import_files_from_base():
@@ -91,6 +92,7 @@ def import_files_from_base():
                 print(colored(user['email'] + " " + user['name'], attrs=['bold']), " ", report['name'])
                 GL_Files[user['email'] + " " + user['name']][report['name']] = ""
                 GL_Result_2[user['email'] + " " + user['name']][report['name']] = [0, 0]
+    GL_IsImported = False
 
 
 def import_instructions_from_json(json_paths):
