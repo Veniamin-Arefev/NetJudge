@@ -67,6 +67,8 @@ def import_files_from_dir(dir_paths):
                 print(colored(user_dir, attrs=['bold']), " ", filename)
                 GL_Files[user_dir][filename] = ""
                 GL_Result_2[user_dir][filename] = [0, 0]
+        if once:
+            print_red(_('No such file or directory'))
 
 
 def import_files_from_base():
@@ -119,13 +121,15 @@ def import_instructions_from_json(json_paths):
             continue
 
 
-def Syntax_correct(source):
+def Syntax_correct(source, mode):
     """Parse files & Write score in GL_Result_1"""
     for user_dir, userfiles in GL_Files.items():
-        print("Participant: '", user_dir, "', his files:\n\t", end="")
+        if mode != "quiet":
+            print("Participant: '", user_dir, "', his files:")
         for userfile in userfiles.keys():
             filename = user_dir + "/" + userfile
-            print(filename)
+            if mode != "quiet":
+                print("\t", filename)
             if source == "dir":
                 obj = tarfile.open(filename)
                 text = obj.extractfile('./OUT.txt').read().decode()
@@ -140,16 +144,24 @@ def Syntax_correct(source):
                 GL_Result_1[user_dir][userfile] = [0, 1]
 
 
-def Semantic_check(GFiles, GRegex, save_results):
+def Semantic_check(GFiles, GRegex, save_results, mode):
     """Write score in GL_Result_2"""
     global GL_Result_2
     for username, reportdict in GFiles.items():
-        print_blue(colored(_("Checking participant '{}':").format(username), attrs=['bold']))
+        once_user = True
         for reportname, lines in reportdict.items():
-            print_blue(_("\n  Checking file {}:").format(reportname))
             regexlist = [regex for regex in GRegex if reportname in regex['files'] or regex['files'] == ['']]
+            initialized = False
+            once_report = True
             for regexind, regex in enumerate(regexlist):
-                print_cyan(_("    RE {}: '{}' ({}put).").format(regexind, regex['regex'], regex['inout']))
+                if once_user and (mode != 'quiet'):
+                    print_blue(colored(_("Checking participant '{}':").format(username), attrs=['bold']))
+                    once_user = False
+                if once_report and (mode != 'quiet'):
+                    print_blue(_("\n  Checking file {}:").format(reportname))
+                    once_report = False
+                if mode != "quiet":
+                    print_cyan(_("    RE {}: '{}' ({}put).").format(regexind, regex['regex'], regex['inout']))
                 find = False
                 matchind = 0
                 linenumber = 0
@@ -159,28 +171,34 @@ def Semantic_check(GFiles, GRegex, save_results):
                         for match in patt.findall(line[1]):
                             find = True
                             matchind += 1
-                            print(
+                            if mode != "quiet":
+                                print(
                                 "      " + colored(_("Match {} in line {}:").format(matchind, lineind), attrs=["bold"]))
                             linewithmatch = colored(match, "green", attrs=["underline"]).join(line[1].split(match))
-                            print(_("        {}").format(colored(linewithmatch)))
+                            if mode != "quiet":
+                                print(_("        {}").format(colored(linewithmatch)))
                             linenumber = lineind + 1
                 listed_results = [0, 0]
-                if not find:
+                initialized = True
+                if not find and (mode != 'quiet'):
                     print_red(_("      No matches in {} lines!").format(linenumber))
                 else:
                     listed_results[0] += 1
                 listed_results[1] += 1
-            checkeq = f"{listed_results[0]} / {listed_results[1]}"
-            if listed_results[0] == listed_results[1]:
-                checkeq = colored(checkeq, 'green')
-            else:
-                checkeq = colored(checkeq, 'red')
-            print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'),
-                                              colored(reportname, 'blue', attrs=['bold'])))
-            if save_results:
-                for i in range(0, 2):
-                    GL_Result_2[username][reportname][i] += listed_results[i]
-        print_blue("\n")
+                if initialized:
+                    checkeq = f"{listed_results[0]} / {listed_results[1]}"
+                    if listed_results[0] == listed_results[1]:
+                        checkeq = colored(checkeq, 'green')
+                    else:
+                        checkeq = colored(checkeq, 'red')
+                    if mode != "quiet":
+                        print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'),
+                                                        colored(reportname, 'blue', attrs=['bold'])))
+                    if save_results:
+                        for i in range(0, 2):
+                            GL_Result_2[username][reportname][i] += listed_results[i]
+        if mode != "quiet":
+            print_blue("\n")
 
 
 def print_regex_record(record):
@@ -204,7 +222,7 @@ class Repl_Regex(cmd.Cmd):
     """Regex repl class."""
 
     prompt = colored(_("[ RegexTest ]:~$ "), 'magenta')
-    mode = "brief"
+    mode = "verbose"
 
     def emptyline(self):
         """Override: Called when an empty line is entered in response to the prompt."""
@@ -241,10 +259,11 @@ class Repl_Regex(cmd.Cmd):
             RegexPlay_Regex.append(record)
             print_green(_('Testing regex:'))
             print_regex_record(record)
-            Syntax_correct(GL_Source)
+            Syntax_correct(GL_Source, "quiet")
             print_cyan(_("  =[ CHECKING... ]="))
-            Semantic_check(GL_Files, RegexPlay_Regex, save_results=False)
+            Semantic_check(GL_Files, RegexPlay_Regex, save_results=False, mode="verbose")
             print_cyan(_("  ==[ CHECK ENDED ]=="))
+            RegexPlay_Regex = []
 
     def do_q(self, arg):
         """Easier exit from regex testing mode.
@@ -256,7 +275,7 @@ class Repl_Regex(cmd.Cmd):
     def do_exit(self, arg):
         """Exit regex testing mode.
 
-        Usage: exint
+        Usage: exit
         """
         return True
 
@@ -295,8 +314,12 @@ class Repl(cmd.Cmd):
 
         Usage: reset
         """
-        global GL_Files, GL_Result_1, GL_Result_2, GL_Regex
-        GL_Files = GL_Result_1 = GL_Result_2 = defaultdict(dict)
+        global GL_Files, GL_Result_1, GL_Result_2, GL_Regex, GL_DataBase, RegexPlay_Regex
+        GL_Files = defaultdict(dict)
+        GL_Result_1 = defaultdict(dict)
+        GL_Result_2 = defaultdict(dict)
+        RegexPlay_Regex = []
+        GL_DataBase = []
         GL_Regex = []
         print_cyan(_(" ==[ All progress is reset!! ]==\n"))
 
@@ -382,8 +405,8 @@ class Repl(cmd.Cmd):
     def do_addreg(self, arg):
         """Add a single regular expression to collection.
 
-        Usage: re [REGEX] ['in'/'out'] {[FILE]}
-           or: re [REGEX] ['in'/'out']
+        Usage: addreg [REGEX] ['in'/'out'] {[FILE]}
+           or: addreg [REGEX] ['in'/'out']
 
         Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
         If FILE is not set, every imported file is checked with this regex!
@@ -428,8 +451,8 @@ class Repl(cmd.Cmd):
         if len(args) != 1:
             print_red(_("Wrong number of arguments"))
         else:
-            if args[0] not in ["quiet", "brief", "verbose"]:
-                print_red(_('Wrong argument. Use one of "quiet", "brief", "verbose"'))
+            if args[0] not in ["quiet", "verbose"]:
+                print_red(_('Wrong argument. Use one of "quiet", "verbose"'))
             else:
                 GL_Mode = args[0]
                 print_green(_("'{}' mode is set.").format(args[0]))
@@ -437,7 +460,7 @@ class Repl(cmd.Cmd):
 
     def complete_mode(self, text, allcommand, beg, end):
         """Mode."""
-        return [s for s in ["quiet", "brief", "verbose", ] if s.startswith(text)]
+        return [s for s in ["quiet", "verbose", ] if s.startswith(text)]
 
     def do_start(self, arg):
         """Main function to start checking process. Checking steps:
@@ -478,11 +501,11 @@ class Repl(cmd.Cmd):
             print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
             if steps > 0:
                 print_cyan(_("  =[ SYNTAX CHECK ]="))
-                Syntax_correct(GL_Source)
+                Syntax_correct(GL_Source, GL_Mode)
             if steps > 1:
                 print_cyan(_("  =[ SEMANTIC CHECK ]="))
                 global GL_Result_2
-                Semantic_check(GL_Files, GL_Regex, save_results=True)
+                Semantic_check(GL_Files, GL_Regex, save_results=True, mode="verbose")
             print_cyan(_("  ==[ CHECK ENDED ]=="))
 
     def complete_start(self, text, allcommand, beg, end):
@@ -511,7 +534,6 @@ class Repl(cmd.Cmd):
 
     def do_saveres(self, arg):
         """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments,
-
         contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
         Usage: saveres {[FILE]}
         """

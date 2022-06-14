@@ -28,7 +28,7 @@ def task_babel():
 def task_test():
     """Run tests"""
     return {
-        "actions": [f"{python_exec} -m unittest -v"],
+        "actions": [f"{python_exec} -m unittest -v report_analyser.test_appcmd"],
     }
 
 
