@@ -1,5 +1,4 @@
 """Commandline functions"""
-import locale
 import shlex
 import cmd
 import gettext
@@ -9,7 +8,7 @@ from collections import defaultdict
 from termcolor import colored, cprint
 
 """Project l10n & i18n"""
-translation = gettext.translation('netjudge', 'report_analyser/po', fallback=True)
+translation = gettext.translation('netjudge', localedir=os.path.join(os.path.dirname(__file__), 'po'), fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
 """Cmd colors"""
@@ -25,7 +24,6 @@ print_blue = lambda x: cprint(x, 'blue')
 """ Standart prompt"""
 print_magenta = lambda x: cprint(x, 'magenta')
 """ Regex prompt"""
-
 
 """Global structures"""
 GL_Files = defaultdict(dict)
@@ -190,7 +188,8 @@ def Semantic_check(GFiles, GRegex, save_results, mode):
                             matchind += 1
                             if mode != "quiet":
                                 print(
-                                "      " + colored(_("Match {} in line {}:").format(matchind, lineind), attrs=["bold"]))
+                                    "      " + colored(_("Match {} in line {}:").format(matchind, lineind),
+                                                       attrs=["bold"]))
                             linewithmatch = colored(match, "green", attrs=["underline"]).join(line[1].split(match))
                             if mode != "quiet":
                                 print(_("        {}").format(colored(linewithmatch)))
@@ -210,7 +209,7 @@ def Semantic_check(GFiles, GRegex, save_results, mode):
                         checkeq = colored(checkeq, 'red')
                     if mode != "quiet":
                         print_blue(_("  {} {} {}\n").format(checkeq, colored("REGEXs matched in file", 'blue'),
-                                                        colored(reportname, 'blue', attrs=['bold'])))
+                                                          colored(reportname, 'blue', attrs=['bold'])))
                     if save_results:
                         for i in range(0, 2):
                             GL_Result_2[username][reportname][i] += listed_results[i]
