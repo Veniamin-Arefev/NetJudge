@@ -1,6 +1,6 @@
 """Report analyser."""
 import sys
-from .appcmd import import_files_from_dir, import_instructions_from_json, Repl, print_red, _, \
+from .appcmd import GL_Mode, import_files_from_dir, import_instructions_from_json, Repl, print_red, _, \
     import_files_from_base
 import argparse
 
@@ -19,13 +19,12 @@ arg_parser.add_argument('reports_directory', metavar='REP_DIR', nargs='?', type=
 arg_parser.add_argument('instructions_file', metavar='INS_DIR', nargs='?', type=str, default='',
                         help='Instruction file, that contains regexes')
 
-
 def main():
     """Main cmd function."""
-    global GL_Mode
     args = arg_parser.parse_args()
     if args.quiet:
-        Repl().do_mode("quiet")
+        global GL_Mode
+        GL_Mode = "quiet"
     if args.reports_source_type in ["CMD", ""]:
         Repl().cmdloop()
     elif args.reports_source_type in ["DIR", "DATABASE"]:

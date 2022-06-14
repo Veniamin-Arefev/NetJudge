@@ -34,22 +34,21 @@ GL_Result_2 = defaultdict(dict)
 GL_Regex = []
 RegexPlay_Regex = []
 GL_DataBase = []
-GL_Mode = "verbose"
 GL_Source = "dir"
 GL_IsImported = False
-
+GL_Mode = "verbose"
 
 def import_files_from_dir(dir_paths):
     """Add keys to GF_Files"""
-    global GL_Source
+    global GL_Source, GL_IsImported
     GL_Source = "dir"
     once = True
     for dir_path in dir_paths:
         """Find all dirs = users"""
         for user_dir in [dir[0] for dir in os.walk(dir_path)]:
             try:
-                file_names = [filename for filename in os.listdir(user_dir) if
-                              re.fullmatch(r"report.\d+.[^\.:]*", filename)]
+                file_names = sorted([filename for filename in os.listdir(user_dir) if
+                              re.fullmatch(r"report.\d+.[^\.:]*", filename)])
             except FileNotFoundError as E:
                 print_red(E)
                 continue
@@ -75,7 +74,7 @@ def import_files_from_dir(dir_paths):
 
 def import_files_from_base():
     """Add keys to GF_Files"""
-    global GL_Source, GL_DataBase
+    global GL_Source, GL_DataBase, GL_IsImported
     GL_Source = "database"
     GL_DataBase = collect_data()
     for user in GL_DataBase:
@@ -197,13 +196,13 @@ def Semantic_check(GFiles, GRegex, save_results, mode):
                     else:
                         checkeq = colored(checkeq, 'red')
                     if mode != "quiet":
-                        print_blue(_("  {} {} {}").format(checkeq, colored("REGEXs matched in file", 'blue'),
+                        print_blue(_("  {} {} {}\n").format(checkeq, colored("REGEXs matched in file", 'blue'),
                                                         colored(reportname, 'blue', attrs=['bold'])))
                     if save_results:
                         for i in range(0, 2):
                             GL_Result_2[username][reportname][i] += listed_results[i]
-        if mode != "quiet":
-            print_blue("\n")
+        # if mode != "quiet":
+        #     print_blue("\n")
 
 
 def print_regex_record(record):
@@ -320,13 +319,14 @@ class Repl(cmd.Cmd):
 
         Usage: reset
         """
-        global GL_Files, GL_Result_1, GL_Result_2, GL_Regex, GL_DataBase, RegexPlay_Regex
+        global GL_Files, GL_Result_1, GL_Result_2, GL_Regex, GL_DataBase, RegexPlay_Regex, GL_IsImported
         GL_Files = defaultdict(dict)
         GL_Result_1 = defaultdict(dict)
         GL_Result_2 = defaultdict(dict)
         RegexPlay_Regex = []
         GL_DataBase = []
         GL_Regex = []
+        GL_IsImported = False
         print_cyan(_(" ==[ All progress is reset!! ]==\n"))
 
     def do_importedreports(self, arg):

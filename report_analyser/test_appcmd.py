@@ -15,9 +15,9 @@ class AppCmdTest(unittest.TestCase):
         output = '''Success
 input_example/veniamin   report.03.base
 input_example/veniamin   report.03.bridge
-input_example/dima   report.03.clone
 input_example/dima   report.03.base
-input_example/dima   report.03.bridge\n'''
+input_example/dima   report.03.bridge
+input_example/dima   report.03.clone\n'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
             import_files_from_dir(['input_example/',])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
@@ -77,7 +77,7 @@ input_example/dima   report.03.bridge\n'''
 Participant: input_example/veniamin His files:
         report.03.base   report.03.bridge        
 Participant: input_example/dima His files:
-        report.03.clone  report.03.base  report.03.bridge\n'''
+        report.03.base   report.03.bridge        report.03.clone\n'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
             Repl().do_reset('')
             import_files_from_dir(['input_example/',])
@@ -112,9 +112,9 @@ Participant: input_example/dima His files:
         output = '''Success
 input_example/veniamin   report.03.base
 input_example/veniamin   report.03.bridge
-input_example/dima   report.03.clone
 input_example/dima   report.03.base
-input_example/dima   report.03.bridge\n'''
+input_example/dima   report.03.bridge
+input_example/dima   report.03.clone\n'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
             Repl().do_reset('')
         with patch('sys.stdout', new = StringIO()) as fake_out:
@@ -197,12 +197,12 @@ Or  'addreg REGEX, FILE1, FILE2...'
   ==[ CHECK STARTS:  Going through 1 steps ]==
   =[ SYNTAX CHECK ]=
 Participant: ' input_example/veniamin ', his files:
-        input_example/veniamin/report.03.base
-input_example/veniamin/report.03.bridge
+         input_example/veniamin/report.03.base
+         input_example/veniamin/report.03.bridge
 Participant: ' input_example/dima ', his files:
-        input_example/dima/report.03.clone
-input_example/dima/report.03.base
-input_example/dima/report.03.bridge
+         input_example/dima/report.03.base
+         input_example/dima/report.03.bridge
+         input_example/dima/report.03.clone
   ==[ CHECK ENDED ]==\n'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
             Repl().do_reset('')
@@ -218,9 +218,9 @@ Participant: ' input_example/veniamin ', his files:
          input_example/veniamin/report.03.base
          input_example/veniamin/report.03.bridge
 Participant: ' input_example/dima ', his files:
-         input_example/dima/report.03.clone
          input_example/dima/report.03.base
          input_example/dima/report.03.bridge
+         input_example/dima/report.03.clone
   =[ SEMANTIC CHECK ]=
 Checking participant 'input_example/veniamin':
 
@@ -229,6 +229,7 @@ Checking participant 'input_example/veniamin':
       Match 1 in line 0:
         Script started on 2022-03-11 10:08:28+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
   1 / 1 REGEXs matched in file report.03.base
+
     RE 1: 'vlan7' (input).
       Match 1 in line 1:
         ip link add link eth1 name vlan7 type vlan id 7
@@ -236,14 +237,35 @@ Checking participant 'input_example/veniamin':
         ip address add dev vlan7 10.10.10.7/24
   1 / 1 REGEXs matched in file report.03.base
 
+
   Checking file report.03.bridge:
     RE 0: 'Script started on' (output).
       Match 1 in line 0:
         Script started on 2022-03-11 10:07:38+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
   1 / 1 REGEXs matched in file report.03.bridge
 
-
 Checking participant 'input_example/dima':
+
+  Checking file report.03.base:
+    RE 0: 'Script started on' (output).
+      Match 1 in line 0:
+        Script started on 2022-03-11 10:08:28+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
+  1 / 1 REGEXs matched in file report.03.base
+
+    RE 1: 'vlan7' (input).
+      Match 1 in line 1:
+        ip link add link eth1 name vlan7 type vlan id 7
+      Match 2 in line 2:
+        ip address add dev vlan7 10.10.10.7/24
+  1 / 1 REGEXs matched in file report.03.base
+
+
+  Checking file report.03.bridge:
+    RE 0: 'Script started on' (output).
+      Match 1 in line 0:
+        Script started on 2022-03-11 10:07:38+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
+  1 / 1 REGEXs matched in file report.03.bridge
+
 
   Checking file report.03.clone:
     RE 0: '10.10.10.\d' (input).
@@ -252,32 +274,15 @@ Checking participant 'input_example/dima':
       Match 2 in line 4:
         ping -c8 10.10.10.7
   1 / 1 REGEXs matched in file report.03.clone
+
     RE 1: 'Script started on' (output).
       Match 1 in line 0:
         Script started on 2022-03-11 10:09:09+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
   1 / 1 REGEXs matched in file report.03.clone
+
     RE 2: 'vlan7' (input).
       No matches in 0 lines!
   0 / 1 REGEXs matched in file report.03.clone
-
-  Checking file report.03.base:
-    RE 0: 'Script started on' (output).
-      Match 1 in line 0:
-        Script started on 2022-03-11 10:08:28+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
-  1 / 1 REGEXs matched in file report.03.base
-    RE 1: 'vlan7' (input).
-      Match 1 in line 1:
-        ip link add link eth1 name vlan7 type vlan id 7
-      Match 2 in line 2:
-        ip address add dev vlan7 10.10.10.7/24
-  1 / 1 REGEXs matched in file report.03.base
-
-  Checking file report.03.bridge:
-    RE 0: 'Script started on' (output).
-      Match 1 in line 0:
-        Script started on 2022-03-11 10:07:38+00:00 [TERM="linux" TTY="/dev/tty1" COLUMNS="100" LINES="37"]
-  1 / 1 REGEXs matched in file report.03.bridge
-
 
   ==[ CHECK ENDED ]==\n'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
@@ -297,9 +302,9 @@ Participant 'input_example/veniamin' results:
 
 Participant 'input_example/dima' results:
 
-  report.03.clone:      2 / 3
   report.03.base:       2 / 2
-  report.03.bridge:     1 / 1'''
+  report.03.bridge:     1 / 1
+  report.03.clone:      2 / 3'''
         with patch('sys.stdout', new = StringIO()) as fake_out:
             Repl().do_reset('')
             Repl().do_addrep('input_example/')
