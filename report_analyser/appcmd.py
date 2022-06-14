@@ -36,6 +36,7 @@ RegexPlay_Regex = []
 GL_DataBase = []
 GL_Mode = "verbose"
 GL_Source = "dir"
+GL_IsImported = False
 
 
 def import_files_from_dir(dir_paths):
@@ -69,6 +70,7 @@ def import_files_from_dir(dir_paths):
                 GL_Result_2[user_dir][filename] = [0, 0]
         if once:
             print_red(_('No such file or directory'))
+    GL_IsImported = False
 
 
 def import_files_from_base():
@@ -90,6 +92,7 @@ def import_files_from_base():
                 print(colored(user['email'] + " " + user['name'], attrs=['bold']), " ", report['name'])
                 GL_Files[user['email'] + " " + user['name']][report['name']] = ""
                 GL_Result_2[user['email'] + " " + user['name']][report['name']] = [0, 0]
+    GL_IsImported = False
 
 
 def import_instructions_from_json(json_paths):
@@ -123,6 +126,7 @@ def import_instructions_from_json(json_paths):
 
 def Syntax_correct(source, mode):
     """Parse files & Write score in GL_Result_1"""
+    global GL_IsImported
     for user_dir, userfiles in GL_Files.items():
         if mode != "quiet":
             print("Participant: '", user_dir, "', his files:")
@@ -142,6 +146,7 @@ def Syntax_correct(source, mode):
                 GL_Result_1[user_dir][userfile] = [1, 1]
             except Exception:
                 GL_Result_1[user_dir][userfile] = [0, 1]
+    GL_IsImported = True
 
 
 def Semantic_check(GFiles, GRegex, save_results, mode):
@@ -242,7 +247,7 @@ class Repl_Regex(cmd.Cmd):
 
         Note, that in 'regextest' mode, results are not saved, only displayed.
         """
-        global RegexPlay_Regex, GL_Files
+        global RegexPlay_Regex, GL_Files, GL_IsImported
         args = shlex.split(arg, comments=True)
         if len(args) < 2:
             print_red(_("Not enough arguments"))
@@ -259,7 +264,8 @@ class Repl_Regex(cmd.Cmd):
             RegexPlay_Regex.append(record)
             print_green(_('Testing regex:'))
             print_regex_record(record)
-            Syntax_correct(GL_Source, "quiet")
+            if not GL_IsImported:
+                Syntax_correct(GL_Source, "quiet")
             print_cyan(_("  =[ CHECKING... ]="))
             Semantic_check(GL_Files, RegexPlay_Regex, save_results=False, mode="verbose")
             print_cyan(_("  ==[ CHECK ENDED ]=="))
@@ -501,7 +507,8 @@ class Repl(cmd.Cmd):
             print_cyan(_("  ==[ CHECK STARTS:  Going through {} steps ]==").format(steps))
             if steps > 0:
                 print_cyan(_("  =[ SYNTAX CHECK ]="))
-                Syntax_correct(GL_Source, GL_Mode)
+                if not GL_IsImported:
+                    Syntax_correct(GL_Source, GL_Mode)
             if steps > 1:
                 print_cyan(_("  =[ SEMANTIC CHECK ]="))
                 global GL_Result_2

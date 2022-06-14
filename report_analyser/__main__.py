@@ -26,8 +26,6 @@ def main():
     args = arg_parser.parse_args()
     if args.quiet:
         Repl().do_mode("quiet")
-    else:
-        Repl().do_mode("verbose")
     if args.reports_source_type in ["CMD", ""]:
         Repl().cmdloop()
     elif args.reports_source_type in ["DIR", "DATABASE"]:
