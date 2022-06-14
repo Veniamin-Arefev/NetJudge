@@ -10,7 +10,6 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   source/tech_docs
    database
    email_helper
    report_analyser
@@ -23,4 +22,4 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
-.. image:: _static/sea.jpg
+.. image:: source/_static/sea.jpg

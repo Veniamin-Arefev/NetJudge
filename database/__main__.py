@@ -8,7 +8,7 @@ from .functions import *
 def main():
     """Main function."""
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('action', type=str, default='parse', choices=['parse', 'export', 'getinfo', 'printinfo'])
+    arg_parser.add_argument('action', type=str, default='parse', choices=['parse', 'export', 'getinfo'])
     arg_parser.add_argument('first_argument', nargs='?', type=str, default='',
                             help='export_file_name or report_username')
     arg_parser.add_argument('report_name', nargs='?', type=str, default='')
