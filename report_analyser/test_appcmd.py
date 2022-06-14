@@ -28,14 +28,14 @@ input_example/dima   report.03.base
 input_example/dima   report.03.bridge
 input_example/dima   report.03.clone\n"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            import_files_from_dir(['input_example/',])
+            import_files_from_dir(['input_example/', ])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
     def test_import_files_from_dir_nofile(self):
         """Import files that does not exist."""
         output = 'No such file or directory'
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            import_files_from_dir(['nofile/',])
+            import_files_from_dir(['nofile/', ])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
     def test_instructions_from_json(self):
@@ -48,14 +48,14 @@ input_example/dima   report.03.clone\n"""
  Re: vlan7
    Files (input):\treport.03.base report.03.clone\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            import_instructions_from_json(['input_example/instruction.json',])
+            import_instructions_from_json(['input_example/instruction.json', ])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-    
+
     def test_instructions_from_json_nofile(self):
         """Import non-existing instructions."""
         output = '''[Errno 2] Nosuchfileordirectory: 'input_example/nofile.json'\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            import_instructions_from_json(['input_example/nofile.json',])
+            import_instructions_from_json(['input_example/nofile.json', ])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
     def test_do_q(self):
@@ -64,7 +64,7 @@ input_example/dima   report.03.clone\n"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_q('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-    
+
     def test_do_exit(self):
         """Exit test."""
         output = '''==[Exiting!]==\n'''
@@ -87,7 +87,7 @@ input_example/dima   report.03.clone\n"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_importedreports('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-            
+
     def test_do_importedreports(self):
         """Import test."""
         output = '''  =[ Imported reports: ]=
@@ -110,7 +110,7 @@ Participant: input_example/dima His files:
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_importedinstructions('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-            
+
     def test_do_importedinstructions(self):
         """Instruction test."""
         output = '''=[ Imported instructions: ]=
@@ -122,11 +122,11 @@ Participant: input_example/dima His files:
    Files (input):       report.03.base  report.03.clone\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_reset('')
-            import_instructions_from_json(['input_example/instruction.json',])
+            import_instructions_from_json(['input_example/instruction.json', ])
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_importedinstructions('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-        
+
     def test_do_addrep(self):
         """Adding repository test."""
         output = '''Success
@@ -164,7 +164,7 @@ input_example/dima   report.03.clone\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_addins('input_example/instruction.json')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-    
+
     def test_do_addins_nofile(self):
         """No instruction file test."""
         output = '''[Errno 2] Nosuchfileordirectory: 'input_example/nofile.json'\n'''
@@ -184,7 +184,7 @@ input_example/dima   report.03.clone\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_addreg('20.20.20. out report.06.clone')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-    
+
     def test_do_addreg_2(self):
         """Another add regex test."""
         output = '''Success\n
@@ -195,7 +195,7 @@ input_example/dima   report.03.clone\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_addreg('20.20.20. out')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
-        
+
     def test_help_start(self):
         """Start test."""
         output = '''Main function to start checking process. Checking steps:
@@ -233,7 +233,7 @@ Participant: ' input_example/dima ', his files:
   ==[ CHECK ENDED ]==\n"""
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_reset('')
-            import_files_from_dir(['input_example/',])
+            import_files_from_dir(['input_example/', ])
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_start('1')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
@@ -322,6 +322,7 @@ Checking participant 'input_example/dima':
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
     def test_do_conclude(self):
+        """Start conclude test."""
         output = '''==[ RESULTS ]==
 Participant 'input_example/veniamin' results:
 
@@ -341,6 +342,7 @@ Participant 'input_example/dima' results:
         with patch('sys.stdout', new=StringIO()) as fake_out:
             Repl().do_conclude('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
+
 
 if __name__ == "__main__":
     unittest.main()

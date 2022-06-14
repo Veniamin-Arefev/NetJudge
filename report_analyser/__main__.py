@@ -19,6 +19,7 @@ arg_parser.add_argument('reports_directory', metavar='REP_DIR', nargs='?', type=
 arg_parser.add_argument('instructions_file', metavar='INS_DIR', nargs='?', type=str, default='',
                         help='Instruction file, that contains regexes')
 
+
 def main():
     """Main cmd function."""
     args = arg_parser.parse_args()
@@ -44,6 +45,7 @@ def main():
             pass
         Repl().do_start("2")
         Repl().do_conclude("")
+
 
 if __name__ == '__main__':
     main()

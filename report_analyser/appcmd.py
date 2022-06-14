@@ -36,6 +36,7 @@ GL_Source = "dir"
 GL_IsImported = False
 GL_Mode = "verbose"
 
+
 def import_files_from_dir(dir_paths):
     """Add keys to GF_Files"""
     global GL_Source, GL_IsImported
@@ -46,7 +47,7 @@ def import_files_from_dir(dir_paths):
         for user_dir in sorted([dir[0] for dir in os.walk(dir_path)])[::-1]:
             try:
                 file_names = sorted([filename for filename in os.listdir(user_dir) if
-                              re.fullmatch(r"report.\d+.[^\.:]*", filename)])
+                                     re.fullmatch(r"report.\d+.[^\.:]*", filename)])
             except FileNotFoundError as E:
                 print_red(E)
                 continue
@@ -209,7 +210,7 @@ def Semantic_check(GFiles, GRegex, save_results, mode):
                         checkeq = colored(checkeq, 'red')
                     if mode != "quiet":
                         print_blue(_("  {} {} {}\n").format(checkeq, colored("REGEXs matched in file", 'blue'),
-                                                          colored(reportname, 'blue', attrs=['bold'])))
+                                                            colored(reportname, 'blue', attrs=['bold'])))
                     if save_results:
                         for i in range(0, 2):
                             GL_Result_2[username][reportname][i] += listed_results[i]
@@ -552,7 +553,7 @@ class Repl(cmd.Cmd):
             print("")
 
     def do_saveres(self, arg):
-        """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments,
+        """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments
         contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
         Usage: saveres {[FILE]}
         """
