@@ -136,7 +136,14 @@ def Syntax_correct(source, mode):
                 print("\t", filename)
             if source == "dir":
                 obj = tarfile.open(filename)
-                text = obj.extractfile('./OUT.txt').read().decode()
+                try:
+                    text = obj.extractfile('./OUT.txt').read().decode()
+                except Exception:
+                    try:
+                        text = obj.extractfile('./OUT.txt').read().decode('cp1251')
+                    except Exception:
+                        text = ''
+
             else:
                 text = get_report_text(userfile, user_dir.split()[0], user_dir.split()[1])
             text = re.sub('\r', '', text)
