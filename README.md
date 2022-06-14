@@ -47,10 +47,11 @@ If you don't have it, you may run any command that interact with mail and create
 ## **Available scripts after installation:**
  * netjudge-fac_idle - Fetch all mail from faculty mail, redirect it to yandex mail and enter idle
  * netjudge-ya_idle - Fetch all mail from yandex mail, update database and enter idle
- * netjudge-download - Download all letters attachments from yandex mail
- * netjudge-database - Parse all attachments and populate database
+ * netjudge-download - Download all letters attachments from yandex mail, also support
+ * netjudge-database parse - Parse all attachments and populate database
+ * netjudge-database export \<FILENAME\> - Export database info info csv file named <FILENAME>
  * netjudge-ya_parse - Create html(actually php) view of database data
- * netjudge-report_analyser - Start cmdline for regex selection
+ * netjudge-report_analyser - Start cmdline for regex selection(examples listed below)
 
 ## **Report analyser usage example:**
 
