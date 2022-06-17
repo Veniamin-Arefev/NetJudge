@@ -17,7 +17,7 @@ if (isset($_COOKIE["super_secret_cookie"]) && $_COOKIE["super_secret_cookie"] ==
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <title>LinuxNetwork 2022 progress check site</title>
-    <link href="https://uneex.ru/favicon.ico" rel="shortcut icon"/>
+    <link href="https://raw.githubusercontent.com/Veniamin-Arefev/NetJudge/master/email_helper/favicon.ico" rel="shortcut icon"/>
     <!--Frameworks-->
     <link href="https://timetable.veniamin.space/css/bootstrap.css" rel="stylesheet"/>
     <script crossorigin="anonymous" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
