@@ -260,3 +260,39 @@ def export_to_csv(filename):
             out_csv.writerow(elems)
 
         session.close()
+
+
+def export_to_csv_regex(filename):
+    """Find grades for every student."""
+    with open(filename, 'w', encoding='utf-8', newline='') as outfile:
+        out_csv = csv.writer(outfile)
+        session = session_factory()
+
+        out_csv.writerow(['Username', 'Email', *homeworks_names_and_files.keys()])
+
+        mails = [item[0] for item in session.query(Student.email)]
+
+        for cur_email in mails:
+            elems = []
+            elems.append(session.query(Student.name).filter(Student.email == cur_email).first()[0])
+            name, domain = cur_email.split('@')
+            elems.append(f'{name[:3]}*@{domain}')
+
+            submitted_tasks = {key: value for key, *value in
+                               session.query(Task.name, Task.creation_date, Task.grade, Task.is_plagiary,
+                                             Task.is_broken, Task.regex_passed, Task.regex_total
+                                             ).join(Student).filter(Student.email == cur_email)}
+
+            for homework_name in homeworks_names_and_files.keys():
+                if homework_name in submitted_tasks.keys():
+                    regex_passed = int(submitted_tasks[homework_name][4])
+                    regex_total = int(submitted_tasks[homework_name][5])
+                    if regex_total != 0 and regex_total != -1:
+                        elems.append(f"{regex_passed / regex_total:.4f}")
+                    else:
+                        elems.append("0")
+                else:
+                    elems.append('0')
+            out_csv.writerow(elems)
+
+        session.close()

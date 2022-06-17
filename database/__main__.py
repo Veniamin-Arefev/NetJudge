@@ -20,6 +20,7 @@ def main():
         rate_reports()
     elif args.action == "export":
         export_to_csv(args.first_argument)
+        export_to_csv_regex("regex_" + args.first_argument)
     elif args.action == "getinfo":
         output = []
         if platform.startswith('win'):
