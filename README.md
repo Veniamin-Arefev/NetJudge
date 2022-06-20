@@ -64,7 +64,7 @@ Here are some usage examples:
 1. Running Net-Judge using reports from database:
 ```
 netjudge-download
-netjudge-database
+netjudge-database parse
 netjudge-report_analyser DATABASE
 [ NetJu ]:~$ addins input_example/instruction.json
 [ NetJu ]:~$ start 2

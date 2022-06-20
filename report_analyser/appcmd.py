@@ -155,8 +155,7 @@ def Syntax_correct(source, mode):
                     student = [student for student in GL_DataBase if student['email'] == user_dir.split()[0]][0]
                     task = [task for task in student['tasks'] if task['name'].startswith(str(userfile[7:9]))][0]
                     report = [report for report in task['reports'] if report['name'] == userfile][0]
-                    text = report['text']
-                    text = re.sub('\r', '', text)
+                    text = re.sub('\r', '', report['text'])
                     lines = [translate(line) for line in text.split('\n') if line]
                     GL_Files[user_dir][userfile] = lines
                     GL_Result_1[user_dir][userfile] = [1, 1]
