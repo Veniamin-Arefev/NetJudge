@@ -37,14 +37,13 @@ def main():
                 import_files_from_dir([args.reports_directory, ])
                 if args.instructions_file != '':
                     import_instructions_from_json([args.instructions_file, ])
+            Repl().do_start("2")
+            Repl().do_conclude("")
         elif args.reports_source_type == "DATABASE":
             import_files_from_base()
             Repl().cmdloop()
             # Решил сделать, чтобы регулярки можно было вставлять только с локальной системы,
             # поэтому дальше переходим в режим проверки через cli
-            pass
-        Repl().do_start("2")
-        Repl().do_conclude("")
 
 
 if __name__ == '__main__':
