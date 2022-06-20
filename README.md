@@ -92,10 +92,10 @@ netjudge-report_analyser CMD
 netjudge-report_analyser CMD
 [ NetJu ]:~$ addrep input_example
 [ NetJu ]:~$ regextest
-[ RegexTest ]:~$ re 10 in report.03.base
-[ RegexTest ]:~$ re 10 out
+[ RegexTest ]:~$ re in 10 report.03.base
+[ RegexTest ]:~$ re out 10
 [ RegexTest ]:~$ q
-[ NetJu ]:~$ addreg 10 in report.03.base
+[ NetJu ]:~$ addreg in 10 report.03.base
 [ NetJu ]:~$ saveins input_example/instr_example.json
 [ NetJu ]:~$ q
 ```
