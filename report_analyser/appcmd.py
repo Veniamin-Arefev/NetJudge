@@ -124,7 +124,7 @@ def import_instructions_from_json(json_paths):
 
 def Syntax_correct(source, mode):
     """Parse files & Write score in GL_Result_1"""
-    global GL_IsImported
+    global GL_IsImported, GL_DataBase
     for user_dir, userfiles in GL_Files.items():
         if mode != "quiet":
             print("Participant: '", user_dir, "', his files:")
@@ -152,7 +152,11 @@ def Syntax_correct(source, mode):
 
             else:
                 try:
-                    lines = get_lines(userfile, user_dir.split()[0], user_dir.split()[1])
+                    student = [student for student in GL_DataBase if student['email'] == user_dir.split()[0]][0]
+                    task = [task for task in student['tasks'] if task['name'].startswith(str(userfile[7:9]))][0]
+                    report = [report for report in task['reports'] if report['name'] == userfile][0]
+                    text = re.sub('\r', '', report['text'])
+                    lines = [translate(line) for line in text.split('\n') if line]
                     GL_Files[user_dir][userfile] = lines
                     GL_Result_1[user_dir][userfile] = [1, 1]
                 except Exception:
