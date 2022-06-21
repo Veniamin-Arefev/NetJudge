@@ -307,7 +307,12 @@ class Repl_Regex(cmd.Cmd):
 
     def complete_re(self, text, allcommand, beg, end):
         """Re."""
-        return [s for s in ["in", "out", ] if s.startswith(text)]
+        rep = {"in", "out"}
+        for username, userfiles in GL_Files.items():
+            for userfile in userfiles.keys():
+                rep.add(userfile)
+        rep = [r for r in rep]
+        return [s for s in [*rep,] if s.startswith(text)]
 
     def do_q(self, arg):
         """Easier exit from regex testing mode.
@@ -509,7 +514,12 @@ class Repl(cmd.Cmd):
 
     def complete_addreg(self, text, allcommand, beg, end):
         """Addreg."""
-        return [s for s in ["in", "out", ] if s.startswith(text)]
+        rep = {"in", "out"}
+        for username, userfiles in GL_Files.items():
+            for userfile in userfiles.keys():
+                rep.add(userfile)
+        rep = [r for r in rep]
+        return [s for s in [*rep,] if s.startswith(text)]
 
     def do_delreg(self, arg):
         """Del a single regular expression from collection.
