@@ -6,8 +6,8 @@ import tarfile
 import re
 import hashlib
 
-from . import *
-from email_helper.deadlines import deadlines as deadlines_dict
+from ..database.__init__ import *
+from ..email_helper.deadlines import deadlines as deadlines_dict
 
 
 class Student(Base):

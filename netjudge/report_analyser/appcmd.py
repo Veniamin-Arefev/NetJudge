@@ -3,12 +3,14 @@ import shlex
 import cmd
 import gettext
 import json
-from database.functions import *
+
+from ..database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
 
 """Project l10n & i18n"""
-translation = gettext.translation('netjudge', localedir=os.path.join(os.path.dirname(__file__), 'po'), fallback=True)
+translation = gettext.translation('netjudge', localedir=os.path.join(os.path.dirname(__file__), '..', 'po'),
+                                  fallback=True)
 _, ngettext = translation.gettext, translation.ngettext
 
 """Cmd colors"""
@@ -283,10 +285,10 @@ class Repl_Regex(cmd.Cmd):
             print_cyan(_("  ==[ CHECK ENDED ]=="))
             RegexPlay_Regex = []
 
-    def do_q(self, arg):
+    def do_EOF(self, arg):
         """Easier exit from regex testing mode.
 
-        Usage: q
+        Usage: ^D
         """
         return True
 
@@ -311,10 +313,10 @@ class Repl(cmd.Cmd):
             self.lastcmd = ""
             return self.onecmd('\n')
 
-    def do_q(self, arg):
+    def do_EOF(self, arg):
         """Shorter variant of 'exit' command.
 
-        Usage: q
+        Usage: ^D
         """
         print_exit_message()
         return True

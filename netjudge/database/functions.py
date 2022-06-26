@@ -1,10 +1,10 @@
 """Misc database functions."""
 import os.path
 import csv
-from .models import *
-from report_analyser.translator import translate
-from email_helper.deadlines import homeworks_names_and_files
-from email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
+from ..database.models import *
+from ..report_analyser.translator import translate
+from ..email_helper.deadlines import homeworks_names_and_files
+from ..email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
 
 
 def get_task_name(report_name):

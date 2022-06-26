@@ -5,13 +5,13 @@ from bs4 import BeautifulSoup as Soup
 
 __all__ = ['create_html_from_database']
 
-from email_helper.deadlines import homeworks_names_and_files
+from ..email_helper.deadlines import homeworks_names_and_files
 
 
 def create_html_from_database(target_path, target_filename):
     """Create html using database."""
     import database
-    from database.models import Student, Task, Report
+    from ..database.models import Student, Task, Report
 
     session = database.session_factory()
 

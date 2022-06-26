@@ -4,9 +4,9 @@ import re
 import unittest
 from unittest.mock import patch
 
-from report_analyser.appcmd import import_files_from_dir
-from report_analyser.appcmd import import_instructions_from_json
-from report_analyser.appcmd import Repl
+from netjudge.report_analyser.appcmd import import_files_from_dir
+from netjudge.report_analyser.appcmd import import_instructions_from_json
+from netjudge.report_analyser.appcmd import Repl
 
 
 def cleanoutput(s):
@@ -58,11 +58,11 @@ input_example/dima   report.03.clone\n"""
             import_instructions_from_json(['input_example/nofile.json', ])
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
-    def test_do_q(self):
+    def test_do_EOF(self):
         """Quit test."""
         output = '''==[Exiting!]==\n'''
         with patch('sys.stdout', new=StringIO()) as fake_out:
-            Repl().do_q('')
+            Repl().do_EOF('')
             self.assertEqual(cleanoutput(fake_out.getvalue()), cleanoutput(output))
 
     def test_do_exit(self):

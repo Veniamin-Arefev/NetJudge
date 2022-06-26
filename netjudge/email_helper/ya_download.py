@@ -3,10 +3,10 @@ import os
 from email.header import decode_header
 from imap_tools import MailBox
 
-from email_helper.mailer_configs import *
-from email_helper.mailer_utilities import *
-from email_helper.deadlines import *
-from email_helper.report_fixer import report_fixer
+from ..email_helper.mailer_configs import *
+from ..email_helper.mailer_utilities import *
+from ..email_helper.deadlines import *
+from ..email_helper.report_fixer import report_fixer
 
 __all__ = ['ya_download']
 

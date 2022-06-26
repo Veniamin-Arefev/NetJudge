@@ -3,21 +3,24 @@ import glob
 from sys import platform
 
 DOIT_CONFIG = {'default_tasks': ['babel', 'style', 'docstyle', 'docs', 'test', 'wheel', 'sdist']}
+project_dir = "netjudge"
 domain = "netjudge"
-version = "1.0.0"
-podir = "report_analyser/po"
+version = "1.2.0"
+podir = "netjudge/po"
 python_exec = ''
 
-if platform.startswith('linux'):
-    python_exec = 'python3'
-elif platform.startswith('win'):
+if platform.startswith('win'):
     python_exec = 'python'
+else:
+    python_exec = 'python3'
+    if not platform.startswith('linux'):
+        print('Your platform may not be supported!')
 
 
 def task_babel():
     """Update and compile translation"""
     return {
-        "actions": [f"pybabel extract -o {podir}/{domain}.pot --input-dirs=.",
+        "actions": [f"pybabel extract -o {podir}/{domain}.pot --input-dirs={project_dir}",
                     f"pybabel update -l ru -D {domain} -i {podir}/{domain}.pot -d {podir}",
                     f"pybabel compile -l ru -D {domain} -d {podir}"],
         'targets': [f'{podir}/{domain}.pot', f'{podir}/ru/LC_MESSAGES/{domain}.mo'],
@@ -28,7 +31,7 @@ def task_babel():
 def task_test():
     """Run tests"""
     return {
-        "actions": [f"{python_exec} -m unittest -v report_analyser.test_appcmd"],
+        "actions": [f"{python_exec} -m unittest -v tests/test_appcmd.py"],
     }
 
 
@@ -37,7 +40,6 @@ def task_wheel():
     return {
         "actions": [f"{python_exec} -m build -w"],
         "file_dep": [f"{podir}/ru/LC_MESSAGES/{domain}.mo"],
-        "targets": [f"dist/{domain}-{version}-py3-none-any.whl"]
     }
 
 
@@ -46,7 +48,6 @@ def task_sdist():
     return {
         "actions": [f"{python_exec} -m build -s"],
         "file_dep": [f"{podir}/ru/LC_MESSAGES/{domain}.mo"],
-        "targets": [f"dist/{domain}-{version}.tar.gz"]
     }
 
 

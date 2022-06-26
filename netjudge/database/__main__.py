@@ -2,7 +2,7 @@
 import argparse
 from sys import platform
 
-from .functions import *
+from ..database.functions import *
 
 
 def main():

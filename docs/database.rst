@@ -4,7 +4,7 @@ Database
 Models
 ======
 
-.. automodule:: database.models
+.. automodule:: netjudge.database.models
    :members:
    :private-members:
    :special-members:
@@ -12,7 +12,7 @@ Models
 
 Functions
 =========
-.. automodule:: database.functions
+.. automodule:: netjudge.database.functions
    :members:
    :private-members:
    :special-members:

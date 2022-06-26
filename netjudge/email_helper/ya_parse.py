@@ -1,6 +1,6 @@
 """Yandex parser."""
-from email_helper.mailer_configs import load_configs
-from email_helper.table_utilities import create_html_from_database
+from ..email_helper.mailer_configs import load_configs
+from ..email_helper.table_utilities import create_html_from_database
 
 __all__ = ['ya_parse_main']
 

@@ -1,12 +1,12 @@
 """Email main."""
 import argparse
 
-from email_helper.mailer_configs import load_configs
-from email_helper.fac_idle import fac_idle_main
-from email_helper.ya_idle import ya_idle_main
-from email_helper.ya_download import ya_download
-from email_helper.ya_parse import ya_parse_main
-from email_helper.table_utilities import create_html_from_database
+from ..email_helper.mailer_configs import load_configs
+from ..email_helper.fac_idle import fac_idle_main
+from ..email_helper.ya_idle import ya_idle_main
+from ..email_helper.ya_download import ya_download
+from ..email_helper.ya_parse import ya_parse_main
+from ..email_helper.table_utilities import create_html_from_database
 
 arg_parser = argparse.ArgumentParser()
 

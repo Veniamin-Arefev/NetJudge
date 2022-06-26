@@ -4,7 +4,7 @@ Report analyser
 Commandline interface
 =====================
 
-.. automodule:: report_analyser.appcmd
+.. automodule:: netjudge.report_analyser.appcmd
    :members:
    :private-members:
    :special-members:
@@ -12,7 +12,7 @@ Commandline interface
 
 Escape sequence translator
 ==========================
-.. automodule:: report_analyser.translator
+.. automodule:: netjudge.report_analyser.translator
    :members:
    :private-members:
    :special-members:
