@@ -1,0 +1,9 @@
+[
+    {
+       "regex":"Script\\d",
+       "inout":"out",
+       "files":[
+         ""
+       ]
+    }
+]

@@ -1,9 +1,11 @@
 """Commandline functions"""
+from multiprocessing.sharedctypes import Value
 import shlex
 import cmd
 import gettext
 import json
-
+import readline
+import atexit
 from ..database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
@@ -95,6 +97,17 @@ def import_files_from_base():
     GL_IsImported = False
 
 
+def import_instructions_on_startup():
+    """Note, that regex dir is NetJudge/regex_library"""
+    print_green("Importing files from regex_library...")
+    dir_path = __file__.split("appcmd.py")[0] + "../regex_library"
+    json_paths = []
+    for filename in sorted([f for files in os.walk(dir_path) for f in files[2]])[::-1]:
+        if filename.endswith(".json"):
+            json_paths.append(dir_path + "/" + filename)
+    import_instructions_from_json(json_paths)
+
+
 def import_instructions_from_json(json_paths):
     """Add keys to GF_Instr"""
     once = True
@@ -126,7 +139,7 @@ def import_instructions_from_json(json_paths):
 
 def Syntax_correct(source, mode):
     """Parse files & Write score in GL_Result_1"""
-    global GL_IsImported
+    global GL_IsImported, GL_DataBase
     for user_dir, userfiles in GL_Files.items():
         if mode != "quiet":
             print("Participant: '", user_dir, "', his files:")
@@ -154,7 +167,11 @@ def Syntax_correct(source, mode):
 
             else:
                 try:
-                    lines = get_lines(userfile, user_dir.split()[0], user_dir.split()[1])
+                    student = [student for student in GL_DataBase if student['email'] == user_dir.split()[0]][0]
+                    task = [task for task in student['tasks'] if task['name'].startswith(str(userfile[7:9]))][0]
+                    report = [report for report in task['reports'] if report['name'] == userfile][0]
+                    text = re.sub('\r', '', report['text'])
+                    lines = [translate(line) for line in text.split('\n') if line]
                     GL_Files[user_dir][userfile] = lines
                     GL_Result_1[user_dir][userfile] = [1, 1]
                 except Exception:
@@ -252,8 +269,9 @@ class Repl_Regex(cmd.Cmd):
     def do_re(self, arg):
         """Test regex on imported reports in regextest mode.
 
-        Usage: re [REGEX] ['in'/'out'] {[FILE]}
-           or: re [REGEX] ['in'/'out']
+        Usage: re ['in'/'out'] [REGEX] {[FILE]}
+           or: re ['in'/'out'] [REGEX] *
+           or: re ['in'/'out'] [REGEX]
 
         Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
         If FILE is not set, every imported file is checked with this regex!
@@ -265,13 +283,16 @@ class Repl_Regex(cmd.Cmd):
         args = shlex.split(arg, comments=True)
         if len(args) < 2:
             print_red(_("Not enough arguments"))
-        elif args[1] not in ['in', 'out']:
-            print_red(_("Wrong argument {}. Use in/out.").format(args[1]))
+        elif args[0] not in ['in', 'out']:
+            print_red(_("Wrong argument {}. Use in/out.").format(args[0]))
         else:
-            reg = args[0]
-            inout = args[1]
+            reg = args[1]
+            inout = args[0]
             if len(args) >= 3:
-                filenames = args[2:]
+                if args[2] != "*":
+                    filenames = args[2:]
+                else:
+                    filenames = ['']
             else:
                 filenames = ['']
             record = {'regex': reg, 'inout': inout, 'files': filenames}
@@ -285,11 +306,28 @@ class Repl_Regex(cmd.Cmd):
             print_cyan(_("  ==[ CHECK ENDED ]=="))
             RegexPlay_Regex = []
 
+    def complete_re(self, text, allcommand, beg, end):
+        """Re."""
+        rep = {"in", "out"}
+        for username, userfiles in GL_Files.items():
+            for userfile in userfiles.keys():
+                rep.add(userfile)
+        rep = [r for r in rep]
+        return [s for s in [*rep,] if s.startswith(text)]
+
+    def do_q(self, arg):
+        """Easier exit from regex testing mode.
+
+        Usage: q
+        """
+        return True
+
     def do_EOF(self, arg):
         """Easier exit from regex testing mode.
 
         Usage: ^D
         """
+        print("")
         return True
 
     def do_exit(self, arg):
@@ -299,13 +337,25 @@ class Repl_Regex(cmd.Cmd):
         """
         return True
 
-
 class Repl(cmd.Cmd):
     """Main cmd class."""
 
+    import_instructions_on_startup()
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
     print_cyan(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
     lastcmd = ''
+
+    def save_history(histfile):
+        readline.set_history_length(1000)
+        readline.write_history_file(histfile)
+
+    histfile = os.path.join(os.path.expanduser("~"), ".netjudge_history")
+    try:
+        readline.read_history_file(histfile)
+    except FileNotFoundError:
+        with open(histfile, 'w+') as f:
+            pass
+    atexit.register(save_history, histfile)
 
     def emptyline(self):
         """Override: Called when an empty line is entered in response to the prompt."""
@@ -313,8 +363,16 @@ class Repl(cmd.Cmd):
             self.lastcmd = ""
             return self.onecmd('\n')
 
-    def do_EOF(self, arg):
+    def do_q(self, arg):
         """Shorter variant of 'exit' command.
+
+        Usage: q
+        """
+        print_exit_message()
+        return True
+
+    def do_EOF(self, arg):
+        """Easier exit from regex testing mode.
 
         Usage: ^D
         """
@@ -359,15 +417,15 @@ class Repl(cmd.Cmd):
                     print(userfile, end="\t ")
                 print("")
 
-    def do_importedinstructions(self, arg):
+    def do_importedregex(self, arg):
         """Print imported instruction files
 
-        Usage: importedinstructions
+        Usage: importedregex
         """
         if not GL_Regex:
-            print_cyan(_("  =[ No instructions imported ]="))
+            print_cyan(_("  =[ No regex imported ]="))
         else:
-            print_cyan(_("  =[ Imported instructions: ]="))
+            print_cyan(_("  =[ Imported regex: ]="))
             for record in GL_Regex:
                 print_regex_record(record)
 
@@ -426,8 +484,9 @@ class Repl(cmd.Cmd):
     def do_addreg(self, arg):
         """Add a single regular expression to collection.
 
-        Usage: addreg [REGEX] ['in'/'out'] {[FILE]}
-           or: addreg [REGEX] ['in'/'out']
+        Usage: re ['in'/'out'] [REGEX] {[FILE]}
+           or: re ['in'/'out'] [REGEX] *
+           or: re ['in'/'out'] [REGEX]
 
         Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
         If FILE is not set, every imported file is checked with this regex!
@@ -437,19 +496,71 @@ class Repl(cmd.Cmd):
         args = shlex.split(arg, comments=True)
         if len(args) < 2:
             print_red(_("Not enough arguments"))
-        elif args[1] not in ['in', 'out']:
-            print_red(_("Wrong argument {}. Use in/out.").format(args[1]))
+        elif args[0] not in ['in', 'out']:
+            print_red(_("Wrong argument {}. Use in/out.").format(args[0]))
         else:
-            reg = args[0]
-            inout = args[1]
+            reg = args[1]
+            inout = args[0]
             if len(args) >= 3:
-                filenames = args[2:]
+                if args[2] != "*":
+                    filenames = args[2:]
+                else:
+                    filenames = ['']
             else:
                 filenames = ['']
             record = {'regex': reg, 'inout': inout, 'files': filenames}
             GL_Regex.append(record)
             print_green(_('Success'))
             print_regex_record(record)
+
+    def complete_addreg(self, text, allcommand, beg, end):
+        """Addreg."""
+        rep = {"in", "out"}
+        for username, userfiles in GL_Files.items():
+            for userfile in userfiles.keys():
+                rep.add(userfile)
+        rep = [r for r in rep]
+        return [s for s in [*rep,] if s.startswith(text)]
+
+    def do_delreg(self, arg):
+        """Del a single regular expression from collection.
+
+        Usage: re ['in'/'out'] [REGEX] {[FILE]}
+           or: re ['in'/'out'] [REGEX] *
+           or: re ['in'/'out'] [REGEX]
+
+        Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
+        If FILE is not set, every imported file is checked with this regex!
+        REGEX and 'in'/'out' parameters must be set!
+        """
+        global GL_Regex
+        args = shlex.split(arg, comments=True)
+        if len(args) < 2:
+            print_red(_("Not enough arguments"))
+        elif args[0] not in ['in', 'out']:
+            print_red(_("Wrong argument {}. Use in/out.").format(args[0]))
+        else:
+            reg = args[1]
+            inout = args[0]
+            if len(args) >= 3:
+                if args[2] != "*":
+                    filenames = args[2:]
+                else:
+                    filenames = ['']
+            else:
+                filenames = ['']
+            record = {'regex': reg, 'inout': inout, 'files': filenames}
+            try:
+                GL_Regex.remove(record)
+                print_green(_('Successive regex deletion'))
+                print_regex_record(record)
+            except ValueError as E:
+                print_red(('No such regex imported, see "importedregex"'))
+
+    def complete_delreg(self, text, allcommand, beg, end):
+        """Delreg."""
+        reg = [reg['inout'] + " " + repr(reg['regex'])[1:-1] + " " + ",".join(reg['files']) for reg in GL_Regex]
+        return [s for s in [*reg,] if s.startswith(text)]
 
     def do_regextest(self, arg):
         """Enter regex mode and test your regex :)
@@ -555,12 +666,19 @@ class Repl(cmd.Cmd):
             print("")
 
     def do_saveres(self, arg):
-        """Save results. If NetJudge is called with DATABASE argument, there is no need to specify arguments
-        contrariwise, if it is called with DIR or CMD argument, you must write output file for results.
+        """Save results. If NetJudge is called with DATABASE argument, you can save results in database,
+        then run command with no argument or with DATABASE in the end, contrariwise, if you want to save
+        results in json file, you must write output file for results.
+
         Usage: saveres {[FILE]}
+           or: saveres DATABASE
+           or: saveres
         """
         global GL_Result_1, GL_Result_2, GL_Source, GL_DataBase
-        if GL_Source == "database":
+        args = shlex.split(arg, comments=True)
+        if len(args) > 1:
+            print_red(_("Wrong number of arguments"))
+        elif (GL_Source == "database") and (len(args) == 0 or args[0] == "DATABASE"):
             session = session_factory()
             for user in GL_DataBase:
                 for task in user['tasks']:
@@ -577,15 +695,11 @@ class Repl(cmd.Cmd):
                         session.commit()
             session.close()
         else:
-            args = shlex.split(arg, comments=True)
-            if len(args) not in [1]:
-                print_red(_("Wrong number of arguments"))
+            try:
+                with open(args[0], 'w') as f:
+                    GL_Result_2["participant name"]["report name"] = ["current grade", "maximum grade"]
+                    json.dump(GL_Result_2, f, indent=6)
+            except FileNotFoundError as E:
+                print_red(E)
             else:
-                try:
-                    with open(args[0], 'w') as f:
-                        GL_Result_2["participant name"]["report name"] = ["current grade", "maximum grade"]
-                        json.dump(GL_Result_2, f, indent=6)
-                except FileNotFoundError as E:
-                    print_red(E)
-                else:
-                    print_green(_("Success: Saved results in {}").format(args[0]))
+                print_green(_("Success: Saved results in {}").format(args[0]))

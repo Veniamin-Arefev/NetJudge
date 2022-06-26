@@ -131,6 +131,7 @@ class Report(Base):
             'regex_passed': self.regex_passed,
             'regex_total': self.regex_total,
             'hash': self.hash,
+            'text': self.text,
         }
         return data
 
