@@ -5,6 +5,8 @@ import os.path
 
 __all__ = ['load_configs']
 
+from functools import cache
+
 default_config_file_name = 'mailer.cfg'
 
 
@@ -19,19 +21,16 @@ def create_default_configs_file():
         'email server host': 'imap.yandex.ru',
         'folder': 'INBOX',
     }
-    config['Checker'] = {
-        'Sliding window days': '0',
-        'Sliding window hours': '0',
-        'Sliding window minutes': '0',
-    }
-    config['Output'] = {
-        'Path to directory': '0',
-        'File name': '0',
+    config['Web_server'] = {
+        'hostname': 'localhost',
+        'port': '8080',
+        'super secret cookie': 'LinuxNetwork20XX',
     }
     with open(default_config_file_name, 'w') as configfile:
         config.write(configfile)
 
 
+@cache
 def load_configs(config_file_name: str = default_config_file_name) -> configparser.ConfigParser:
     """Load configs."""
     if os.path.isfile(config_file_name):
