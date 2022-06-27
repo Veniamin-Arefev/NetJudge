@@ -6,7 +6,7 @@ import gettext
 import json
 import readline
 import atexit
-from ..database.functions import *
+from netjudge.database.functions import *
 from collections import defaultdict
 from termcolor import colored, cprint
 

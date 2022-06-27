@@ -1,7 +1,7 @@
 """Database."""
 import argparse
 
-from ..database.functions import *
+from netjudge.database.functions import *
 
 
 def main():

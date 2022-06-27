@@ -10,7 +10,7 @@ class MyServer(BaseHTTPRequestHandler):
 
     def do_GET(self):
         answer = None
-        configs = load_configs('mailer_ya.cfg')
+        configs = load_configs('mailer.cfg')
 
         cookies = {key: value for key, value in
                    map(lambda x: map(lambda y: y.strip(), x.split('=')), self.headers.get('Cookie').split(';'))}
@@ -33,7 +33,7 @@ class MyServer(BaseHTTPRequestHandler):
 
     def do_POST(self):
         answer = None
-        configs = load_configs('mailer_ya.cfg')
+        configs = load_configs('mailer.cfg')
 
         cookies = {key: value for key, value in
                    map(lambda x: map(lambda y: y.strip(), x.split('=')), self.headers.get('Cookie').split(';'))}

@@ -2,37 +2,45 @@
 import datetime
 import imaplib
 import ssl
+import os
 from time import sleep
 
-from ..email_helper.mailer_configs import *
-from ..email_helper.mailer_utilities import connect_to_mailbox
+from netjudge.email_helper.mailer_utilities import get_ya_mailbox
+from netjudge.email_helper.ya_download import ya_download
+from netjudge.email_helper.deadlines import homeworks_names_and_files
 
 __all__ = ['ya_idle_main']
 
 
 def update():
     """Update."""
-    print(f'[{datetime.datetime.now().strftime("%H:%M")}] Update!')
+    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Update!')
     try:
-        from ..email_helper.ya_parse import ya_parse_main
-        ya_parse_main()
+        import netjudge.database
+        from netjudge.database.functions import add_report, rate_reports
+        # path == task_dir/homework_name/email/uid
+        for path in ya_download():
+            for filename in homeworks_names_and_files[path.split(os.sep)[1]]:
+                add_report(path.split(os.sep)[2], path + os.sep + filename)
+        rate_reports(print_info=True)
+        with open('last_update_time', 'w') as file:
+            file.write(datetime.datetime.now().strftime("%d %b %H:%M"))
+
     except BaseException as e:
         print(e)
 
 
 def ya_idle_main():
     """Main function."""
-    ya_configs = load_configs('mailer_ya.cfg')
-
-    ya_mailbox = connect_to_mailbox(ya_configs)
+    ya_mailbox = get_ya_mailbox()
     update()
 
-    print(f'[{datetime.datetime.now().strftime("%H:%M")}] Start IDLE mode')
+    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Start IDLE mode')
 
     while True:
         try:
             responses = ya_mailbox.idle.wait(5 * 60)
-            # print(f'[{datetime.datetime.now().strftime("%H:%M")}] {responses}')
+            # print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] {responses}')
             recent = [item for item in responses if item.endswith(b'RECENT')]
 
             if recent:
@@ -41,15 +49,15 @@ def ya_idle_main():
         except (imaplib.IMAP4.abort, ssl.SSLEOFError):
             try:
                 while True:
-                    print(f'[{datetime.datetime.now().strftime("%H:%M")}] Reconnecting...')
-                    ya_mailbox = connect_to_mailbox(ya_configs)
+                    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting...')
+                    ya_mailbox = get_ya_mailbox()
                     break
             except (ConnectionError):
-                print(f'[{datetime.datetime.now().strftime("%H:%M")}] Reconnecting failed. Timeout 5 minutes')
+                print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
                 sleep(5 * 60)
 
             update()
 
         except KeyboardInterrupt:
-            print(f'[{datetime.datetime.now().strftime("%H:%M")}] Exit IDLE mode')
+            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Exit IDLE mode')
             break

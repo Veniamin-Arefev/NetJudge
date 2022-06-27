@@ -1,29 +1,32 @@
 """Mail utilities."""
-import configparser
 import datetime
 from email.mime.text import MIMEText
 from email.header import decode_header
 from imap_tools import MailBox, AND, OR
 
-__all__ = ['MailerUtilities', 'connect_to_mailbox', 'get_ya_mailbox']
+__all__ = ['MailerUtilities', 'get_ya_mailbox', 'get_fac_mailbox']
 
 from .mailer_configs import load_configs
 
 
-def connect_to_mailbox(configs: configparser.ConfigParser):
-    """Connect to mailbox."""
-    con_mailbox = MailBox(configs['Server']['email server host'])
-    con_mailbox.login(configs['Credentials']['Username'],
-                      configs['Credentials']['Password'],
-                      initial_folder=configs['Server']['folder'])
-
+def get_ya_mailbox():
+    """Get Yandex mailbox."""
+    configs = load_configs('mailer.cfg')
+    con_mailbox = MailBox(configs['Yandex Server']['email server host'])
+    con_mailbox.login(configs['Yandex Credentials']['Username'],
+                      configs['Yandex Credentials']['Password'],
+                      initial_folder=configs['Yandex Server']['folder'])
     return con_mailbox
 
 
-def get_ya_mailbox():
-    """Get Yandex mailbox."""
-    ya_configs = load_configs('mailer_ya.cfg')
-    return connect_to_mailbox(ya_configs)
+def get_fac_mailbox():
+    """Get Fac mailbox."""
+    configs = load_configs('mailer.cfg')
+    con_mailbox = MailBox(configs['Fac Server']['email server host'])
+    con_mailbox.login(configs['Fac Credentials']['Username'],
+                      configs['Fac Credentials']['Password'],
+                      initial_folder=configs['Fac Server']['folder'])
+    return con_mailbox
 
 
 class MailerUtilities:
@@ -54,9 +57,10 @@ class MailerUtilities:
             uids.append(self.get_uids_for_file(file))
         return set.intersection(*uids)
 
-    def get_by_uids(self, uids: list):
+    def get_by_uids(self, uids: list, headers_only=False):
         """Get by uids."""
-        return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True) if len(uids) > 0 else ()
+        return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True, headers_only=headers_only) \
+            if len(uids) > 0 else ()
 
     def get_username_by_email(self, email: str):
         """Get student's name from email."""
@@ -65,7 +69,7 @@ class MailerUtilities:
             name, codec = decode_header(name[:name.index('<')].strip())[0]
             return name.title() if codec is None else name.decode(codec).title()
 
-    def transfer_mail_to_mailbox_and_archive(self, uids, target_mailbox: MailBox,
+    def transfer_mail_to_mailbox_and_archive(self, uids, target_mailbox: MailBox, archive_folder, target_folder,
                                              print_info=False):
         """Transfer and archive mail."""
         if uids == 'all':
@@ -79,10 +83,11 @@ class MailerUtilities:
 
         uids_to_move = []
         for mail in mails:
-            target_mailbox.append(mail, dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
+            target_mailbox.append(mail, target_folder,
+                                  dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
             uids_to_move.append(mail.uid)
-        self.mailbox.move(uids_to_move, 'archived')
+        self.mailbox.move(uids_to_move, archive_folder)
 
         if print_info and len(uids_to_move) > 0:
-            print(f'[{datetime.datetime.now().strftime("%H:%M")}] '
+            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
                   f'A total of {len(uids_to_move)} letters have been moved.')

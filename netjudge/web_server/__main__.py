@@ -10,7 +10,7 @@ super_secret_cookie = None
 
 def main():
     """Main web server function."""
-    configs = load_configs('mailer_ya.cfg')
+    configs = load_configs('mailer.cfg')
 
     httpd = HTTPServer((configs['Web_server']['hostname'], int(configs['Web_server']['port'])), MyServer)
     print(f"Started server on http://{configs['Web_server']['hostname']}:{configs['Web_server']['port']}")

@@ -1,10 +1,10 @@
 """Misc database functions."""
 import os.path
 import csv
-from ..database.models import *
-from ..report_analyser.translator import translate
-from ..email_helper.deadlines import homeworks_names_and_files
-from ..email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
+from netjudge.database.models import *
+from netjudge.report_analyser.translator import translate
+from netjudge.email_helper.deadlines import homeworks_names_and_files
+from netjudge.email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
 
 
 def get_task_name(report_name):
@@ -93,11 +93,12 @@ def add_report(email, report_path):
     session.close()
 
 
-def rate_reports():
+def rate_reports(print_info=False):
     """Gives grade to every report and check plagiary"""
     session = session_factory()
     tasks = session.query(Task)
-    print("Rating reports", end="\r")
+    if print_info:
+        print("Rating reports", end=' ' * 40 + '\r')
     for task in tasks:
 
         """Task is confirmed plagiary"""
@@ -138,7 +139,8 @@ def rate_reports():
             session.commit()
 
     session.close()
-    print("Finished")
+    if print_info:
+        print("Finished", end=' ' * 40 + '\r')
 
 
 def get_report_text(report_name, email=None, name=None):

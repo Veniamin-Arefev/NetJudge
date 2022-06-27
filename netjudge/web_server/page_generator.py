@@ -94,8 +94,11 @@ def get_index_page(is_admin=False):
             elem.string = str(sum([item[1] for item in submitted_tasks.values()]))
             body_tr.append(elem)
 
-        soup.find('h6').string = f'Last updated: {datetime.datetime.now().strftime("%d %b %H:%M")}'. \
-            replace(' ', u'\xa0')
+        try:
+            with open('last_update_time', 'r') as file:
+                soup.find('h6').string = f'Last updated: {file.read()}'.replace(' ', u'\xa0')
+        except BaseException:
+            pass
         session.close()
 
         page = str(soup).replace('&gt;', '>')

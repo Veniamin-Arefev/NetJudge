@@ -43,7 +43,7 @@ def is_tar(btext):
     return is_tar_file
 
 
-def report_fixer(root_path):
+def report_fixer(root_path, print_info=False):
     """Fix report."""
     for file, *tail in traverse(root_path, final=False):
         with open(file, "rb") as f:
@@ -58,7 +58,8 @@ def report_fixer(root_path):
                 content = content.replace(b'\r\n', b'\n')
                 continue
             break
-        print(f"Fixed {file}")
+        if print_info:
+            print(f"Fixed {file}")
         with open(file, "wb") as f:
             f.write(content)
         # print(f"{is_tar(content)} --- {file}")

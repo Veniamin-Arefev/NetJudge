@@ -3,9 +3,9 @@
 import configparser
 import os.path
 
-__all__ = ['load_configs']
-
 from functools import cache
+
+__all__ = ['load_configs']
 
 default_config_file_name = 'mailer.cfg'
 
@@ -13,19 +13,44 @@ default_config_file_name = 'mailer.cfg'
 def create_default_configs_file():
     """Create default configs."""
     config = configparser.ConfigParser()
-    config['Credentials'] = {
+    config['Fac Credentials'] = {
         'Username': 'User',
         'Password': 'Password',
     }
-    config['Server'] = {
-        'email server host': 'imap.yandex.ru',
+    config['Yandex Credentials'] = {
+        'Username': 'User',
+        'Password': 'Password',
+    }
+    config['Fac Server'] = {
+        'email server host': 'imap.cs.msu.ru',
         'folder': 'INBOX',
+        'storage folder': 'LinuxNetwork20XX',
+    }
+    config['Yandex Server'] = {
+        'email server host': 'imap.yandex.ru',
+        'folder': 'LinuxNetwork20XX',
     }
     config['Web_server'] = {
         'hostname': 'localhost',
         'port': '8080',
         'super secret cookie': 'LinuxNetwork20XX',
     }
+    config['Homework names'] = {
+        '1': '01_HardwareAndCommandline',
+        '2': '02_DataLink',
+        '3': '03_BridgeVlan',
+    }
+    config['Homework files'] = {
+        '1': ['report.01.base', 'report.01.clone'],
+        '2': ['report.02.base', 'report.02.clone'],
+        '3': ['report.03.base', 'report.03.clone', 'report.03.bridge'],
+    }
+    config['Homework deadlines'] = {
+        '1': '2022-02-23',
+        '2': '2022-03-02',
+        '3': '2022-03-09',
+    }
+
     with open(default_config_file_name, 'w') as configfile:
         config.write(configfile)
 

@@ -6,8 +6,8 @@ import tarfile
 import re
 import hashlib
 
-from ..database.__init__ import *
-from ..email_helper.deadlines import deadlines as deadlines_dict
+from netjudge.database.__init__ import *
+from netjudge.email_helper.deadlines import deadlines as deadlines_dict
 
 
 class Student(Base):

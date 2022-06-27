@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  1.0\n"
 "Report-Msgid-Bugs-To: a3.okonishnikov@mail.ru\n"
-"POT-Creation-Date: 2022-06-26 01:17+0300\n"
+"POT-Creation-Date: 2022-06-27 04:26+0300\n"
 "PO-Revision-Date: 2022-04-11 18:57+0300\n"
 "Last-Translator: @Uberariy Okonishnikov Ariy <a3.okonishnikov@mail.ru>\n"
 "Language: ru\n"
@@ -24,8 +24,8 @@ msgstr ""
 msgid "Not enough arguments, see '--help'"
 msgstr "Добавить бы ещё аргументов..."
 
-#: netjudge/report_analyser/appcmd.py:60 netjudge/report_analyser/appcmd.py:120
-#: netjudge/report_analyser/appcmd.py:453
+#: netjudge/report_analyser/appcmd.py:60 netjudge/report_analyser/appcmd.py:131
+#: netjudge/report_analyser/appcmd.py:513
 msgid "Success"
 msgstr "Успешно!"
 
@@ -33,11 +33,11 @@ msgstr "Успешно!"
 msgid "No such file or directory"
 msgstr ""
 
-#: netjudge/report_analyser/appcmd.py:115
+#: netjudge/report_analyser/appcmd.py:126
 msgid "Instruction json file contains invalid structures!"
 msgstr "Файл с инструкциями содержит некорректные структуры!"
 
-#: netjudge/report_analyser/appcmd.py:116
+#: netjudge/report_analyser/appcmd.py:127
 msgid ""
 "It must be list: [{'regex': STRING, 'inout': in/out 'files': [STRING, "
 "STRING]}, ..."
@@ -45,11 +45,11 @@ msgstr ""
 "Должен быть список: [{'regex': STRING, 'inout': in/out 'files': [STRING, "
 "STRING]}, ..."
 
-#: netjudge/report_analyser/appcmd.py:178
+#: netjudge/report_analyser/appcmd.py:193
 msgid "Checking participant '{}':"
 msgstr "Проверка участника '{}':"
 
-#: netjudge/report_analyser/appcmd.py:181
+#: netjudge/report_analyser/appcmd.py:196
 msgid ""
 "\n"
 "  Checking file {}:"
@@ -57,40 +57,40 @@ msgstr ""
 "\n"
 "  Проверяем файл {}:"
 
-#: netjudge/report_analyser/appcmd.py:184
+#: netjudge/report_analyser/appcmd.py:199
 msgid "    RE {}: '{}' ({}put)."
 msgstr "    RE {}: '{}' ({}put)."
 
-#: netjudge/report_analyser/appcmd.py:196
+#: netjudge/report_analyser/appcmd.py:211
 msgid "Match {} in line {}:"
 msgstr "Соответствие {} на строке {}:"
 
-#: netjudge/report_analyser/appcmd.py:200
+#: netjudge/report_analyser/appcmd.py:215
 msgid "        {}"
 msgstr "        {}"
 
-#: netjudge/report_analyser/appcmd.py:205
+#: netjudge/report_analyser/appcmd.py:220
 msgid "      No matches in {} lines!"
 msgstr "      Нет соответствий, хотя просмотрели {} строк файла!"
 
-#: netjudge/report_analyser/appcmd.py:216
+#: netjudge/report_analyser/appcmd.py:231
 #, fuzzy
 msgid "  {} {} {}\n"
 msgstr "  {} {} {}"
 
-#: netjudge/report_analyser/appcmd.py:227
+#: netjudge/report_analyser/appcmd.py:242
 msgid " Re: {}"
 msgstr " Re: {}"
 
-#: netjudge/report_analyser/appcmd.py:229
+#: netjudge/report_analyser/appcmd.py:244
 msgid "   Files ({}put):"
 msgstr "   Для файлов ({}put):"
 
-#: netjudge/report_analyser/appcmd.py:233
+#: netjudge/report_analyser/appcmd.py:248
 msgid "   Every imported file ({}put)."
 msgstr "   Для всех файлов ({}put)."
 
-#: netjudge/report_analyser/appcmd.py:239
+#: netjudge/report_analyser/appcmd.py:254
 msgid ""
 "\n"
 " ==[ Exiting! ]=="
@@ -98,108 +98,116 @@ msgstr ""
 "\n"
 " ==[ Исход проверяльщика. ]=="
 
-#: netjudge/report_analyser/appcmd.py:245
+#: netjudge/report_analyser/appcmd.py:260
 #, fuzzy
 msgid "[ RegexTest ]:~$ "
 msgstr "[ ИнетДжа ]:~$ "
 
-#: netjudge/report_analyser/appcmd.py:269
-#: netjudge/report_analyser/appcmd.py:390
-#: netjudge/report_analyser/appcmd.py:404
-#: netjudge/report_analyser/appcmd.py:441
+#: netjudge/report_analyser/appcmd.py:285
+#: netjudge/report_analyser/appcmd.py:446
+#: netjudge/report_analyser/appcmd.py:460
+#: netjudge/report_analyser/appcmd.py:498
+#: netjudge/report_analyser/appcmd.py:539
 msgid "Not enough arguments"
 msgstr "Добавить бы ещё аргументов..."
 
-#: netjudge/report_analyser/appcmd.py:271
-#: netjudge/report_analyser/appcmd.py:443
+#: netjudge/report_analyser/appcmd.py:287
+#: netjudge/report_analyser/appcmd.py:500
+#: netjudge/report_analyser/appcmd.py:541
 msgid "Wrong argument {}. Use in/out."
 msgstr "Неправильный параметр {}. Используйте in/out."
 
-#: netjudge/report_analyser/appcmd.py:281
+#: netjudge/report_analyser/appcmd.py:300
 msgid "Testing regex:"
 msgstr "Тестируем регулярку:"
 
-#: netjudge/report_analyser/appcmd.py:285
+#: netjudge/report_analyser/appcmd.py:304
 msgid "  =[ CHECKING... ]="
 msgstr "  =[ ПРОВЕРЯЕМ... ]="
 
-#: netjudge/report_analyser/appcmd.py:287
-#: netjudge/report_analyser/appcmd.py:533
+#: netjudge/report_analyser/appcmd.py:306
+#: netjudge/report_analyser/appcmd.py:642
 msgid "  ==[ CHECK ENDED ]=="
 msgstr "  ==[ ПРОВЕРКА ОКОНЧЕНА ]=="
 
-#: netjudge/report_analyser/appcmd.py:308
+#: netjudge/report_analyser/appcmd.py:344
 msgid "[ NetJu ]:~$ "
 msgstr "[ ИнетДжа ]:~$ "
 
-#: netjudge/report_analyser/appcmd.py:309
+#: netjudge/report_analyser/appcmd.py:345
 msgid " ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"
 msgstr ""
 " ==[ Добро Пожаловать в ИНЕТ-ДЖАДЖ - Среда проверки задач для библиотеки "
 "iproute2! ]==\n"
 
-#: netjudge/report_analyser/appcmd.py:347
+#: netjudge/report_analyser/appcmd.py:403
 msgid " ==[ All progress is reset!! ]==\n"
 msgstr " ==[ Весь прогресс работы сброшен!! ]==\n"
 
-#: netjudge/report_analyser/appcmd.py:355
+#: netjudge/report_analyser/appcmd.py:411
 msgid "  =[ No reports imported ]="
 msgstr "  =[ Отчёты в систему не добавлены ]="
 
-#: netjudge/report_analyser/appcmd.py:357
+#: netjudge/report_analyser/appcmd.py:413
 msgid "  =[ Imported reports: ]="
 msgstr "  =[ Добавленные отчёты: ]="
 
-#: netjudge/report_analyser/appcmd.py:359
+#: netjudge/report_analyser/appcmd.py:415
 msgid ""
 "Participant: {} His files:\n"
 "\t"
 msgstr ""
 
-#: netjudge/report_analyser/appcmd.py:370
-msgid "  =[ No instructions imported ]="
-msgstr "  =[ Инструкций в систему не добавлено ]="
+#: netjudge/report_analyser/appcmd.py:426
+#, fuzzy
+msgid "  =[ No regex imported ]="
+msgstr "  =[ Отчёты в систему не добавлены ]="
 
-#: netjudge/report_analyser/appcmd.py:372
-msgid "  =[ Imported instructions: ]="
-msgstr "  =[ Добавленные инструкции: ]="
+#: netjudge/report_analyser/appcmd.py:428
+#, fuzzy
+msgid "  =[ Imported regex: ]="
+msgstr "  =[ Добавленные отчёты: ]="
 
-#: netjudge/report_analyser/appcmd.py:418
-#: netjudge/report_analyser/appcmd.py:475
-#: netjudge/report_analyser/appcmd.py:504
+#: netjudge/report_analyser/appcmd.py:474
 #: netjudge/report_analyser/appcmd.py:584
+#: netjudge/report_analyser/appcmd.py:613
+#: netjudge/report_analyser/appcmd.py:680
 #, fuzzy
 msgid "Wrong number of arguments"
 msgstr "Добавить бы ещё аргументов..."
 
-#: netjudge/report_analyser/appcmd.py:426
+#: netjudge/report_analyser/appcmd.py:482
 msgid "Success: Saved REGEXs in {}"
 msgstr "Успех: Сохранили регулярки в {}"
 
-#: netjudge/report_analyser/appcmd.py:461
+#: netjudge/report_analyser/appcmd.py:555
+msgid "Successive regex deletion"
+msgstr ""
+
+#: netjudge/report_analyser/appcmd.py:570
 msgid "  ==[ ENTERING REGEX TESTING MODE: ]=="
 msgstr "  ==[ ПЕРЕХОДИМ В РЕЖИМ ТЕСТИРОВАНИЯ РЕГУЛЯРОК: ]=="
 
-#: netjudge/report_analyser/appcmd.py:463
+#: netjudge/report_analyser/appcmd.py:572
 msgid "  ==[ EXITING REGEX TESTING MODE: ]=="
 msgstr "  ==[ ПОКИДАЕМ РЕЖИМ ТЕСТИРОВАНИЯ РЕГУЛЯРОК: ]=="
 
-#: netjudge/report_analyser/appcmd.py:478
+#: netjudge/report_analyser/appcmd.py:587
 #, fuzzy
 msgid "Wrong argument. Use one of \"quiet\", \"verbose\""
 msgstr ""
 "Неправильный параметр. Используйте один из \"quiet\", \"brief\", "
 "\"verbose\""
 
-#: netjudge/report_analyser/appcmd.py:481
+#: netjudge/report_analyser/appcmd.py:590
 msgid "'{}' mode is set."
 msgstr "Установленный режим: '{}'."
 
-#: netjudge/report_analyser/appcmd.py:508
+#: netjudge/report_analyser/appcmd.py:617
 msgid "Wrong number of steps to be done: {}"
 msgstr "Введено неправильное число шагов проверки: {}"
 
-#: netjudge/report_analyser/appcmd.py:517
+#: netjudge/report_analyser/appcmd.py:626
 #, fuzzy
 msgid ""
 "No report files imported! => No steps would be done!\n"
@@ -208,7 +216,7 @@ msgstr ""
 "Отчётов в системе нет! => Проверки не будет!\n"
 "    Используйте 'addf ДИРЕКТОРИЯ_ОТЧЕТОВ'"
 
-#: netjudge/report_analyser/appcmd.py:521
+#: netjudge/report_analyser/appcmd.py:630
 #, fuzzy
 msgid ""
 "No instructions imported! => Second step is skipped\n"
@@ -217,35 +225,35 @@ msgstr ""
 "Инструкций в системе нет! => Пропускаем третий этап проверки!\n"
 "    Используйте 'addf ФАЙЛ_ИНСТРУКЦИЙ'"
 
-#: netjudge/report_analyser/appcmd.py:522
+#: netjudge/report_analyser/appcmd.py:631
 msgid "Or  'addreg REGEX, FILE1, FILE2...'"
 msgstr "Или  'addreg REGEX, FILE1, FILE2...'"
 
-#: netjudge/report_analyser/appcmd.py:524
+#: netjudge/report_analyser/appcmd.py:633
 msgid "  ==[ CHECK STARTS:  Going through {} steps ]=="
 msgstr "  ==[ НАЧИНАЕТСЯ ПРОВЕРКА:  Нас ожидает {} этапов ]=="
 
-#: netjudge/report_analyser/appcmd.py:526
+#: netjudge/report_analyser/appcmd.py:635
 msgid "  =[ SYNTAX CHECK ]="
 msgstr "  =[ ПРОВЕРКА СИНТАКСИСА ]="
 
-#: netjudge/report_analyser/appcmd.py:530
+#: netjudge/report_analyser/appcmd.py:639
 msgid "  =[ SEMANTIC CHECK ]="
 msgstr "  =[ ПРОВЕРКА СЕМАНТИКИ ]="
 
-#: netjudge/report_analyser/appcmd.py:546
+#: netjudge/report_analyser/appcmd.py:655
 msgid "  ==[ RESULTS ]=="
 msgstr "  ==[ РЕЗУЛЬТАТЫ ]=="
 
-#: netjudge/report_analyser/appcmd.py:549
+#: netjudge/report_analyser/appcmd.py:658
 msgid "Participant '{}' results:\n"
 msgstr "Результаты участника '{}':\n"
 
-#: netjudge/report_analyser/appcmd.py:556
+#: netjudge/report_analyser/appcmd.py:665
 msgid "  {}:\t{}"
 msgstr "  {}:\t{}"
 
-#: netjudge/report_analyser/appcmd.py:593
+#: netjudge/report_analyser/appcmd.py:705
 #, fuzzy
 msgid "Success: Saved results in {}"
 msgstr "Успех: Сохранили регулярки в {}"
@@ -263,4 +271,10 @@ msgstr "Успех: Сохранили регулярки в {}"
 
 #~ msgid "  {} {} {}"
 #~ msgstr "  {} {} {}"
+
+#~ msgid "  =[ No instructions imported ]="
+#~ msgstr "  =[ Инструкций в систему не добавлено ]="
+
+#~ msgid "  =[ Imported instructions: ]="
+#~ msgstr "  =[ Добавленные инструкции: ]="
 
