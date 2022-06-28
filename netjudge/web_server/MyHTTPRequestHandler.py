@@ -16,7 +16,7 @@ class MyServer(BaseHTTPRequestHandler):
                    map(lambda x: map(lambda y: y.strip(), x.split('=')), self.headers.get('Cookie').split(';'))}
 
         is_admin = 'super_secret_cookie' in cookies.keys() and \
-                   cookies['super_secret_cookie'] == configs['Web_server']['super secret cookie']
+                   cookies['super_secret_cookie'] == configs['Web server']['super secret cookie']
         if self.path == '/':
             answer = get_index_page(is_admin)
 
@@ -39,7 +39,7 @@ class MyServer(BaseHTTPRequestHandler):
                    map(lambda x: map(lambda y: y.strip(), x.split('=')), self.headers.get('Cookie').split(';'))}
 
         is_admin = 'super_secret_cookie' in cookies.keys() and \
-                   cookies['super_secret_cookie'] == configs['Web_server']['super secret cookie']
+                   cookies['super_secret_cookie'] == configs['Web server']['super secret cookie']
         if self.path == '/data' and is_admin:
             body = self.rfile.read(int(self.headers['Content-Length']))
 

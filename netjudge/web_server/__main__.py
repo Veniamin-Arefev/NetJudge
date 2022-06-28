@@ -12,8 +12,8 @@ def main():
     """Main web server function."""
     configs = load_configs('mailer.cfg')
 
-    httpd = HTTPServer((configs['Web_server']['hostname'], int(configs['Web_server']['port'])), MyServer)
-    print(f"Started server on http://{configs['Web_server']['hostname']}:{configs['Web_server']['port']}")
+    httpd = HTTPServer((configs['Web server']['hostname'], int(configs['Web server']['port'])), MyServer)
+    print(f"Started server on http://{configs['Web server']['hostname']}:{configs['Web server']['port']}")
 
     try:
         httpd.serve_forever()

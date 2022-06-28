@@ -30,7 +30,7 @@ def create_default_configs_file():
         'email server host': 'imap.yandex.ru',
         'folder': 'LinuxNetwork20XX',
     }
-    config['Web_server'] = {
+    config['Web server'] = {
         'hostname': 'localhost',
         'port': '8080',
         'super secret cookie': 'LinuxNetwork20XX',
