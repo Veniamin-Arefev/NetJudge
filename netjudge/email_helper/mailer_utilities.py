@@ -14,8 +14,12 @@ def get_ya_mailbox():
     configs = load_configs('mailer.cfg')
     con_mailbox = MailBox(configs['Yandex Server']['email server host'])
     con_mailbox.login(configs['Yandex Credentials']['Username'],
-                      configs['Yandex Credentials']['Password'],
-                      initial_folder=configs['Yandex Server']['folder'])
+                      configs['Yandex Credentials']['Password'])
+    try:
+        con_mailbox.folder.create(configs['Yandex Server']['folder'])
+    except Exception:
+        pass
+    con_mailbox.folder.set(configs['Yandex Server']['folder'])
     return con_mailbox
 
 
@@ -24,8 +28,16 @@ def get_fac_mailbox():
     configs = load_configs('mailer.cfg')
     con_mailbox = MailBox(configs['Fac Server']['email server host'])
     con_mailbox.login(configs['Fac Credentials']['Username'],
-                      configs['Fac Credentials']['Password'],
-                      initial_folder=configs['Fac Server']['folder'])
+                      configs['Fac Credentials']['Password'])
+    try:
+        con_mailbox.folder.create(configs['Fac Server']['folder'])
+    except Exception:
+        pass
+    con_mailbox.folder.set(configs['Fac Server']['folder'])
+    try:
+        con_mailbox.folder.create(configs['Fac Server']['storage folder'])
+    except Exception:
+        pass
     return con_mailbox
 
 

@@ -98,7 +98,7 @@ def rate_reports(print_info=False):
     session = session_factory()
     tasks = session.query(Task)
     if print_info:
-        print("Rating reports", end=' ' * 40 + '\r')
+        print("Rating reports")
     for task in tasks:
 
         """Task is confirmed plagiary"""
@@ -140,7 +140,7 @@ def rate_reports(print_info=False):
 
     session.close()
     if print_info:
-        print("Finished", end=' ' * 40 + '\r')
+        print("Finished")
 
 
 def get_report_text(report_name, email=None, name=None):

@@ -23,7 +23,7 @@ def ya_download(download_dir='tasks', print_info=True):
             mailbox = get_ya_mailbox()
             mailer_utils = MailerUtilities(mailbox)
         if print_info:
-            print(f"Current parsing task : {homework_name}", end=' ' * 40 + '\r')
+            print(f"Current parsing task : {homework_name}")
         uids = mailer_utils.get_by_filenames(homework_files)
         submitted[homework_name] = uids
 
@@ -34,7 +34,7 @@ def ya_download(download_dir='tasks', print_info=True):
 
     for homework_name, homeworks_files in homeworks_names_and_files.items():
         if print_info:
-            print(f"Current download task : {homework_name}", end=' ' * 40 + '\r')
+            print(f"Current download task : {homework_name}")
         cur_dir = download_dir + os.sep + homework_name
         if not os.path.isdir(cur_dir):
             os.mkdir(cur_dir)
