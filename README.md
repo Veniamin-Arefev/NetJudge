@@ -41,17 +41,52 @@ Course host may use this project to check how course participants progress solve
 Project interface includes both [**notification table**](https://uneex.veniamin.space/) for course participants, and interactive `command line` for course commander & moderators.
 
 ## **Config files:**
-Current project uses two config file for work. File names is `mailer_fac.cfg` and `mailer_ya.cfg`.
-If you don't have it, you may run any command that interact with mail and create default config file named `mailer.cfg`.
+You must submit correctly filled config file named `mailer.cfg` for programm. It must contain credentials for faculty's and yandex mails, web server properties and homework info(name, files and deadlines for each). Default config file can be created by running any script.
 
 ## **Available scripts after installation:**
- * netjudge-fac_idle - Fetch all mail from faculty mail, redirect it to yandex mail and enter idle
- * netjudge-ya_idle - Fetch all mail from yandex mail, update database and enter idle
- * netjudge-download - Download all letters attachments from yandex mail, also support
- * netjudge-database parse - Parse all attachments and populate database
- * netjudge-database export \<FILENAME\> - Export database info info csv file named <FILENAME>
- * netjudge-ya_parse - Create html(actually php) view of database data
+ * netjudge-fac_idle - Fetches all mail from faculty `folder` from configs, moves them to `storage folder`, also creates copy for yandex `folder`. After that turns idle mode, that repeats process if new mail arrives.
+ * netjudge-ya_idle - Fetches all mail from yandex `folder` from configs, downloads new mail to `tasks` folder, update database with new entries. After that turns idle mode, that repeats process if new mail arrives.
+ * netjudge-download - Download all letters attachments from yandex mailbox
+ * netjudge-web_server - Download all letters attachments from yandex mail, also support
+ * netjudge-database parse - Parse all downloaded files `tasks` folder, then populate database
+ * netjudge-database export \<FILENAME\> - Export database info info csv files named <FILENAME> and regex_<FILENAME>
  * netjudge-report_analyser - Start cmdline for regex selection(examples listed below)
+ 
+## **Common use cases:**
+
+0. netjudge-fac_idle program should be run only in one instance at a time. 
+
+1. We want to start web server, that will automatically update everything if new mail arrives.  We need to start 3 separated consoles in background.
+    ```
+    in first  $ netjudge-fac_idle
+    in second $ netjudge-ya_idle
+    in third  $ netjudge-web_server
+    ```
+2. We want to use report_analyser with fac_idle running somewhere. It means that we want to copy all mail from fac mailbox to yandex mailbox first, then download all mail and update database.
+
+    1. We want to continue receiving updates to out database. We should run in background:
+        ```
+        $ netjudge-ya_idle
+        ```
+        
+    1. We want to download all letters once. We should run:
+        ```
+        $ netjudge-download
+        $ netjudge-database parse
+        ```
+        
+    After creating `data.db` we can run:
+    
+    ```
+    $ netjudge-report_analyser DATABASE
+    ```
+3. We want to use report_analyser without fac_idle running somewhere. It means that we want to copy all mail from fac mailbox to yandex mailbox first.
+We need to run this command in console:
+    ```
+    $ netjudge-fac_idle
+    ```
+
+    Ather it print, that it entered idle mode, we can stop it by pressing ^С. After that we can go to to point 2.
 
 ## **Report analyser usage example:**
 
@@ -72,7 +107,8 @@ netjudge-report_analyser DATABASE
 [ NetJu ]:~$ saveres
 [ NetJu ]:~$ q
 ```
-## Additional possibillities:
+Additional possibillities:
+
 2. Running Net-Judge with one command without database interference:
 ```
 netjudge-report_analyser DIR input_example/ input_example/instruction.json
@@ -109,7 +145,7 @@ netjudge-report_analyser CMD
 
 Python libs/modules:
 - `bs4`, `sqlalchemy`, `imap_tools`, `termcolor`
-- python version >= 3.10
+- python version >= 3.9
 
 ## **Authors:**
 
