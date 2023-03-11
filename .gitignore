@@ -1,5 +1,6 @@
 .idea/
-venv/   
+venv/
+tasks/
 *.cfg
 .doit.db*
 

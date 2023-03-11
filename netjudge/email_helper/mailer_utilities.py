@@ -69,10 +69,10 @@ class MailerUtilities:
             uids.append(self.get_uids_for_file(file))
         return set.intersection(*uids)
 
-    def get_by_uids(self, uids: list, headers_only=False):
+    def get_by_uids(self, uids: list, headers_only=False, mark_seen=False):
         """Get by uids."""
-        return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True, headers_only=headers_only) \
-            if len(uids) > 0 else ()
+        return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True, headers_only=headers_only,
+                                  mark_seen=mark_seen) if len(uids) > 0 else ()
 
     def get_username_by_email(self, email: str):
         """Get student's name from email."""
@@ -103,3 +103,17 @@ class MailerUtilities:
         if print_info and len(uids_to_move) > 0:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
                   f'A total of {len(uids_to_move)} letters have been moved.')
+
+    def transfer_mail_to_mailbox_and_mark_seen(self, target_mailbox: MailBox, target_folder, print_info=False):
+        """Transfer and mark seen."""
+        mails = self.mailbox.fetch(AND(all=True, seen=False), bulk=True, mark_seen=True)
+
+        moved_count = 0
+        for mail in mails:
+            target_mailbox.append(mail, target_folder,
+                                  dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
+            moved_count += 1
+
+        if print_info and moved_count > 0:
+            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
+                  f'A total of {moved_count} letters have been moved.')

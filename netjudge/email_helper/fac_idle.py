@@ -18,10 +18,8 @@ def fac_idle_main():
     ya_mailbox = get_ya_mailbox()
 
     fac_mailer_utils = MailerUtilities(fac_mailbox)
-    fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox,
-                                                          configs['Fac Server']['storage folder'],
-                                                          configs['Yandex Server']['folder'],
-                                                          print_info=True)
+    fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox, configs['Yandex Server']['folder'],
+                                                            print_info=True)
 
     print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Start IDLE mode')
 
@@ -32,10 +30,8 @@ def fac_idle_main():
             recent = [item for item in responses if item.endswith(b'RECENT')]
 
             if recent:
-                fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox,
-                                                                      configs['Fac Server']['storage folder'],
-                                                                      configs['Yandex Server']['folder'],
-                                                                      print_info=True)
+                fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox, configs['Yandex Server']['folder'],
+                                                                        print_info=True)
 
         except (imaplib.IMAP4.abort, ssl.SSLEOFError):
             try:
@@ -45,10 +41,9 @@ def fac_idle_main():
                     ya_mailbox = get_ya_mailbox()
 
                     fac_mailer_utils = MailerUtilities(fac_mailbox)
-                    fac_mailer_utils.transfer_mail_to_mailbox_and_archive('all', ya_mailbox,
-                                                                          configs['Fac Server']['storage folder'],
-                                                                          configs['Yandex Server']['folder'],
-                                                                          print_info=True)
+                    fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox,
+                                                                            configs['Yandex Server']['folder'],
+                                                                            print_info=True)
                     break
             except (ConnectionError):
                 print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
