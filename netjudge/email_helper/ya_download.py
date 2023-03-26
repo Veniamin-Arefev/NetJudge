@@ -17,6 +17,7 @@ def ya_download(download_dir='tasks', print_info=True):
 
     i = 0
     for homework_name, homework_files in homeworks_names_and_files.items():
+        # workaround because yandex blocks
         i += 1
         if i == 3:
             i = 0
@@ -52,5 +53,6 @@ def ya_download(download_dir='tasks', print_info=True):
                     with open(email_path + os.sep + attachment.filename, 'wb') as f:
                         f.write(attachment.payload)
             success_downloaded.append(email_path)
+    print(f"Fixing reports...")
     report_fixer(download_dir)
     return success_downloaded

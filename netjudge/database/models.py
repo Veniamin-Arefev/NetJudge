@@ -51,7 +51,7 @@ class Task(Base):
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    creation_date = Column(DateTime, default=datetime.datetime.fromisoformat('2011-11-11 04:20:33'))
+    creation_date = Column(DateTime, default=datetime.datetime.fromisoformat('2009-05-17 20:08:25'))
     grade = Column(Integer, default=0)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)

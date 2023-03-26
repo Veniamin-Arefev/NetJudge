@@ -5,7 +5,7 @@ from sys import platform
 DOIT_CONFIG = {'default_tasks': ['babel', 'style', 'docstyle', 'docs', 'test', 'wheel', 'sdist']}
 project_dir = "netjudge"
 domain = "netjudge"
-version = "1.2.0"
+version = "1.3.1"
 podir = "netjudge/po"
 python_exec = ''
 

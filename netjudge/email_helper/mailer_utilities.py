@@ -69,7 +69,7 @@ class MailerUtilities:
             uids.append(self.get_uids_for_file(file))
         return set.intersection(*uids)
 
-    def get_by_uids(self, uids: list, headers_only=False, mark_seen=False):
+    def get_by_uids(self, uids: list, headers_only=False, mark_seen=True):
         """Get by uids."""
         return self.mailbox.fetch(AND(uid=",".join(uids)), bulk=True, headers_only=headers_only,
                                   mark_seen=mark_seen) if len(uids) > 0 else ()
