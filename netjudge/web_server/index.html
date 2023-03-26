@@ -6,7 +6,8 @@
     <meta content="width=device-width, initial-scale=1" name="viewport"/>
     <meta content="" name="description"/>
     <title>LinuxNetwork 2022 progress check site</title>
-    <link href="https://raw.githubusercontent.com/Veniamin-Arefev/NetJudge/master/netjudge/web_server/favicon.ico" rel="shortcut icon"/>
+    <link href="https://raw.githubusercontent.com/Veniamin-Arefev/NetJudge/master/netjudge/web_server/favicon.ico"
+          rel="shortcut icon"/>
     <!--Frameworks-->
     <link href="https://timetable.veniamin.space/css/bootstrap.css" rel="stylesheet"/>
     <script crossorigin="anonymous" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
@@ -55,7 +56,7 @@
             filter: invert(100%);
         }
 
-        .night-mode  .bg-purple {
+        .night-mode .bg-purple {
             filter: invert(100%);
         }
 
@@ -90,7 +91,8 @@
         }
 
         .my_fit {
-            height: 80vh; !important;
+            height: 80vh;
+        !important;
         }
     </style>
 </head>
@@ -101,25 +103,43 @@
         <div class="col">
             <textarea id="cookie_textarea" placeholder="Type your cookie here"></textarea>
         </div>
-        <div class="col"><text class="p-2 bg-success">Passed on time</text></div>
-        <div class="col"><text class="p-2 bg-warning">Overdue for a week</text></div>
-        <div class="col"><text class="p-2 bg-danger">Overdue more than a week</text></div>
-        <div class="col"><text class="p-2 bg-primary">Plagiarism</text></div>
-        <div class="col"><text class="p-2 bg-info">Bad archive</text></div>
+        <div class="col">
+            <text class="p-2 bg-success">Passed on time</text>
+        </div>
+        <div class="col">
+            <text class="p-2 bg-warning">Overdue for a week</text>
+        </div>
+        <div class="col">
+            <text class="p-2 bg-danger">Overdue more than a week</text>
+        </div>
+        <div class="col">
+            <text class="p-2 bg-primary">Plagiarism</text>
+        </div>
+        <div class="col">
+            <text class="p-2 bg-info">Bad archive</text>
+        </div>
         <div class="col">
             <button class="btn bg-purple" id="cookie-button" type="button">Set cookie</button>
-            <script>
-                $(function () {
-                    let cookie_textarea = $("#cookie_textarea");
-                    let cookie_button = $("#cookie-button");
-
-                    cookie_button.on("click", function (e) {
-                        document.cookie = "super_secret_cookie=" + cookie_textarea.val() + ";";
-                        window.location.reload();
-                    });
-                });
-            </script>
         </div>
+        <script>
+            $(function () {
+                let cookie_textarea = $("#cookie_textarea");
+                let cookie_button = $("#cookie-button");
+
+                function change_super_secret_cookie(event) {
+                    if (event.which === 13) {
+                        if (!event.repeat) {
+                            document.cookie = "super_secret_cookie=" + cookie_textarea.val() + ";";
+                            window.location.reload();
+                        }
+                        event.preventDefault(); // Prevents the addition of a new line in the text field
+                    }
+                }
+
+                cookie_textarea.on("keydown", change_super_secret_cookie);
+                cookie_button.on("click", change_super_secret_cookie);
+            });
+        </script>
     </div>
     <div class="overflow-scroll my_fit">
         <table class="table table-hover table-striped table-bordered align-middle" id="main_table">

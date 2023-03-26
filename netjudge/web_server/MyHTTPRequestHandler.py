@@ -12,8 +12,11 @@ class MyServer(BaseHTTPRequestHandler):
         answer = None
         configs = load_configs('mailer.cfg')
 
-        cookies = {key: value for key, value in
-                   map(lambda x: map(lambda y: y.strip(), x.split('=', 1)), self.headers.get('Cookie').split(';'))}
+        if self.headers.get('Cookie'):
+            cookies = {key: value for key, value in
+                       map(lambda x: map(lambda y: y.strip(), x.split('=', 1)), self.headers.get('Cookie').split(';'))}
+        else:
+            cookies = {}
 
         is_admin = 'super_secret_cookie' in cookies.keys() and \
                    cookies['super_secret_cookie'] == configs['Web server']['super secret cookie']
