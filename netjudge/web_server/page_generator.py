@@ -1,38 +1,45 @@
 """Utilities for table."""
-import datetime
+import html
 import os
 from bs4 import BeautifulSoup as Soup
 from netjudge.email_helper.deadlines import homeworks_names_and_files
 
 __all__ = ['get_index_page', 'get_data_page']
 
+from netjudge.email_helper.mailer_configs import load_configs
+
 ADMIN_FORM_REPLACEMENT = '''
-    <form action="data" method="POST" target="_blank" id="data_form" hidden>
-        <input id="form_username" name="username" type="text"/>
-        <input id="form_homework_name" name="homework_name" type="text"/>
-        <input name="form_submit" type="submit"/>
-    </form>
-    <script>
-            $(function () {
-                $("tbody > tr > th").on("click", function (e) {
-                    let username = $(e.currentTarget).parent().children()[0].innerText.replace("&nbsp;", " ")
-                    let col_index = $(e.currentTarget).index($(e.currentTarget).innerText);
-                    if (col_index > 1) {
-                        $("#form_username").val(username);
-                        $("#form_homework_name").val($("thead > tr > th")[col_index].innerText);
-                        $("#data_form").trigger("submit");
-                        console.log($("thead > tr > th")[col_index].innerText);
-                        console.log(username);
-                    }
-                });
-            });
-    </script>'''
+<form action="data" method="POST" target="_blank" id="data_form" hidden>
+    <input id="form_username" name="username" type="text"/>
+    <input id="form_homework_name" name="homework_name" type="text"/>
+    <input name="form_submit" type="submit"/>
+</form>
+<script>
+$(function () {
+    $("tbody > tr > th").on("click", function (e) {
+        let username = $(e.currentTarget).parent().children()[0].innerText.replace("&nbsp;", " ")
+        let col_index = $(e.currentTarget).index($(e.currentTarget).innerText);
+        let total_cols = $(e.currentTarget).parent().children().length - 1;
+        // console.log(total_cols);
+        // console.log(col_index);
+        if (col_index > 1 && col_index < total_cols) {
+            $("#form_username").val(username);
+            $("#form_homework_name").val($("thead > tr > th")[col_index].innerText);
+            $("#data_form").trigger("submit");
+            console.log($("thead > tr > th")[col_index].innerText);
+            console.log(username);
+        }
+    });
+});
+</script>'''
 
 
 def get_index_page(is_admin=False):
     """Create html main page."""
     import netjudge.database as database
     from netjudge.database.models import Student, Task
+
+    configs = load_configs('mailer.cfg')
 
     session = database.session_factory()
 
@@ -106,6 +113,7 @@ def get_index_page(is_admin=False):
             page = page.replace('ADMIN_FORM_REPLACEMENT', ADMIN_FORM_REPLACEMENT)
         else:
             page = page.replace('ADMIN_FORM_REPLACEMENT', '')
+        page = page.replace('COURSE_NAME_REPLACEMENT', configs['Web server']['course name'])
         return page
 
 
@@ -116,13 +124,16 @@ def get_data_page(username, homework_name):
 
     output = []
     for file_name in homeworks_names_and_files[homework_name]:
+        report_text = html.escape(get_report_text(name=username, report_name=file_name))
         output.append(
             f"""            
-                    <tr> 
-                        <th>{file_name}</th>
-                        <th><pre>{get_report_text(name=username, report_name=file_name)}
-                        </pre></th>
-                    </tr>""")
+            <tr> 
+                <th>{file_name}</th>
+                <th>
+                    <pre>{report_text}
+                    </pre>
+                </th>
+            </tr>""")
 
     data_table = ''.join(output)
 

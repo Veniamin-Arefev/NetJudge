@@ -8,6 +8,9 @@ import hashlib
 
 from netjudge.database.__init__ import *
 from netjudge.email_helper.deadlines import deadlines as deadlines_dict
+from netjudge.email_helper.mailer_configs import load_configs
+
+_default_datetime = datetime.datetime.fromisoformat('2009-05-17 20:09:00')
 
 
 class Student(Base):
@@ -51,8 +54,8 @@ class Task(Base):
     reports = relationship("Report", back_populates="task")
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    creation_date = Column(DateTime, default=datetime.datetime.fromisoformat('2009-05-17 20:08:25'))
-    grade = Column(Integer, default=0)
+    creation_date = Column(DateTime, default=_default_datetime)
+    grade = Column(Integer)
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
     regex_passed = Column(Integer, default=-1)
@@ -89,8 +92,8 @@ class Report(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)  # report.03.base
     text = Column(Text)
-    creation_date = Column(DateTime)
-    hash = Column(String)
+    creation_date = Column(DateTime, default=_default_datetime)
+    hash = Column(String, default=hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest())
     is_plagiary = Column(Boolean, default=False)
     is_broken = Column(Boolean, default=False)
     grade = Column(Integer)  # 0, 1, 2, 4
@@ -101,22 +104,27 @@ class Report(Base):
         """Initialise report object."""
         self.task = task
         self.name = os.path.basename(file_path)
+        self.creation_date = _default_datetime
         try:
             file = tarfile.open(file_path)
-            self.text = file.extractfile('./OUT.txt').read().decode()
+
             self.creation_date = self.get_report_date(file)
             self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
-        except Exception:
+
+            raw_text = file.extractfile('./OUT.txt').read()
+
             try:
-                file = tarfile.open(file_path)
-                self.text = file.extractfile('./OUT.txt').read().decode('cp1251')
-                self.creation_date = self.get_report_date(file)
-                self.hash = hashlib.md5(file.extractfile('./TIME.txt').read()).hexdigest()
+                self.text = raw_text.decode()
             except Exception:
-                self.text = ""
-                self.creation_date = datetime.datetime.fromisoformat('2011-11-11 04:20:33')
-                self.hash = hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest()
-                self.is_broken = True
+                try:
+                    self.text = raw_text.decode('cp1251')
+                except Exception:
+                    self.text = raw_text.decode(errors="ignore")
+
+        except Exception:
+            self.text = ""
+            self.is_broken = True
+
         self.set_grade()
 
     def json(self):
@@ -145,18 +153,20 @@ class Report(Base):
 
     def set_grade(self):
         """Give report a grade."""
+        configs = load_configs('mailer.cfg')
+
         cur_deadline = self.get_deadline()
         # get offset-naive datetime
         cur_deadline = datetime.datetime.strptime(cur_deadline.strftime('%d-%m-%Y %H:%M:%S'), '%d-%m-%Y %H:%M:%S')
         if self.is_plagiary:
-            self.grade = 0
+            self.grade = int(configs['Rating grades']['plagiarism'])
         else:
             if self.creation_date < cur_deadline:
-                self.grade = 4
+                self.grade = int(configs['Rating grades']['on_time'])
             elif self.creation_date < cur_deadline + datetime.timedelta(7):
-                self.grade = 2
+                self.grade = int(configs['Rating grades']['week'])
             else:
-                self.grade = 1
+                self.grade = int(configs['Rating grades']['fortnight'])
         return self.grade
 
     def get_deadline(self):

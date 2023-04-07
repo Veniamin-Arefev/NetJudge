@@ -34,6 +34,7 @@ def create_default_configs_file():
         'hostname': 'localhost',
         'port': '8080',
         'super secret cookie': 'LinuxNetwork20XX',
+        'course name': 'LinuxNetwork20XX',
     }
     config['Homework names'] = {
         '1': '01_HardwareAndCommandline',
@@ -49,6 +50,13 @@ def create_default_configs_file():
         '1': '2022-02-23',
         '2': '2022-03-02',
         '3': '2022-03-09',
+    }
+    config['Rating grades'] = {
+        'on_time': '4',
+        'week': '2',
+        'fortnight': '1',
+        'bad_archive': '0',
+        'plagiarism': '0',
     }
 
     with open(default_config_file_name, 'w') as configfile:

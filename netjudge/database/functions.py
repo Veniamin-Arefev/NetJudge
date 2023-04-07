@@ -6,6 +6,8 @@ from netjudge.report_analyser.translator import translate
 from netjudge.email_helper.deadlines import homeworks_names_and_files
 from netjudge.email_helper.mailer_utilities import MailerUtilities, get_ya_mailbox
 
+from netjudge.email_helper.mailer_configs import load_configs
+
 
 def get_task_name(report_name):
     """Find task name by one of it's reports"""
@@ -97,16 +99,19 @@ def rate_reports(print_info=False):
     """Gives grade to every report and check plagiary"""
     session = session_factory()
     tasks = session.query(Task)
+
+    configs = load_configs('mailer.cfg')
+
     if print_info:
         print("Rating reports")
     for task in tasks:
 
         """Task is confirmed plagiary"""
         if task.is_plagiary:
-            task.grade = 0
+            task.grade = int(configs['Rating grades']['plagiarism'])
             for report in task.reports:
                 report.is_plagiary = True
-                report.grade = 0
+                report.grade = int(configs['Rating grades']['plagiarism'])
             session.commit()
         else:
             """Check originality"""
@@ -115,10 +120,10 @@ def rate_reports(print_info=False):
                     """Found new plagiary"""
                     for clone in same_reports:
                         clone.task.is_plagiary = True
-                        clone.task.grade = 0
+                        clone.task.grade = int(configs['Rating grades']['plagiarism'])
                         for report in clone.task.reports:
                             report.is_plagiary = True
-                            report.grade = 0
+                            report.grade = int(configs['Rating grades']['plagiarism'])
                     session.commit()
                 else:
                     """Report seems to pe original"""
@@ -135,7 +140,7 @@ def rate_reports(print_info=False):
             session.commit()
 
         if task.is_broken:
-            task.grade = 0
+            task.grade = int(configs['Rating grades']['bad_archive'])
             session.commit()
 
     session.close()
@@ -163,14 +168,12 @@ def get_report_text(report_name, email=None, name=None):
     report = session.query(Report).join(Task).filter(Task.student == student).filter(Report.name == report_name).first()
     if not report or report.is_broken:
         return ''
-    text = re.sub('\r', '', report.text)
-    lines = [translate(line) for line in text.split('\n') if line]
-    text = ''
-    for line in lines:
-        # if len(line[1].strip()) > 0:
-        text += ("in | " if line[0] == 'input' else "out| ") + line[1] + '\n'
+    rep_text = report.text.replace('\r', '')
     session.close()
-    return text
+
+    lines = [translate(line[:1000]) for line in rep_text.split('\n') if line]
+    lines = [("in | " if line[0] == 'input' else "out| ") + line[1] for line in lines]
+    return "\n".join(lines)
 
 
 def get_student_data(email):

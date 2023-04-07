@@ -11,11 +11,11 @@ def translate(code: str) -> (str, str):
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     """Removing color sequences"""
-    code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*(m|H)', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*;\d*([mH])', '', code)
     code = re.sub(r'\x1b\[\d*;\d*;\d*(m\*|H\*)', '', code)
-    code = re.sub(r'\x1b\[\d*;\d*;\d*(m|H)', '', code)
+    code = re.sub(r'\x1b\[\d*;\d*;\d*([mH])', '', code)
     code = re.sub(r'\x1b\[\d*;\d*m\*', '', code)
-    code = re.sub(r'\x1b\[\d*(m|H)', '', code)
+    code = re.sub(r'\x1b\[\d*([mH])', '', code)
     new_line = ''
     digit = ''
     state = 'standard'
@@ -26,7 +26,7 @@ def translate(code: str) -> (str, str):
         else 'output'
 
     if line_type == 'input':
-        code = re.sub(r'\S*\[[\s|\S]*~\]# ', '', code)  # иногда в начале бывают лишние символы
+        code = re.sub(r'\S*\[[\s|\S]*~]# ', '', code)  # иногда в начале бывают лишние символы
         code = re.sub(r'\(reverse-i-search\)`[\s |\S]*\':', '', code)
     for letter in code:
         if state == 'standard':
@@ -69,5 +69,5 @@ def translate(code: str) -> (str, str):
     if new_line and new_line[-1] == '\r':
         new_line = new_line[:-1]
         new_line = re.sub(r'(\s|\S)*\r', '', new_line)  # \r - это еще и возврат каретки
-        new_line = re.sub(r'\[[\s|\S]*~\]\$', '', new_line)
+        new_line = re.sub(r'\[[\s|\S]*~]\$', '', new_line)
     return line_type, new_line.strip()
