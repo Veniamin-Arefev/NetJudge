@@ -1,5 +1,5 @@
 """Web server."""
-from http.server import HTTPServer
+from http.server import ThreadingHTTPServer
 
 from netjudge.email_helper.mailer_configs import load_configs
 
@@ -12,7 +12,7 @@ def main():
     """Main web server function."""
     configs = load_configs('mailer.cfg')
 
-    httpd = HTTPServer((configs['Web server']['hostname'], int(configs['Web server']['port'])), MyServer)
+    httpd = ThreadingHTTPServer((configs['Web server']['hostname'], int(configs['Web server']['port'])), MyServer)
     print(f"Started server on http://{configs['Web server']['hostname']}:{configs['Web server']['port']}")
 
     try:
