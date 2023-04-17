@@ -106,13 +106,16 @@ class MailerUtilities:
 
     def transfer_mail_to_mailbox_and_mark_seen(self, target_mailbox: MailBox, target_folder, print_info=False):
         """Transfer and mark seen."""
-        mails = self.mailbox.fetch(AND(all=True, seen=False), bulk=True, mark_seen=True)
+        mails = self.mailbox.fetch(AND(all=True, seen=False), bulk=True, mark_seen=False)
 
         moved_count = 0
         for mail in mails:
             target_mailbox.append(mail, target_folder,
                                   dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
             moved_count += 1
+
+        # mark mails as seen
+        self.mailbox.fetch(AND(all=True, seen=False), bulk=True, mark_seen=True)
 
         if print_info and moved_count > 0:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '

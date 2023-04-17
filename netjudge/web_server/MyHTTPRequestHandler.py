@@ -5,6 +5,17 @@ from netjudge.email_helper.mailer_configs import load_configs
 from netjudge.web_server.page_generator import get_index_page, get_data_page
 
 
+def check_is_admin(cookies_str: str, super_secret_cookie: str):
+    if cookies_str:
+        cookies = {key: value for key, value in
+                   map(lambda x: map(lambda y: y.strip(), x.split('=', 1)), cookies_str.split(';'))
+                   }
+
+        return 'super_secret_cookie' in cookies.keys() and cookies['super_secret_cookie'] == super_secret_cookie
+
+    return False
+
+
 class MyServer(BaseHTTPRequestHandler):
     super_secret_cookie = None
 
@@ -12,14 +23,8 @@ class MyServer(BaseHTTPRequestHandler):
         answer = None
         configs = load_configs('mailer.cfg')
 
-        if self.headers.get('Cookie'):
-            cookies = {key: value for key, value in
-                       map(lambda x: map(lambda y: y.strip(), x.split('=', 1)), self.headers.get('Cookie').split(';'))}
-        else:
-            cookies = {}
+        is_admin = check_is_admin(self.headers.get('Cookie'), configs['Web server']['super secret cookie'])
 
-        is_admin = 'super_secret_cookie' in cookies.keys() and \
-                   cookies['super_secret_cookie'] == configs['Web server']['super secret cookie']
         if self.path == '/':
             answer = get_index_page(is_admin)
 
@@ -38,11 +43,8 @@ class MyServer(BaseHTTPRequestHandler):
         answer = None
         configs = load_configs('mailer.cfg')
 
-        cookies = {key: value for key, value in
-                   map(lambda x: map(lambda y: y.strip(), x.split('=', 1)), self.headers.get('Cookie').split(';'))}
+        is_admin = check_is_admin(self.headers.get('Cookie'), configs['Web server']['super secret cookie'])
 
-        is_admin = 'super_secret_cookie' in cookies.keys() and \
-                   cookies['super_secret_cookie'] == configs['Web server']['super secret cookie']
         if self.path == '/data' and is_admin:
             body = self.rfile.read(int(self.headers['Content-Length']))
 

@@ -33,30 +33,36 @@ def update():
 def ya_idle_main():
     """Main function."""
     ya_mailbox = get_ya_mailbox()
-    update()
+
+    need_update: bool = True
 
     print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Start IDLE mode')
 
     while True:
         try:
-            responses = ya_mailbox.idle.wait(5 * 60)
-            # print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] {responses}')
-            recent = [item for item in responses if item.endswith(b'RECENT')]
-
-            if recent:
+            if need_update:
                 update()
+
+            responses = ya_mailbox.idle.wait(5 * 60)
+
+            if [item for item in responses if item.endswith(b'RECENT')]:
+                need_update = True
+
 
         except (imaplib.IMAP4.abort, ssl.SSLEOFError):
             try:
                 while True:
-                    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting...')
-                    ya_mailbox = get_ya_mailbox()
+                    while True:
+                        print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting...')
+                        ya_mailbox = get_ya_mailbox()
+                        break
+
+                    need_update = True
+
                     break
             except (ConnectionError):
                 print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
                 sleep(5 * 60)
-
-            update()
 
         except KeyboardInterrupt:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Exit IDLE mode')

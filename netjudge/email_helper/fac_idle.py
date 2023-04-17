@@ -18,20 +18,22 @@ def fac_idle_main():
     ya_mailbox = get_ya_mailbox()
 
     fac_mailer_utils = MailerUtilities(fac_mailbox)
-    fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox, configs['Yandex Server']['folder'],
-                                                            print_info=True)
+
+    need_update: bool = True
 
     print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Start IDLE mode')
 
     while True:
         try:
-            responses = fac_mailbox.idle.wait(5 * 60)
-            # print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] {responses}')
-            recent = [item for item in responses if item.endswith(b'RECENT')]
-
-            if recent:
-                fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox, configs['Yandex Server']['folder'],
+            if need_update:
+                fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox,
+                                                                        configs['Yandex Server']['folder'],
                                                                         print_info=True)
+            responses = fac_mailbox.idle.wait(5 * 60)
+
+            if [item for item in responses if item.endswith(b'RECENT')]:
+                need_update = True
+
 
         except (imaplib.IMAP4.abort, ssl.SSLEOFError):
             try:
@@ -41,9 +43,8 @@ def fac_idle_main():
                     ya_mailbox = get_ya_mailbox()
 
                     fac_mailer_utils = MailerUtilities(fac_mailbox)
-                    fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox,
-                                                                            configs['Yandex Server']['folder'],
-                                                                            print_info=True)
+                    need_update = True
+
                     break
             except (ConnectionError):
                 print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
