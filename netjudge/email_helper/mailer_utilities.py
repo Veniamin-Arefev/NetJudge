@@ -112,10 +112,10 @@ class MailerUtilities:
         for mail in mails:
             target_mailbox.append(mail, target_folder,
                                   dt=datetime.datetime.strptime(mail.date_str, "%a, %d %b %Y %H:%M:%S %z"))
-            moved_count += 1
 
-        # mark mails as seen
-        self.mailbox.fetch(AND(all=True, seen=False), bulk=True, mark_seen=True)
+            # mark mail as seen on fac
+            list(self.mailbox.fetch(AND(uid=mail.uid), mark_seen=True, headers_only=True))
+            moved_count += 1
 
         if print_info and moved_count > 0:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
