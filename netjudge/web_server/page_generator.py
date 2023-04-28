@@ -53,7 +53,7 @@ def get_index_page(is_admin=False):
         thead.append(head_tr := soup.new_tag('tr'))
         # thead content
 
-        mails = [item[0] for item in session.query(Student.email)]
+        mails = sorted([item[0] for item in session.query(Student.email)])
 
         for i in ['Username', 'Email', *homeworks_names_and_files.keys(), 'Total\xa0grade']:
             elem = soup.new_tag('th', attrs={'scope': 'col'})
@@ -64,8 +64,8 @@ def get_index_page(is_admin=False):
             tbody.append(body_tr := soup.new_tag('tr'))
 
             elem = soup.new_tag('th')
-            elem.string = session.query(Student.name).filter(Student.email == cur_email).first()[0].replace(' ',
-                                                                                                            u'\xa0')
+            elem.string = session.query(Student.name) \
+                .filter(Student.email == cur_email).first()[0].replace(' ', u'\xa0')
             body_tr.append(elem)
 
             elem = soup.new_tag('th')
@@ -73,32 +73,38 @@ def get_index_page(is_admin=False):
             elem.string = f'{name[:3]}*@{domain}'
             body_tr.append(elem)
 
-            submitted_tasks = {key: value for key, *value in
-                               session.query(Task.name, Task.creation_date, Task.grade, Task.is_plagiary,
-                                             Task.is_broken).join(Student).filter(Student.email == cur_email)}
+            submitted_tasks: dict[str, Task] = {task.name: task for task in
+                                                session.query(Task.name,
+                                                              Task.creation_date,
+                                                              Task.grade,
+                                                              Task.is_plagiary,
+                                                              Task.is_broken)
+                                                .join(Student).filter(Student.email == cur_email)
+                                                }
 
             for homework_name in homeworks_names_and_files.keys():
-                if homework_name in submitted_tasks.keys():
-                    color = None
-                    if submitted_tasks[homework_name][1] == 4:
+                cur_task = submitted_tasks.get(homework_name, None)
+                if cur_task is not None:
+                    if cur_task.grade == int(configs['Rating grades']['on_time']):
                         color = 'bg-success'
-                    elif submitted_tasks[homework_name][1] == 2:
+                    elif cur_task.grade == int(configs['Rating grades']['week']):
                         color = 'bg-warning'
-                    elif submitted_tasks[homework_name][1] == 1:
+                    elif cur_task.grade == int(configs['Rating grades']['fortnight']):
                         color = 'bg-danger'
-                    elif submitted_tasks[homework_name][2] == 1 \
-                            and submitted_tasks[homework_name][3] == 0:  # not original and not broken
+                    elif cur_task.is_plagiary and not cur_task.is_broken:
+                        # not original and not broken
                         color = 'bg-primary'
                     else:
+                        # broken
                         color = 'bg-info'
                     elem = soup.new_tag('th', attrs={'class': color})
-                    elem.string = submitted_tasks[homework_name][0].strftime("%d\xa0%b\xa0%H:%M")
+                    elem.string = cur_task.creation_date.strftime("%d\xa0%b\xa0%H:%M")
                 else:
                     elem = soup.new_tag('th')
                     elem.string = 'Nope'
                 body_tr.append(elem)
             elem = soup.new_tag('th')
-            elem.string = str(sum([item[1] for item in submitted_tasks.values()]))
+            elem.string = str(sum([task.grade for task in submitted_tasks.values()]))
             body_tr.append(elem)
 
         try:

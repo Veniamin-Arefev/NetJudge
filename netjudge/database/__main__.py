@@ -8,15 +8,14 @@ def main():
     """Main function."""
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('action', type=str, default='parse', choices=['parse', 'export'])
-    arg_parser.add_argument('first_argument', nargs='?', type=str, default='',
-                            help='export_file_name or report_username')
-    arg_parser.add_argument('report_name', nargs='?', type=str, default='')
+    arg_parser.add_argument('--file_name', nargs='?', type=str, default='data', help='Export file name')
+    arg_parser.add_argument('--tasks_dir', nargs='?', type=str, default='tasks')
 
     args = arg_parser.parse_args()
 
     if args.action == "parse":
-        add_all_reports_in_tree(print_info=True)
-        rate_reports()
+        add_all_reports_in_tree(args.tasks_dir, print_info=True)
+        rate_reports(print_info=True)
     elif args.action == "export":
         export_to_csv(args.first_argument)
         export_to_csv_regex("regex_" + args.first_argument)

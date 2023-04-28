@@ -17,22 +17,19 @@ def get_task_name(report_name):
     return tasks[0] if tasks else None
 
 
-def add_all_reports_in_tree(reports_path='tasks', print_info=False):
+def add_all_reports_in_tree(reports_path: str, print_info=False):
     """Store all reports as file tree."""
     for homework_name in os.listdir(reports_path):
         if print_info:
-            print(f"Current importing task : {homework_name}", end="\r")
-        for email in os.listdir(reports_path + os.sep + homework_name):
-            for report_try in os.listdir(reports_path + os.sep + homework_name + os.sep + email):
-                for filename in os.listdir(reports_path + os.sep + homework_name + os.sep +
-                                           email + os.sep + report_try):
+            print(f"Current importing task : {homework_name}")
+
+        # path == task_dir/homework_name/email/uid/<files>
+
+        for email in os.listdir(emails_path := reports_path + os.sep + homework_name):
+            for uid in os.listdir(uids_path := emails_path + os.sep + email):
+                for filename in os.listdir(file_path := uids_path + os.sep + uid):
                     """Check the correctness of the file"""
-                    add_report(email,
-                               reports_path + os.sep +
-                               homework_name + os.sep +
-                               email + os.sep +
-                               report_try + os.sep +
-                               filename)
+                    add_report(email, file_path + os.sep + filename)
 
 
 def add_report(email, report_path):

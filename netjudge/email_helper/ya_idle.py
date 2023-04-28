@@ -18,7 +18,7 @@ def update():
     try:
         import netjudge.database
         from netjudge.database.functions import add_report, rate_reports
-        # path == task_dir/homework_name/email/uid
+        # path == task_dir/homework_name/email/uid/<files>
         for path in ya_download():
             for filename in homeworks_names_and_files[path.split(os.sep)[1]]:
                 add_report(path.split(os.sep)[2], path + os.sep + filename)

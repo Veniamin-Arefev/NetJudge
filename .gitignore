@@ -3,6 +3,8 @@ venv/
 tasks/
 *.cfg
 .doit.db*
+test*.py
+last_update_time
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
