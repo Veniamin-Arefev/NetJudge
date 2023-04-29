@@ -24,9 +24,11 @@ def ya_download(download_dir='tasks', print_info=True):
             mailbox = get_ya_mailbox()
             mailer_utils = MailerUtilities(mailbox)
         if print_info:
-            print(f"Current parsing task : {homework_name}")
+            print(f"Current parsing task : {homework_name=:>30}.", end=" ")
         uids = mailer_utils.get_by_filenames(homework_files)
         submitted[homework_name] = uids
+        if print_info:
+            print(f"Found : {len(uids):5} mails")
 
     if not os.path.isdir(download_dir):
         os.mkdir(download_dir)
@@ -35,7 +37,7 @@ def ya_download(download_dir='tasks', print_info=True):
 
     for homework_name, homeworks_files in homeworks_names_and_files.items():
         if print_info:
-            print(f"Current download task : {homework_name}")
+            print(f"Current downloading task : {homework_name:>30}.")
         cur_dir = download_dir + os.sep + homework_name
         if not os.path.isdir(cur_dir):
             os.mkdir(cur_dir)
@@ -53,6 +55,8 @@ def ya_download(download_dir='tasks', print_info=True):
                     with open(email_path + os.sep + attachment.filename, 'wb') as f:
                         f.write(attachment.payload)
             success_downloaded.append(email_path)
+
+    print(f"Downloaded total of {len(success_downloaded)} files")
     print(f"Fixing reports...")
     report_fixer(download_dir)
     return success_downloaded

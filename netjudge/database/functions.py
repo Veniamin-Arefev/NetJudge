@@ -95,12 +95,13 @@ def add_report(email, report_path):
 def rate_reports(print_info=False):
     """Gives grade to every report and check plagiary"""
     session = session_factory()
-    tasks = session.query(Task)
 
     configs = load_configs('mailer.cfg')
 
     if print_info:
         print("Rating reports")
+
+    tasks = session.query(Task)
     for task in tasks:
 
         """Task is confirmed plagiary"""
