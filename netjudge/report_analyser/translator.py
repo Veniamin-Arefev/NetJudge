@@ -1,6 +1,7 @@
 """REmove escape-sequences from text."""
 import re
 
+max_len = 200
 
 def translate(code: str) -> (str, str):
     """Translates text with bash escape sequences to normal text.
@@ -8,6 +9,8 @@ def translate(code: str) -> (str, str):
     Input: raw shell input.
     Ouput: tuple: (type of line, processed line without control sequences).
     """
+    code = code[:max_len]
+
     code = re.sub('\x07', '', code)  # Звук при ошибке. Не нужен
     code = re.sub(r'(\s|\S)*:\t', '', code)  # Удаление tab-ов
     """Removing color sequences"""

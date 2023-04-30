@@ -27,8 +27,8 @@ def add_all_reports_in_tree(reports_path: str, print_info=False):
 
         for email in os.listdir(emails_path := reports_path + os.sep + homework_name):
             for uid in os.listdir(uids_path := emails_path + os.sep + email):
+                print(f"    {email}/{uid}")
                 for filename in os.listdir(file_path := uids_path + os.sep + uid):
-                    """Check the correctness of the file"""
                     add_report(email, file_path + os.sep + filename)
 
 
@@ -74,14 +74,11 @@ def add_report(email, report_path):
 
             """Replacing older report by new one"""
             session.delete(report)
-            session.commit()
             session.add(new_report)
             session.commit()
         else:
-
             """New report is older"""
-            session.delete(task.reports[-1])
-            session.commit()
+            pass
 
     task.creation_date = min([report.creation_date for report in task.reports])
     if sum([1 for report in task.reports if report.is_broken]):
@@ -169,7 +166,7 @@ def get_report_text(report_name, email=None, name=None):
     rep_text = report.text.replace('\r', '')
     session.close()
 
-    lines = [translate(line[:1000]) for line in rep_text.split('\n') if line]
+    lines = [translate(line) for line in rep_text.split('\n') if line]
     lines = [("in | " if line[0] == 'input' else "out| ") + line[1] for line in lines]
     return "\n".join(lines)
 

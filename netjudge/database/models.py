@@ -87,7 +87,7 @@ class Report(Base):
 
     __tablename__ = 'report'
 
-    task_id = Column(Integer, ForeignKey('task.id', ondelete='CASCADE'), nullable=True)
+    task_id = Column(Integer, ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
     task = relationship("Task", back_populates="reports")
     id = Column(Integer, primary_key=True)
     name = Column(String)  # report.03.base
