@@ -24,7 +24,7 @@ def ya_download(download_dir='tasks', print_info=True):
             mailbox = get_ya_mailbox()
             mailer_utils = MailerUtilities(mailbox)
         if print_info:
-            print(f"Current parsing task : {homework_name=:>30}.", end=" ")
+            print(f"Current parsing task : {homework_name:>30}.", end=" ")
         uids = mailer_utils.get_by_filenames(homework_files)
         submitted[homework_name] = uids
         if print_info:

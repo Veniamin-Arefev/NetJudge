@@ -1,5 +1,4 @@
 """Commandline functions"""
-from multiprocessing.sharedctypes import Value
 import shlex
 import cmd
 import gettext
@@ -17,7 +16,7 @@ _, ngettext = translation.gettext, translation.ngettext
 
 """Cmd colors"""
 print_cyan = lambda x: cprint(x, 'cyan')
-""" For standart system output"""
+""" For standard system output"""
 print_green = lambda x: cprint(x, 'green')
 """ For positive user experience"""
 print_red = lambda x: cprint(x, 'red')
@@ -25,7 +24,7 @@ print_red = lambda x: cprint(x, 'red')
 print_yellow = lambda x: cprint(x, 'yellow')
 """ For undefined user experience"""
 print_blue = lambda x: cprint(x, 'blue')
-""" Standart prompt"""
+""" Standard prompt"""
 print_magenta = lambda x: cprint(x, 'magenta')
 """ Regex prompt"""
 
@@ -313,7 +312,7 @@ class Repl_Regex(cmd.Cmd):
             for userfile in userfiles.keys():
                 rep.add(userfile)
         rep = [r for r in rep]
-        return [s for s in [*rep,] if s.startswith(text)]
+        return [s for s in [*rep, ] if s.startswith(text)]
 
     def do_q(self, arg):
         """Easier exit from regex testing mode.
@@ -337,12 +336,13 @@ class Repl_Regex(cmd.Cmd):
         """
         return True
 
+
 class Repl(cmd.Cmd):
     """Main cmd class."""
 
     import_instructions_on_startup()
     prompt = colored(_("[ NetJu ]:~$ "), 'blue')
-    print_cyan(_(" ==[ Welcome to NET-JUDGE - Check enviroment for iproute2 library! ]==\n"))
+    print_cyan(_(" ==[ Welcome to NET-JUDGE - Check environment for iproute2 library! ]==\n"))
     lastcmd = ''
 
     def save_history(histfile):
@@ -362,14 +362,6 @@ class Repl(cmd.Cmd):
         if self.lastcmd:
             self.lastcmd = ""
             return self.onecmd('\n')
-
-    def do_q(self, arg):
-        """Shorter variant of 'exit' command.
-
-        Usage: q
-        """
-        print_exit_message()
-        return True
 
     def do_EOF(self, arg):
         """Easier exit from regex testing mode.
@@ -484,9 +476,9 @@ class Repl(cmd.Cmd):
     def do_addreg(self, arg):
         """Add a single regular expression to collection.
 
-        Usage: re ['in'/'out'] [REGEX] {[FILE]}
-           or: re ['in'/'out'] [REGEX] *
-           or: re ['in'/'out'] [REGEX]
+        Usage: addreg ['in'/'out'] [REGEX] {[FILE]}
+           or: addreg ['in'/'out'] [REGEX] *
+           or: addreg ['in'/'out'] [REGEX]
 
         Add a REGEX and specify, if 'in'-put or 'out'-put of FILEs is checked.
         If FILE is not set, every imported file is checked with this regex!
@@ -520,7 +512,7 @@ class Repl(cmd.Cmd):
             for userfile in userfiles.keys():
                 rep.add(userfile)
         rep = [r for r in rep]
-        return [s for s in [*rep,] if s.startswith(text)]
+        return [s for s in [*rep, ] if s.startswith(text)]
 
     def do_delreg(self, arg):
         """Del a single regular expression from collection.
@@ -560,7 +552,7 @@ class Repl(cmd.Cmd):
     def complete_delreg(self, text, allcommand, beg, end):
         """Delreg."""
         reg = [reg['inout'] + " " + repr(reg['regex'])[1:-1] + " " + ",".join(reg['files']) for reg in GL_Regex]
-        return [s for s in [*reg,] if s.startswith(text)]
+        return [s for s in [*reg, ] if s.startswith(text)]
 
     def do_regextest(self, arg):
         """Enter regex mode and test your regex :)

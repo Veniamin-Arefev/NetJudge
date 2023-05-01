@@ -1,7 +1,7 @@
 """REmove escape-sequences from text."""
 import re
 
-max_len = 200
+max_len = 300
 
 def translate(code: str) -> (str, str):
     """Translates text with bash escape sequences to normal text.
