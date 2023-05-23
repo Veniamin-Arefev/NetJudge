@@ -5,6 +5,8 @@ import ssl
 import os
 from time import sleep
 
+from netjudge.email_helper.mailer_configs import load_configs
+
 from netjudge.email_helper.mailer_utilities import get_ya_mailbox
 from netjudge.email_helper.ya_download import ya_download
 from netjudge.email_helper.deadlines import homeworks_names_and_files
@@ -32,6 +34,8 @@ def update():
 
 def ya_idle_main():
     """Main function."""
+    configs = load_configs()
+
     ya_mailbox = get_ya_mailbox()
 
     need_update: bool = True
@@ -43,7 +47,7 @@ def ya_idle_main():
             if need_update:
                 update()
 
-            responses = ya_mailbox.idle.wait(5 * 60)
+            responses = ya_mailbox.idle.wait(int(configs['Yandex Server']['timeout time']))
 
             if [item for item in responses if item.endswith(b'RECENT')]:
                 need_update = True
@@ -62,7 +66,7 @@ def ya_idle_main():
                     break
             except (ConnectionError):
                 print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
-                sleep(5 * 60)
+                sleep(int(configs['Yandex Server']['timeout time']))
 
         except KeyboardInterrupt:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Exit IDLE mode')

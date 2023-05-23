@@ -22,11 +22,13 @@ def create_default_configs_file():
         'Password': 'Password',
     }
     config['Fac Server'] = {
+        'timeout time': '600',
         'email server host': 'imap.cs.msu.ru',
         'folder': 'INBOX',
         'storage folder': 'LinuxNetwork20XX',
     }
     config['Yandex Server'] = {
+        'timeout time': '600',
         'email server host': 'imap.yandex.ru',
         'folder': 'LinuxNetwork20XX',
     }

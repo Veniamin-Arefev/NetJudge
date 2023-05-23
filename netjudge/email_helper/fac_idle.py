@@ -29,7 +29,7 @@ def fac_idle_main():
                 fac_mailer_utils.transfer_mail_to_mailbox_and_mark_seen(ya_mailbox,
                                                                         configs['Yandex Server']['folder'],
                                                                         print_info=True)
-            responses = fac_mailbox.idle.wait(5 * 60)
+            responses = fac_mailbox.idle.wait(int(configs['Fac Server']['timeout time']))
 
             if [item for item in responses if item.endswith(b'RECENT')]:
                 need_update = True
@@ -48,7 +48,7 @@ def fac_idle_main():
                     break
             except (ConnectionError):
                 print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
-                sleep(5 * 60)
+                sleep(int(configs['Fac Server']['timeout time']))
 
         except KeyboardInterrupt:
             print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Exit IDLE mode')
