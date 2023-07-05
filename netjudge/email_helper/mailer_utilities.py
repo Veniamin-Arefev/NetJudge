@@ -6,12 +6,15 @@ from imap_tools import MailBox, AND, OR
 
 __all__ = ['MailerUtilities', 'get_ya_mailbox', 'get_fac_mailbox']
 
-from .mailer_configs import load_configs
+from netjudge.common.configs import load_configs
+from netjudge.common.logger import get_logger
+
+my_logger = get_logger(__name__, true_name='mailer_utilities')
 
 
 def get_ya_mailbox():
     """Get Yandex mailbox."""
-    configs = load_configs('mailer.cfg')
+    configs = load_configs()
     con_mailbox = MailBox(configs['Yandex Server']['email server host'])
     con_mailbox.login(configs['Yandex Credentials']['Username'],
                       configs['Yandex Credentials']['Password'])
@@ -25,7 +28,7 @@ def get_ya_mailbox():
 
 def get_fac_mailbox():
     """Get Fac mailbox."""
-    configs = load_configs('mailer.cfg')
+    configs = load_configs()
     con_mailbox = MailBox(configs['Fac Server']['email server host'])
     con_mailbox.login(configs['Fac Credentials']['Username'],
                       configs['Fac Credentials']['Password'])
@@ -101,8 +104,7 @@ class MailerUtilities:
         self.mailbox.move(uids_to_move, archive_folder)
 
         if print_info and len(uids_to_move) > 0:
-            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
-                  f'A total of {len(uids_to_move)} letters have been moved.')
+            my_logger.info(f'A total of {len(uids_to_move)} letters have been moved.')
 
     def transfer_mail_to_mailbox_and_mark_seen(self, target_mailbox: MailBox, target_folder, print_info=False):
         """Transfer and mark seen."""
@@ -118,5 +120,4 @@ class MailerUtilities:
             moved_count += 1
 
         if print_info and moved_count > 0:
-            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] '
-                  f'A total of {moved_count} letters have been moved.')
+            my_logger.info(f'A total of {moved_count} letters have been moved.')

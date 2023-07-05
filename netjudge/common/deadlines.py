@@ -1,7 +1,7 @@
 """Task deadlines and names."""
 from datetime import datetime, timedelta
 from ast import literal_eval
-from netjudge.email_helper.mailer_configs import load_configs
+from netjudge.common.configs import load_configs
 
 __all__ = ['homeworks_names_and_files', 'deadlines']
 

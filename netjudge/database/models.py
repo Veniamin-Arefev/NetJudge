@@ -1,16 +1,21 @@
 """All database models."""
+import os
+
 from sqlalchemy import *
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, DeclarativeBase, Mapped, mapped_column
 import datetime
 import tarfile
 import re
 import hashlib
 
-from netjudge.database.__init__ import *
-from netjudge.email_helper.deadlines import deadlines as deadlines_dict
-from netjudge.email_helper.mailer_configs import load_configs
+from netjudge.common.deadlines import deadlines as deadlines_dict
+from netjudge.common.configs import load_configs
 
 _default_datetime = datetime.datetime.fromisoformat('2009-05-17 20:09:00')
+
+
+class Base(DeclarativeBase):
+    pass
 
 
 class Student(Base):
@@ -18,17 +23,19 @@ class Student(Base):
 
     __tablename__ = 'student'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    email = Column(String)
     tasks = relationship("Task", back_populates="student")
 
-    def __init__(self, name, email):
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String)
+
+    def __init__(self, name, email, **kw: Any):
         """Initialise student object
 
         :param name: Student's name
         :param email: Student's email
         """
+        super().__init__(**kw)
         self.name = name
         self.email = email
 
@@ -49,20 +56,22 @@ class Task(Base):
 
     __tablename__ = 'task'
 
-    student_id = Column(Integer, ForeignKey('student.id', ondelete='CASCADE'), nullable=False)
     student = relationship("Student", back_populates="tasks")
     reports = relationship("Report", back_populates="task")
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    creation_date = Column(DateTime, default=_default_datetime)
-    grade = Column(Integer)
-    is_plagiary = Column(Boolean, default=False)
-    is_broken = Column(Boolean, default=False)
-    regex_passed = Column(Integer, default=-1)
-    regex_total = Column(Integer, default=-1)
 
-    def __init__(self, student, name):
+    student_id: Mapped[int] = mapped_column(ForeignKey("student.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String())
+    creation_date: Mapped[datetime.datetime] = mapped_column(DateTime, default=_default_datetime)
+    grade: Mapped[int] = mapped_column(nullable=True)
+    is_plagiary: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_broken: Mapped[bool] = Column(Boolean, default=False)
+    regex_passed: Mapped[int] = mapped_column(default=-1)
+    regex_total: Mapped[int] = mapped_column(default=-1)
+
+    def __init__(self, student, name, **kw: Any):
         """Initialise task object."""
+        super().__init__(**kw)
         self.student = student
         self.name = name
 
@@ -87,21 +96,24 @@ class Report(Base):
 
     __tablename__ = 'report'
 
-    task_id = Column(Integer, ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
     task = relationship("Task", back_populates="reports")
-    id = Column(Integer, primary_key=True)
-    name = Column(String)  # report.03.base
-    text = Column(Text)
-    creation_date = Column(DateTime, default=_default_datetime)
-    hash = Column(String, default=hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest())
-    is_plagiary = Column(Boolean, default=False)
-    is_broken = Column(Boolean, default=False)
-    grade = Column(Integer)  # 0, 1, 2, 4
-    regex_passed = Column(Integer, default=-1)
-    regex_total = Column(Integer, default=-1)
 
-    def __init__(self, task, file_path):
+    task_id: Mapped[int] = mapped_column(ForeignKey('task.id', ondelete='CASCADE'), nullable=False)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(Text)
+    creation_date: Mapped[datetime.datetime] = mapped_column(DateTime, default=_default_datetime)
+    hash: Mapped[str] = Column(String, default=hashlib.md5(str(datetime.datetime.now()).encode()).hexdigest(), nullable=False)
+    grade: Mapped[int] = mapped_column(nullable=True)
+    is_plagiary: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_broken: Mapped[bool] = Column(Boolean, default=False)
+    regex_passed: Mapped[int] = mapped_column(default=-1)
+    regex_total: Mapped[int] = mapped_column(default=-1)
+
+    def __init__(self, task, file_path, **kw: Any):
         """Initialise report object."""
+        super().__init__(**kw)
         self.task = task
         self.name = os.path.basename(file_path)
         self.creation_date = _default_datetime
@@ -143,7 +155,8 @@ class Report(Base):
         }
         return data
 
-    def get_report_date(self, file):
+    @staticmethod
+    def get_report_date(file):
         """Report creation date."""
         line = file.extractfile('./TIME.txt').read().decode().split('\n')[0]
         time_lines = re.findall(r'START_TIME \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', line)
@@ -153,7 +166,7 @@ class Report(Base):
 
     def set_grade(self):
         """Give report a grade."""
-        configs = load_configs('mailer.cfg')
+        configs = load_configs()
 
         cur_deadline = self.get_deadline()
         # get offset-naive datetime

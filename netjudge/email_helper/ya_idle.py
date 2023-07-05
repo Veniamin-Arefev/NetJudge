@@ -5,18 +5,21 @@ import ssl
 import os
 from time import sleep
 
-from netjudge.email_helper.mailer_configs import load_configs
+from netjudge.common.configs import load_configs
+from netjudge.common.logger import get_logger
+
+my_logger = get_logger(__name__, true_name="ya_idle")
 
 from netjudge.email_helper.mailer_utilities import get_ya_mailbox
 from netjudge.email_helper.ya_download import ya_download
-from netjudge.email_helper.deadlines import homeworks_names_and_files
+from netjudge.common.deadlines import homeworks_names_and_files
 
 __all__ = ['ya_idle_main']
 
 
 def update():
     """Update."""
-    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Update!')
+    my_logger.info("Update!")
     try:
         import netjudge.database
         from netjudge.database.functions import add_report, rate_reports
@@ -29,45 +32,44 @@ def update():
             file.write(datetime.datetime.now().strftime("%d %b %H:%M"))
 
     except BaseException as e:
-        print(e)
+        my_logger.error(e)
 
 
 def ya_idle_main():
     """Main function."""
     configs = load_configs()
 
+    timeout_time = int(configs['Yandex Server']['timeout time'])
+
     ya_mailbox = get_ya_mailbox()
 
     need_update: bool = True
 
-    print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Start IDLE mode')
+    my_logger.info('Start IDLE mode')
 
     while True:
         try:
             if need_update:
                 update()
+                need_update = False
 
-            responses = ya_mailbox.idle.wait(int(configs['Yandex Server']['timeout time']))
+            responses = ya_mailbox.idle.wait(timeout_time)
 
             if [item for item in responses if item.endswith(b'RECENT')]:
                 need_update = True
 
 
         except (imaplib.IMAP4.abort, ssl.SSLEOFError):
-            try:
-                while True:
-                    while True:
-                        print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting...')
-                        ya_mailbox = get_ya_mailbox()
-                        break
-
-                    need_update = True
-
+            need_update = True
+            while True:
+                try:
+                    my_logger.warn('Reconnecting...')
+                    ya_mailbox = get_ya_mailbox()
                     break
-            except (ConnectionError):
-                print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Reconnecting failed. Timeout 5 minutes')
-                sleep(int(configs['Yandex Server']['timeout time']))
+                except (ConnectionError):
+                    my_logger.warn(f'Reconnecting failed. Timeout {timeout_time} seconds')
+                    sleep(timeout_time)
 
         except KeyboardInterrupt:
-            print(f'[{datetime.datetime.now().strftime("%H:%M %d.%m")}] Exit IDLE mode')
+            my_logger.info('Exit IDLE mode')
             break

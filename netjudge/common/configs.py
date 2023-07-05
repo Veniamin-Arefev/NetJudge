@@ -13,9 +13,13 @@ default_config_file_name = 'mailer.cfg'
 def create_default_configs_file():
     """Create default configs."""
     config = configparser.ConfigParser()
+    config['Logging'] = {
+        'console level': 'INFO',
+        'file level': 'DEBUG',
+    }
     config['Fac Credentials'] = {
-        'Username': 'User',
-        'Password': 'Password',
+        'username': 'user',
+        'password': 'password',
     }
     config['Yandex Credentials'] = {
         'Username': 'User',

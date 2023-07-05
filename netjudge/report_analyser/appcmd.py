@@ -671,7 +671,7 @@ class Repl(cmd.Cmd):
         if len(args) > 1:
             print_red(_("Wrong number of arguments"))
         elif (GL_Source == "database") and (len(args) == 0 or args[0] == "DATABASE"):
-            session = session_factory()
+            session = Session(engine)
             for user in GL_DataBase:
                 for task in user['tasks']:
                     database_task = session.query(Task).get(task['id'])

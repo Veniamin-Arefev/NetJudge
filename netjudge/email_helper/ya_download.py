@@ -1,8 +1,12 @@
 """Yandex downloader."""
 import os
+
+from netjudge.common.logger import get_logger
+
+my_logger = get_logger(__name__, true_name='ya_download')
+
 from netjudge.email_helper.mailer_utilities import *
-from netjudge.email_helper.deadlines import *
-from netjudge.email_helper.report_fixer import report_fixer
+from netjudge.common.deadlines import *
 
 __all__ = ['ya_download']
 
@@ -23,12 +27,10 @@ def ya_download(download_dir='tasks', print_info=True):
             i = 0
             mailbox = get_ya_mailbox()
             mailer_utils = MailerUtilities(mailbox)
-        if print_info:
-            print(f"Current parsing task : {homework_name:>30}.", end=" ")
         uids = mailer_utils.get_by_filenames(homework_files)
         submitted[homework_name] = uids
         if print_info:
-            print(f"Found : {len(uids):5} mails")
+            my_logger.info(f"For Task: {homework_name:>30} found {len(uids):5} mails.")
 
     if not os.path.isdir(download_dir):
         os.mkdir(download_dir)
@@ -37,7 +39,7 @@ def ya_download(download_dir='tasks', print_info=True):
 
     for homework_name, homeworks_files in homeworks_names_and_files.items():
         if print_info:
-            print(f"Current downloading task : {homework_name:>30}.")
+            my_logger.info(f"Downloading Task : {homework_name:>30}.")
         cur_dir = download_dir + os.sep + homework_name
         if not os.path.isdir(cur_dir):
             os.mkdir(cur_dir)
@@ -56,7 +58,7 @@ def ya_download(download_dir='tasks', print_info=True):
                         f.write(attachment.payload)
             success_downloaded.append(email_path)
 
-    print(f"Downloaded total of {len(success_downloaded)} files")
-    print(f"Fixing reports...")
-    report_fixer(download_dir)
+    my_logger.info(f"Downloaded total of {len(success_downloaded)} files")
+    # print(f"Fixing reports...")
+    # report_fixer(download_dir)
     return success_downloaded

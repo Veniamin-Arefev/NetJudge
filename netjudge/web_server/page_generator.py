@@ -2,11 +2,15 @@
 import html
 import os
 from bs4 import BeautifulSoup as Soup
-from netjudge.email_helper.deadlines import homeworks_names_and_files
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from netjudge.common.deadlines import homeworks_names_and_files
+from netjudge.common.configs import load_configs
+from netjudge.database.common import Session
+from netjudge.database.models import Student, Task
 
 __all__ = ['get_index_page', 'get_data_page']
-
-from netjudge.email_helper.mailer_configs import load_configs
 
 ADMIN_FORM_REPLACEMENT = '''
 <form action="data" method="POST" target="_blank" id="data_form" hidden>
@@ -36,14 +40,10 @@ $(function () {
 
 def get_index_page(is_admin=False):
     """Create html main page."""
-    import netjudge.database as database
-    from netjudge.database.models import Student, Task
 
-    configs = load_configs('mailer.cfg')
+    configs = load_configs()
 
-    session = database.session_factory()
-
-    with open(os.path.join(os.path.dirname(__file__), 'index.html'), 'r', encoding='utf-8') as in_file:
+    with open(os.path.join(os.path.dirname(__file__), 'index.html'), 'r', encoding='utf-8') as in_file, Session() as session:
         soup = Soup(in_file, features='html.parser')
 
         table = soup.find('table')
@@ -53,7 +53,7 @@ def get_index_page(is_admin=False):
         thead.append(head_tr := soup.new_tag('tr'))
         # thead content
 
-        mails = sorted([item[0] for item in session.query(Student.email)])
+        mails = sorted(session.scalars(select(Student.email)))
 
         for i in ['Username', 'Email', *homeworks_names_and_files.keys(), 'Total\xa0grade']:
             elem = soup.new_tag('th', attrs={'scope': 'col'})
@@ -74,12 +74,7 @@ def get_index_page(is_admin=False):
             body_tr.append(elem)
 
             submitted_tasks: dict[str, Task] = {task.name: task for task in
-                                                session.query(Task.name,
-                                                              Task.creation_date,
-                                                              Task.grade,
-                                                              Task.is_plagiary,
-                                                              Task.is_broken)
-                                                .join(Student).filter(Student.email == cur_email)
+                                                session.scalars(select(Task).join(Student).where(Student.email == cur_email))
                                                 }
 
             for homework_name in homeworks_names_and_files.keys():
@@ -112,7 +107,6 @@ def get_index_page(is_admin=False):
                 soup.find('h6').string = f'Last updated: {file.read()}'.replace(' ', u'\xa0')
         except BaseException:
             pass
-        session.close()
 
         page = str(soup).replace('&gt;', '>')
         if is_admin:
@@ -125,7 +119,6 @@ def get_index_page(is_admin=False):
 
 def get_data_page(username, homework_name):
     """Create html data page."""
-    import netjudge.database
     from netjudge.database.functions import get_report_text
 
     output = []
